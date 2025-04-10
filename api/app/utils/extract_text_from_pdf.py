@@ -10,6 +10,7 @@ def extract_text(path_pdf):
 
 def open_folder(path):
     texts = []
+    path = Path(path)
     for path_pdf in path.glob("*.pdf"):
         text = extract_text(path_pdf)
         texts.append(text)
