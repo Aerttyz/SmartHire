@@ -1,14 +1,9 @@
 from flask import Flask
-from app.extensions import db
-from app.config import Config
-
+from app.routes.resume_nlp_routes import resume_bp
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
-
-    db.init_app(app)
-
+    app.register_blueprint(resume_bp)
     return app
 
 if __name__ == "__main__":
