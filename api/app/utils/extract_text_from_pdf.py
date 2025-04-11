@@ -1,17 +1,33 @@
 import fitz # PyMuPDF
 from pathlib import Path
+from app.exceptions import errors
 
 def extract_text(path_pdf):
-    pdf = fitz.open(path_pdf)
-    text = ""
-    for page in pdf:
-        text += page.get_text()
-    return text
+    try:
+        pdf = fitz.open(path_pdf)
+        text = ""
+        for page in pdf:
+            text += page.get_text()
+        return text
+    except errors.file_not_found as e:
+        raise errors.errosfile_not_found(f"File not found: {path_pdf}") from e
 
 def open_folder(path):
-    texts = []
     path = Path(path)
-    for path_pdf in path.glob("*.pdf"):
-        text = extract_text(path_pdf)
-        texts.append(text)
+
+    if not path.exists():
+        raise errors.path_not_found(f"Path not found: {path}")
+    
+    texts = []
+    pdf_files = list(path.glob("*.pdf"))
+
+    if not pdf_files:
+        raise errors.file_not_found(f"No PDF files found in the directory: {path}")
+
+    for path_pdf in pdf_files: 
+       if path_pdf.is_file():
+            text = extract_text(path_pdf)
+            texts.append(text)
+            
     return texts
+    
