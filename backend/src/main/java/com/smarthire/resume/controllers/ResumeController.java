@@ -18,10 +18,6 @@ public class ResumeController {
     public ResponseEntity<?> analyzeFolder(@RequestBody Map<String, String> requestBody) {
         String path = requestBody.get("path");
 
-        if (path == null || path.isEmpty()) {
-            return ResponseEntity.badRequest().body("Path is required");
-        }
-
         Map<String, Object> result = resumeService.analyzeFolder(path);
         return ResponseEntity.ok(result);
     }
