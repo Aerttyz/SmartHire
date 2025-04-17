@@ -12,16 +12,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class RestExceptionHandler {
 
     @ExceptionHandler(EmptyPathException.class)
-    private ResponseEntity<String> emptyPathHandler(EmptyPathException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Path is required");
+    private ResponseEntity<RestErrorMessage> emptyPathHandler(EmptyPathException ex) {
+        RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(treatedResponse);
     }
     @ExceptionHandler(InvalidPathException.class)
-    private ResponseEntity<String> invalidPathHandler(InvalidPathException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid path");
+    private ResponseEntity<RestErrorMessage> invalidPathHandler(InvalidPathException ex) {
+        RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(treatedResponse);
     }
     @ExceptionHandler(FlaskServiceException.class)
-    private ResponseEntity<String> flaskConnectionHandler(FlaskServiceException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to connect to server");
+    private ResponseEntity<RestErrorMessage> flaskConnectionHandler(FlaskServiceException ex) {
+        RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
     }
 
 }
