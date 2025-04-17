@@ -1,7 +1,7 @@
 package com.smarthire.resume.services;
 
 import com.smarthire.resume.exceptions.EmptyPathException;
-import com.smarthire.resume.exceptions.FlaskServiceException;
+import com.smarthire.resume.exceptions.FlaskConnectionException;
 import com.smarthire.resume.exceptions.InvalidPathException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -37,7 +37,7 @@ public class ResumeService {
         } catch (HttpClientErrorException ex) {
             throw new InvalidPathException();
         } catch (ResourceAccessException ex) {
-            throw new FlaskServiceException();
+            throw new FlaskConnectionException();
         }
     }
 }

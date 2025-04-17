@@ -1,7 +1,7 @@
 package com.smarthire.resume.infra;
 
 import com.smarthire.resume.exceptions.EmptyPathException;
-import com.smarthire.resume.exceptions.FlaskServiceException;
+import com.smarthire.resume.exceptions.FlaskConnectionException;
 import com.smarthire.resume.exceptions.InvalidPathException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +21,8 @@ public class RestExceptionHandler {
         RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(treatedResponse);
     }
-    @ExceptionHandler(FlaskServiceException.class)
-    private ResponseEntity<RestErrorMessage> flaskConnectionHandler(FlaskServiceException ex) {
+    @ExceptionHandler(FlaskConnectionException.class)
+    private ResponseEntity<RestErrorMessage> flaskConnectionHandler(FlaskConnectionException ex) {
         RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
     }
