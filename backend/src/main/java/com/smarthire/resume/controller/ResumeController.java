@@ -1,6 +1,6 @@
-package com.smarthire.resume.controllers;
+package com.smarthire.resume.controller;
 
-import com.smarthire.resume.services.ResumeService;
+import com.smarthire.resume.service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;

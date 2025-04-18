@@ -1,4 +1,4 @@
-package com.smarthire.resume.exceptions;
+package com.smarthire.resume.exception;
 
 public class InvalidPathException extends RuntimeException {
     public InvalidPathException() {
