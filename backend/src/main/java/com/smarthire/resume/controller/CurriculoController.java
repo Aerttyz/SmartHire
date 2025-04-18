@@ -9,7 +9,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/resume")
-public class ResumeController {
+public class CurriculoController {
 
     @Autowired
     private ResumeService resumeService;

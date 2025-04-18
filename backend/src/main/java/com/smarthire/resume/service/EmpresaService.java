@@ -30,8 +30,8 @@ public class EmpresaService {
          return empresaRepository.findAll();
     }
 
-    public void excluir(Empresa empresa) {
-        empresaRepository.save(empresa);
+    public void excluir(String nomeEmpresa) {
+        empresaRepository.deleteByNome(nomeEmpresa);
     }
 
 }

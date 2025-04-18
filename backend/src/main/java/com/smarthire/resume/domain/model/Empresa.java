@@ -18,14 +18,12 @@ public class Empresa {
     @EqualsAndHashCode.Include
     private UUID id;
 
-    private String name;
 
     @EqualsAndHashCode.Include
     private String cnpj;
 
+    private String nome;
     private String email;
-
     private String senha;
-
     private String telefone;
 }
