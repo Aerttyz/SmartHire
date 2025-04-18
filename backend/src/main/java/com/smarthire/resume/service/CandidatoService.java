@@ -31,7 +31,7 @@ public class CandidatoService {
         return candidatoRepository.findAll();
     }
 
-    public void excluir(Candidato candidato) {
-        candidatoRepository.save(candidato);
+    public void excluir(String nomeCandidato) {
+        candidatoRepository.deleteByNome(nomeCandidato);
     }
 }

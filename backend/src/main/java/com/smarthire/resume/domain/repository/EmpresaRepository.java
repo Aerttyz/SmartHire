@@ -18,4 +18,6 @@ public interface EmpresaRepository extends JpaRepository<Empresa, UUID> {
     boolean existsByNome(String nomeEmpresa);
 
     void deleteByNome(String nomeEmpresa);
+
+    Optional<Empresa> findByNome(String nome);
 }

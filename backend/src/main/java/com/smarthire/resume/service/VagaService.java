@@ -6,9 +6,11 @@ import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class VagaService {
 
     private VagaRepository vagaRepository;
@@ -22,8 +24,8 @@ public class VagaService {
         return vagaRepository.findAll();
     }
 
-    public void excluir(Vaga vaga) {
-        vagaRepository.save(vaga);
+    public void excluir(String nomeVaga) {
+        vagaRepository.deleteByNome(nomeVaga);
     }
 
 }

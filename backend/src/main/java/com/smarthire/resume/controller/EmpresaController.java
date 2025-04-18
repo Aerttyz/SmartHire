@@ -33,9 +33,9 @@ public class EmpresaController {
         Caso de uso:
         -   Empresa deseja buscar empresas clientes dentro da plataforma
      */
-    @GetMapping({"/{empresa_id}"})
-    public ResponseEntity<Empresa> buscarEmpresa(@PathVariable Long empresa_id) {
-        Optional<Empresa> empresaOptional = empresaRepository.findById(empresa_id);
+    @GetMapping({"/{nomeEmpresa}"})
+    public ResponseEntity<Empresa> buscarEmpresa(@PathVariable String nomeEmpresa) {
+        Optional<Empresa> empresaOptional = empresaRepository.findByNome(nomeEmpresa);
         if (empresaOptional.isPresent()) {
             return ResponseEntity.ok(empresaOptional.get());
         }

@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 @Service
-public class ResumeService {
+public class CurriculoService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final String flaskUrl = "http://localhost:5000/extract_entities";

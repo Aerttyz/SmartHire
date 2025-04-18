@@ -21,7 +21,7 @@ public class Candidato {
     @EqualsAndHashCode.Include
     private UUID id;
 
-    private String name;
+    private String nome;
 
     private String email;
 

@@ -22,7 +22,7 @@ public class Vaga {
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
 
-    private String name;
+    private String nome;
 
     private boolean isActive;
 }
