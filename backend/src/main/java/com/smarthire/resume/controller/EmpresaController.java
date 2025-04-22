@@ -33,7 +33,7 @@ public class EmpresaController {
         Caso de uso:
         -   Empresa deseja buscar empresas clientes dentro da plataforma
      */
-    @GetMapping({"/{nomeEmpresa}"})
+    @GetMapping({"/empresas/{nomeEmpresa}"})
     public ResponseEntity<Empresa> buscarEmpresa(@PathVariable String nomeEmpresa) {
         Optional<Empresa> empresaOptional = empresaRepository.findByNome(nomeEmpresa);
         if (empresaOptional.isPresent()) {
