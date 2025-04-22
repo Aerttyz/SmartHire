@@ -1,4 +1,4 @@
-package com.smarthire.resume.exceptions;
+package com.smarthire.resume.exception;
 
 public class EmptyPathException extends RuntimeException {
     public EmptyPathException() {

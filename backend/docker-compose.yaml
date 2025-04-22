@@ -1,0 +1,22 @@
+networks:
+  local-net:
+
+services:
+  postgresql:
+    container_name: postgresql
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./files/postgresql:/var/lib/postgresql/data
+    restart: "always"
+    shm_size: "4gb"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    networks:
+      - local-net

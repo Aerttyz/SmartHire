@@ -1,8 +1,8 @@
-package com.smarthire.resume.services;
+package com.smarthire.resume.service;
 
-import com.smarthire.resume.exceptions.EmptyPathException;
-import com.smarthire.resume.exceptions.FlaskConnectionException;
-import com.smarthire.resume.exceptions.InvalidPathException;
+import com.smarthire.resume.exception.EmptyPathException;
+import com.smarthire.resume.exception.FlaskConnectionException;
+import com.smarthire.resume.exception.InvalidPathException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 @Service
-public class ResumeService {
+public class CurriculoService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final String flaskUrl = "http://localhost:5000/extract_entities";

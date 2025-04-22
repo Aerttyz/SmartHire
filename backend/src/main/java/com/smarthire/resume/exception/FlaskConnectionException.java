@@ -1,4 +1,4 @@
-package com.smarthire.resume.exceptions;
+package com.smarthire.resume.exception;
 
 public class FlaskConnectionException extends RuntimeException {
     public FlaskConnectionException() {

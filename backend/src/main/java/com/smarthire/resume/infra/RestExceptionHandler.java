@@ -1,8 +1,8 @@
 package com.smarthire.resume.infra;
 
-import com.smarthire.resume.exceptions.EmptyPathException;
-import com.smarthire.resume.exceptions.FlaskConnectionException;
-import com.smarthire.resume.exceptions.InvalidPathException;
+import com.smarthire.resume.exception.EmptyPathException;
+import com.smarthire.resume.exception.FlaskConnectionException;
+import com.smarthire.resume.exception.InvalidPathException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
