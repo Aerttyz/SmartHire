@@ -6,6 +6,8 @@ import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import jakarta.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 @Service
 public class VagaService {
 
+    @Autowired
     private VagaRepository vagaRepository;
 
     @Transactional
