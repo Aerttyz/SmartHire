@@ -31,10 +31,4 @@ def open_folder(path):
             
     return texts
     
-def clean_text(text, entities):
-    clean_text = text
 
-    for entity in entities:
-        clean_text = clean_text.replace(entity[0], "")
-        
-    return clean_text.strip()
