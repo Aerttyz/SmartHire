@@ -9,3 +9,9 @@ class file_not_found(Exception):
     def __init__(self, message="File not found."):
         self.message = message
         super().__init__(self.message)
+    
+class model_not_found(Exception):
+    """Exception raised when the model is not found."""
+    def __init__(self, message="Model not found."):
+        self.message = message
+        super().__init__(self.message)
