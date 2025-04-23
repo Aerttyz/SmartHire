@@ -26,5 +26,10 @@ public class RestExceptionHandler {
         RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
     }
+    @ExceptionHandler(BusinessRuleException.class)
+        private ResponseEntity<RestErrorMessage> businessRuleHandler(BusinessRuleException ex) {
+            RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(treatedResponse);
+    }
 
 }
