@@ -1,5 +1,6 @@
 package com.smarthire.resume.infra;
 
+import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.EmptyPathException;
 import com.smarthire.resume.exception.FlaskConnectionException;
 import com.smarthire.resume.exception.InvalidPathException;
