@@ -3,6 +3,9 @@ package com.smarthire.resume.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.smarthire.resume.domain.enums.Situacao;
+import com.smarthire.resume.domain.model.Candidato;
+import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.exception.EmptyPathException;
 import com.smarthire.resume.exception.FlaskConnectionException;
 import com.smarthire.resume.exception.InvalidPathException;
@@ -34,6 +37,8 @@ public class CurriculoService {
 
     @Autowired
     private CurriculoRepository curriculoRepository;
+    @Autowired
+    private CandidatoRepository candidatoRepository;
 
     public Map<String, Object> analyzeFolder(String path) {
         if (path == null || path.isEmpty()) {
@@ -119,6 +124,15 @@ public class CurriculoService {
 
             curriculoRepository.save(curriculo);
             curriculosSalvos.add(curriculo);
+            Candidato candidato = new Candidato();
+            candidato.setCurriculo(curriculo);
+            candidato.setNome(curriculo.getNome());
+            candidato.setEmail(curriculo.getEmail());
+            candidato.setTelefone(curriculo.getTelefone());
+            candidato.setSituacao(Situacao.TRIAGEM);
+
+            candidatoRepository.save(candidato);
+
         }
 
         return curriculosSalvos;
