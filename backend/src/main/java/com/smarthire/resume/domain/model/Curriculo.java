@@ -1,12 +1,12 @@
 package com.smarthire.resume.domain.model;
 
-import com.smarthire.resume.domain.enums.Situacao;
-import jakarta.persistence.*;
-import lombok.*;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
+import lombok.*;
+import jakarta.persistence.*;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,8 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "candidato")
-public class Candidato {
+public class Curriculo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,14 +26,15 @@ public class Candidato {
     private String email;
 
     private String telefone;
+    
+    private String experiencia;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "curriculo_id")
-    private Curriculo curriculo;
+    @ElementCollection
+    private List<String> formacaoAcademica = new ArrayList<>();
 
-    @OneToOne
-    private Vaga vaga;
+    @ElementCollection
+    private List<String> habilidades = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
-    private Situacao situacao;
+    @ElementCollection
+    private List<String> idiomas = new ArrayList<>();
 }
