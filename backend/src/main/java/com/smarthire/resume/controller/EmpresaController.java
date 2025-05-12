@@ -4,8 +4,10 @@ import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.service.EmpresaService;
+
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @AllArgsConstructor
 @RestController
@@ -29,17 +37,10 @@ public class EmpresaController {
         return empresaRepository.findAll();
     }
 
-    /*
-        Caso de uso:
-        -   Empresa deseja buscar empresas clientes dentro da plataforma
-     */
-    @GetMapping({"/empresas/{nomeEmpresa}"})
+    @GetMapping({"/{nomeEmpresa}"})
     public ResponseEntity<Empresa> buscarEmpresa(@PathVariable String nomeEmpresa) {
-        Optional<Empresa> empresaOptional = empresaRepository.findByNome(nomeEmpresa);
-        if (empresaOptional.isPresent()) {
-            return ResponseEntity.ok(empresaOptional.get());
-        }
-        return ResponseEntity.notFound().build();
+        Optional<Empresa> empresaOptional = empresaRepository.findByNomeIgnoreCase(nomeEmpresa);
+        return empresaOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -48,6 +49,9 @@ public class EmpresaController {
         return empresaService.salvar(empresa);
     }
 
+    // REFATORAR - SAVIO
+
+    @PutMapping("/{id}")
     public ResponseEntity<Empresa> atualizarEmpresaPorNome(@PathVariable String nomeEmpresa,
                                                     @Valid @RequestBody Empresa empresa) {
         if (!empresaRepository.existsByNome(empresa.getNome())) {
@@ -58,15 +62,13 @@ public class EmpresaController {
         return ResponseEntity.ok(empresa);
     }
 
-    /* Caso de uso
-        - Empresa deseja excluir cadastro
-    */
-    @DeleteMapping
-    public ResponseEntity<Void> removerEmpresa(@PathVariable String nomeEmpresa) {
-        if (!empresaRepository.existsByNome(nomeEmpresa)) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removerEmpresa(@PathVariable UUID id) {
+        Optional<Empresa> empresaOptional = empresaRepository.findById(id);
+        if (empresaOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        empresaService.excluir(nomeEmpresa);
+        empresaService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 

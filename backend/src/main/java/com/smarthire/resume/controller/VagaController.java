@@ -4,8 +4,10 @@ import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.service.VagaService;
+
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 @RestController
@@ -28,10 +31,6 @@ public class VagaController {
         return vagaRepository.findAll();
     }
 
-    /*
-        Caso de uso:
-        -   empresa deseja buscar vagas cadastradas
-     */
     @GetMapping({"/{nomeVaga}"})
     public ResponseEntity<Vaga> buscarVaga(@PathVariable String nomeVaga) {
         Optional<Vaga> vagaOptional = vagaRepository.findByNome(nomeVaga);
@@ -47,6 +46,8 @@ public class VagaController {
         return vagaService.salvar(vaga);
     }
 
+
+    // REFATORAR - SAVIO
     public ResponseEntity<Vaga> atualizarvagaPorNome(@PathVariable String nomeVaga,
                                                                @Valid @RequestBody Vaga vaga) {
         if (!vagaRepository.existsByNome(vaga.getNome())) {
@@ -57,15 +58,14 @@ public class VagaController {
         return ResponseEntity.ok(vaga);
     }
 
-    /* Caso de uso
-        - empresa deseja excluir vaga de seu processo
-    */
-    @DeleteMapping
-    public ResponseEntity<Void> removerVaga(@PathVariable String nomeVaga) {
-        if (!vagaRepository.existsByNome(nomeVaga)) {
+    
+    @DeleteMapping({"/{id}"})
+    public ResponseEntity<Void> removerVaga(@PathVariable UUID id) {
+        Optional<Vaga> vagaOptional = vagaRepository.findById(id);
+        if (vagaOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        vagaService.excluir(nomeVaga);
+        vagaService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 

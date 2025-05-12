@@ -5,8 +5,10 @@ import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.List;
 
 @AllArgsConstructor
@@ -30,8 +32,11 @@ public class EmpresaService {
          return empresaRepository.findAll();
     }
 
-    public void excluir(String nomeEmpresa) {
-        empresaRepository.deleteByNome(nomeEmpresa);
+    @Transactional
+    public void excluir(UUID id) {
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada."));
+        empresaRepository.delete(empresa);
     }
 
 }

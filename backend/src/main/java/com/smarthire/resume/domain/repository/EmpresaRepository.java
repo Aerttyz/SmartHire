@@ -11,13 +11,11 @@ import java.util.UUID;
 public interface EmpresaRepository extends JpaRepository<Empresa, UUID> {
     public Optional<Empresa> findByCnpj(String cnpj);
 
-    Optional<Empresa> findById(UUID empresaId);
+    Optional<Empresa> findById(UUID id);
 
     boolean existsByCnpj(String cnpjEmpresa);
 
     boolean existsByNome(String nomeEmpresa);
 
-    void deleteByNome(String nomeEmpresa);
-
-    Optional<Empresa> findByNome(String nome);
+    Optional<Empresa> findByNomeIgnoreCase(String nome);
 }

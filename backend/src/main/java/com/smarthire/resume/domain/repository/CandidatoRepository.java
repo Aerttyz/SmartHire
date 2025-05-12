@@ -12,7 +12,6 @@ public interface CandidatoRepository extends JpaRepository<Candidato, UUID> {
 
     Optional<Candidato> findByEmail(String email);
     Optional<Candidato> findByNome(String nome);
-    void deleteByNome(String nome);
-
+    Optional<Candidato> findById(UUID id);
     boolean existsByNome(String nomeCandidato);
 }

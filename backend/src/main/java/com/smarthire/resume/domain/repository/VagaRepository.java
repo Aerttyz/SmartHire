@@ -12,5 +12,5 @@ public interface VagaRepository extends JpaRepository<Vaga, UUID> {
 
     Optional<Vaga> findByNome(String nomeVaga);
     boolean existsByNome(String nomeVaga);
-    void deleteByNome(String nomeVaga);
+    Optional<Vaga> findById(UUID id);
 }

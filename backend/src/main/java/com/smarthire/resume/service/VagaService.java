@@ -5,12 +5,14 @@ import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
+
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class VagaService {
@@ -27,8 +29,10 @@ public class VagaService {
         return vagaRepository.findAll();
     }
 
-    public void excluir(String nomeVaga) {
-        vagaRepository.deleteByNome(nomeVaga);
+    public void excluir(UUID id) {
+        Vaga vaga = vagaRepository.findById(id)
+                .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada."));
+        vagaRepository.delete(vaga);
     }
 
 }
