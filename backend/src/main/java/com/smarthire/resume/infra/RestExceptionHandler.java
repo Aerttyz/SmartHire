@@ -4,6 +4,7 @@ import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.EmptyPathException;
 import com.smarthire.resume.exception.FlaskConnectionException;
 import com.smarthire.resume.exception.InvalidPathException;
+import com.smarthire.resume.exception.PersistenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,5 +33,10 @@ public class RestExceptionHandler {
             RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(treatedResponse);
     }
+    @ExceptionHandler(PersistenceException.class) 
+        private ResponseEntity<RestErrorMessage> persistenceHandler(PersistenceException ex) {
+            RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
+        }
 
 }

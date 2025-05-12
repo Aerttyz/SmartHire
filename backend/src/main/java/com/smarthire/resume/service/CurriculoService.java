@@ -11,6 +11,7 @@ import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.EmptyPathException;
 import com.smarthire.resume.exception.FlaskConnectionException;
 import com.smarthire.resume.exception.InvalidPathException;
+import com.smarthire.resume.exception.PersistenceException;
 
 import jakarta.transaction.Transactional;
 
@@ -125,7 +126,9 @@ public class CurriculoService {
                 });
                 curriculo.setExperiencia(responseMap.get("anos_totais"));
             } catch (Exception e) {
+                // impressao da stack trace apenas para desenvolvimento
                 e.printStackTrace(); 
+                throw new PersistenceException("Erro ao salvar currículo");
             }
 
             curriculoRepository.save(curriculo);
