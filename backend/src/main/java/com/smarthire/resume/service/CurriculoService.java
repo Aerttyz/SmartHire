@@ -2,6 +2,7 @@ package com.smarthire.resume.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
@@ -89,7 +90,7 @@ public class CurriculoService {
                     continue;
 
                 String valor = entidade.get(0).trim();
-                String tipo = entidade.get(1).toUpperCase();
+                String tipo = entidade.get(1).toUpperCase(Locale.ROOT);
 
                 switch (tipo) {
                     case "NAME":
