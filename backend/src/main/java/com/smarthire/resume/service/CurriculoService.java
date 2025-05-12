@@ -6,6 +6,7 @@ import java.util.List;
 import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
+import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.EmptyPathException;
 import com.smarthire.resume.exception.FlaskConnectionException;
 import com.smarthire.resume.exception.InvalidPathException;
@@ -108,6 +109,8 @@ public class CurriculoService {
                     case "EDUCATION":
                         curriculo.getFormacaoAcademica().add(valor);
                         break;
+                    default:
+                        throw new BusinessRuleException("Tipo inválido: " + tipo);
                 }
             }
 
