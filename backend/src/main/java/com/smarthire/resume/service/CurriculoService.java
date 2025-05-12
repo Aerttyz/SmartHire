@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
+import com.smarthire.resume.service.CandidatoService;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.EmptyPathException;
@@ -40,6 +41,8 @@ public class CurriculoService {
     private CurriculoRepository curriculoRepository;
     @Autowired
     private CandidatoRepository candidatoRepository;
+    @Autowired
+    private CandidatoService candidatoService;
 
     public Map<String, Object> analyzeFolder(String path) {
         if (path == null || path.isEmpty()) {
@@ -127,14 +130,8 @@ public class CurriculoService {
 
             curriculoRepository.save(curriculo);
             curriculosSalvos.add(curriculo);
-            Candidato candidato = new Candidato();
-            candidato.setCurriculo(curriculo);
-            candidato.setNome(curriculo.getNome());
-            candidato.setEmail(curriculo.getEmail());
-            candidato.setTelefone(curriculo.getTelefone());
-            candidato.setSituacao(Situacao.TRIAGEM);
-
-            candidatoRepository.save(candidato);
+            
+            candidatoService.criarComCurriculo(curriculo);
 
         }
 

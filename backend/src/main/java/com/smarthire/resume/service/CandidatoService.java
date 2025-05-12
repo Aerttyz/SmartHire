@@ -1,7 +1,9 @@
 package com.smarthire.resume.service;
 
+import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.Empresa;
+import com.smarthire.resume.domain.model.Curriculo;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
@@ -33,5 +35,16 @@ public class CandidatoService {
 
     public void excluir(String nomeCandidato) {
         candidatoRepository.deleteByNome(nomeCandidato);
+    }
+
+    public void criarComCurriculo(Curriculo curriculo) {
+        Candidato candidato = new Candidato();
+        candidato.setCurriculo(curriculo);
+        candidato.setNome(curriculo.getNome());
+        candidato.setEmail(curriculo.getEmail());
+        candidato.setTelefone(curriculo.getTelefone());
+        candidato.setSituacao(Situacao.TRIAGEM);
+
+        salvar(candidato);
     }
 }
