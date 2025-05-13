@@ -1,5 +1,7 @@
 package com.smarthire.resume.controller;
 
+import com.smarthire.resume.domain.DTO.VagaDto;
+import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -26,9 +29,13 @@ public class VagaController {
     @Autowired
     private VagaRepository vagaRepository;
 
-    @GetMapping
-    public List<Vaga> listarVagas() {
-        return vagaRepository.findAll();
+   @GetMapping
+    public ResponseEntity<List<VagaRespostaDto>> listarTodas() {
+        List<Vaga> vagas = vagaRepository.findAll();
+        List<VagaRespostaDto> dtos = vagas.stream()
+                .map(vagaService::listar)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping({"/{nomeVaga}"})
@@ -42,8 +49,10 @@ public class VagaController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Vaga adicionarvaga(@Valid @RequestBody Vaga vaga) {
-        return vagaService.salvar(vaga);
+    public ResponseEntity<?> adicionarvaga(@Valid @RequestBody VagaDto vaga) {
+        
+        vagaService.salvar(vaga);
+        return ResponseEntity.ok("Vaga cadastrada com sucesso");
     }
 
 
