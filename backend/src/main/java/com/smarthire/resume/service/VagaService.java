@@ -3,11 +3,9 @@ package com.smarthire.resume.service;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRequisitosDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
-import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.model.VagaRequisitosModel;
-import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
@@ -17,7 +15,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service

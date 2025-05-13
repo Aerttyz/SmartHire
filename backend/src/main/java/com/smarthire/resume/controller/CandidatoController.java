@@ -1,7 +1,9 @@
 package com.smarthire.resume.controller;
 
+import com.smarthire.resume.domain.DTO.CandidatoDto;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
+import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.service.CandidatoService;
 
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -26,10 +29,16 @@ public class CandidatoController {
     private CandidatoService candidatoService;
     @Autowired
     private CandidatoRepository candidatoRepository;
+    @Autowired
+    private VagaRepository vagaRepository;
 
     @GetMapping
-    public List<Candidato> listarCandidatos() {
-        return candidatoRepository.findAll();
+    public ResponseEntity<List<CandidatoDto>> listar() {
+        List<Candidato> candidatos = candidatoRepository.findAll();
+        List<CandidatoDto> dtos = candidatos.stream()
+                .map(candidatoService::listarCandidatos)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping({"/{nomeCandidato}"})
@@ -46,7 +55,16 @@ public class CandidatoController {
     public Candidato adicionarcandidato(@Valid @RequestBody Candidato candidato) {
         return candidatoService.salvar(candidato);
     }
-    
+
+    @PostMapping("/{idCandidato}/vaga/{idVaga}")
+    public ResponseEntity<Void> adicionarCandidatoAVaga(@PathVariable UUID idCandidato, @PathVariable UUID idVaga) {
+        if (!candidatoRepository.existsById(idCandidato) || !vagaRepository.existsById(idVaga)) {
+            return ResponseEntity.notFound().build();
+        }
+        candidatoService.adicionarCandidatoAVaga(idCandidato, idVaga);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping({"/{id}"})
     public ResponseEntity<Void> removerCandidato(@PathVariable UUID id) {
         Optional<Candidato> candidatoOptional = candidatoRepository.findById(id);
