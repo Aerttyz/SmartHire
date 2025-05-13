@@ -114,10 +114,8 @@ public class CurriculoService {
             String responseStr = (String) curriculoData.get("response");
             try {
                 String jsonLimpo = responseStr.replace("```json\n", "").replace("\n```", "");
-                ObjectMapper mapper = new ObjectMapper();
-                Map<String, String> responseMap = mapper.readValue(jsonLimpo, new TypeReference<>() {
-                });
-                curriculo.setExperiencia(responseMap.get("anos_totais"));
+                
+                curriculo.setExperiencia(jsonLimpo);
             } catch (Exception e) {
                 e.printStackTrace(); 
             }

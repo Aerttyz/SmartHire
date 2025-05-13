@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services import resume_nlp_service
+from app.services import resume_nlp_service, compare_to_job_service
 from app.exceptions import errors
 from google.api_core.exceptions import InvalidArgument, PermissionDenied, ResourceExhausted
 
@@ -27,3 +27,13 @@ def extract_entities_route():
         return jsonify({"error": f"Resource exhausted: {e}"}), 503
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+    
+@resume_bp.route('/compare_resumes', methods=['GET'])
+def compare_resumes_route():
+    job_id = request.args.get('vaga_id')
+
+    if not job_id:
+        return jsonify({"error": "vaga_id is required"}), 400
+    
+    candidates = compare_to_job_service.search_candidates_from_jobs_service(job_id)
+    return jsonify({"candidates": candidates}), 200
