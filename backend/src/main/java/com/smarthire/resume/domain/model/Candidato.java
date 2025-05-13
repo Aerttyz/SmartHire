@@ -32,7 +32,8 @@ public class Candidato {
     @JoinColumn(name = "curriculo_id")
     private Curriculo curriculo;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "vaga_id")
     private Vaga vaga;
 
     @Enumerated(EnumType.STRING)

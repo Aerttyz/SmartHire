@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -50,6 +49,10 @@ public class CandidatoService {
         candidatoDto.setNome(candidato.getNome());
         candidatoDto.setEmail(candidato.getEmail());
         candidatoDto.setTelefone(candidato.getTelefone());
+        candidatoDto.setExperiencia(candidato.getCurriculo().getExperiencia());
+        candidatoDto.setFormacaoAcademica(candidato.getCurriculo().getFormacaoAcademica());
+        candidatoDto.setHabilidades(candidato.getCurriculo().getHabilidades());
+        candidatoDto.setIdiomas(candidato.getCurriculo().getIdiomas());
         candidatoDto.setVaga(vagaResumoDto);
 
         return candidatoDto;
