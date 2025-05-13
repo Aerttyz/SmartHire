@@ -2,10 +2,13 @@ package com.smarthire.resume.controller;
 
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
+import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.model.Vaga;
+import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.service.VagaService;
+import com.smarthire.resume.domain.DTO.VagaRequestDTO;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -28,6 +31,8 @@ public class VagaController {
     private VagaService vagaService;
     @Autowired
     private VagaRepository vagaRepository;
+    @Autowired
+    private EmpresaRepository empresaRepository;
 
    @GetMapping
     public ResponseEntity<List<VagaRespostaDto>> listarTodas() {
@@ -49,22 +54,24 @@ public class VagaController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<?> adicionarvaga(@Valid @RequestBody VagaDto vaga) {
-        
-        vagaService.salvar(vaga);
-        return ResponseEntity.ok("Vaga cadastrada com sucesso");
+    public Vaga adicionarvaga(@Valid @RequestBody Vaga vaga) {
+        return vagaService.salvar(vaga);
     }
 
 
-    // REFATORAR - SAVIO
-    public ResponseEntity<Vaga> atualizarvagaPorNome(@PathVariable String nomeVaga,
-                                                               @Valid @RequestBody Vaga vaga) {
-        if (!vagaRepository.existsByNome(vaga.getNome())) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Vaga> atualizarvagaPorId(@PathVariable UUID id,
+                                                               @Valid @RequestBody VagaRequestDTO data) {
+        Optional<Vaga> vagaOptional = vagaRepository.findById(id);
+        if(vagaOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        vaga.setNome(nomeVaga);
+        Empresa empresaVaga = empresaRepository.findById(data.empresaId())
+                .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
 
-        return ResponseEntity.ok(vaga);
+        Vaga vaga = vagaOptional.get();
+        vaga.atualizarCom(data, empresaVaga);
+        return ResponseEntity.ok(vagaService.salvar(vaga));
     }
 
     

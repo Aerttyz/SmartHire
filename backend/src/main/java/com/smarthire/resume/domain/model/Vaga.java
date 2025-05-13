@@ -1,9 +1,10 @@
 package com.smarthire.resume.domain.model;
 
+import com.smarthire.resume.domain.DTO.VagaRequestDTO;
+import java.util.List;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,6 +26,7 @@ public class Vaga {
 
     private String nome;
 
+    private String descricao;
     private boolean isActive;
 
     @OneToOne(mappedBy = "vaga", cascade = CascadeType.ALL)
@@ -32,4 +34,11 @@ public class Vaga {
 
     @OneToMany(mappedBy = "vaga", cascade = CascadeType.ALL)
     private List<Candidato> candidatos;
+
+    public void atualizarCom(VagaRequestDTO data, Empresa empresa) {
+        this.empresa = empresa;
+        this.nome = data.nome();
+        this.descricao = data.descricao();
+        this.isActive = data.isActive();
+    }
 }

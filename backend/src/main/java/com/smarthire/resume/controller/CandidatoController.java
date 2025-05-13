@@ -1,8 +1,14 @@
 package com.smarthire.resume.controller;
 
+import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.DTO.CandidatoDto;
 import com.smarthire.resume.domain.model.Candidato;
+import com.smarthire.resume.domain.model.Curriculo;
+import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
+import com.smarthire.resume.domain.repository.CurriculoRepository;
+import com.smarthire.resume.domain.repository.VagaRepository;
+import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.service.CandidatoService;
@@ -26,11 +32,13 @@ import java.util.stream.Collectors;
 public class CandidatoController {
 
     @Autowired
+    private CurriculoRepository curriculoRepository;
+    @Autowired
+    private VagaRepository vagaRepository;
+    @Autowired
     private CandidatoService candidatoService;
     @Autowired
     private CandidatoRepository candidatoRepository;
-    @Autowired
-    private VagaRepository vagaRepository;
 
     @GetMapping
     public ResponseEntity<List<CandidatoDto>> listar() {
@@ -48,6 +56,23 @@ public class CandidatoController {
             return ResponseEntity.ok(candidatoOptional.get());
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Candidato> atualizarPeloId(@PathVariable UUID id,
+                                                @Valid @RequestBody CandidatoRequestDTO data) {
+        Optional<Candidato> candidatoOptional = candidatoRepository.findById(id);
+        if(candidatoOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Curriculo curriculo = curriculoRepository.findById(data.curriculoId())
+                .orElseThrow(() -> new BusinessRuleException("Currículo não encontrado"));
+        Vaga vaga = vagaRepository.findById(data.vagaId())
+                .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada"));
+        Situacao situacao = Situacao.valueOf(data.situacao());
+        Candidato candidato = candidatoOptional.get();
+        candidato.atualizarCom(data, curriculo, vaga, situacao);
+        return ResponseEntity.ok(candidatoService.salvar(candidato));
     }
 
     @ResponseStatus(HttpStatus.CREATED)

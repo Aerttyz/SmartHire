@@ -1,5 +1,7 @@
 package com.smarthire.resume.service;
 
+import com.smarthire.resume.domain.model.Candidato;
+import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRequisitosDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
@@ -48,6 +50,11 @@ public class VagaService {
         vaga.setRequisitos(requisitos);
 
         vagaRepository.save(vaga);
+    }
+
+    @Transactional
+    public Vaga salvar(Vaga vaga) {
+        return vagaRepository.save(vaga);
     }
 
     public VagaRespostaDto listar(Vaga vaga) {
