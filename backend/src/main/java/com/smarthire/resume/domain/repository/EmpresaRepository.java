@@ -19,5 +19,5 @@ public interface EmpresaRepository extends JpaRepository<Empresa, UUID> {
 
     void deleteByNome(String nomeEmpresa);
 
-    Optional<Empresa> findByNome(String nome);
+    Optional<Empresa> findByNome(String nomeEmpresa);
 }
