@@ -1,10 +1,10 @@
 package com.smarthire.resume.domain.model;
 
 import com.smarthire.resume.domain.enums.Situacao;
+import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -38,4 +38,13 @@ public class Candidato {
 
     @Enumerated(EnumType.STRING)
     private Situacao situacao;
+
+    public void atualizarCom(CandidatoRequestDTO data, Curriculo curriculo, Vaga vaga, Situacao situacao) {
+        this.nome = data.nome();
+        this.email = data.email();
+        this.telefone = data.telefone();
+        this.curriculo = curriculo;
+        this.vaga = vaga;
+        this.situacao = situacao;
+    }
 }

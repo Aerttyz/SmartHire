@@ -1,5 +1,6 @@
 package com.smarthire.resume.domain.model;
 
+import com.smarthire.resume.domain.DTO.EmpresaRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,4 +27,11 @@ public class Empresa {
     private String email;
     private String senha;
     private String telefone;
+
+    public void atualizarCom(EmpresaRequestDTO data) {
+        this.cnpj = data.cnpj();
+        this.nome = data.nome();
+        this.email = data.email();
+        this.telefone = data.telefone();
+    }
 }
