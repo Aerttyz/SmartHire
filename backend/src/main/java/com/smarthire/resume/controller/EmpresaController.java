@@ -52,8 +52,15 @@ public class EmpresaController {
 
     @PutMapping("/{nomeEmpresa}")
     public ResponseEntity<Empresa> atualizarEmpresaPorNome(@PathVariable String nomeEmpresa,
-                                                    @Valid @RequestBody Empresa empresa) {
+                                                           @Valid @RequestBody Empresa empresa) {
         if (!empresaRepository.existsByNome(empresa.getNome())) {
+            return ResponseEntity.notFound().build();
+        }
+        empresa.setNome(nomeEmpresa);
+
+        return ResponseEntity.ok(empresa);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Empresa> atualizarEmpresaPorId(@PathVariable UUID id,
                                                     @Valid @RequestBody EmpresaRequestDTO data) {
