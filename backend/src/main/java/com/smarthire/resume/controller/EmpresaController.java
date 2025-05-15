@@ -51,7 +51,7 @@ public class EmpresaController {
 
     // REFATORAR - SAVIO
 
-    @PutMapping("/{id}")
+    @PutMapping("/{nomeEmpresa}")
     public ResponseEntity<Empresa> atualizarEmpresaPorNome(@PathVariable String nomeEmpresa,
                                                     @Valid @RequestBody Empresa empresa) {
         if (!empresaRepository.existsByNome(empresa.getNome())) {
