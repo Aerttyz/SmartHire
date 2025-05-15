@@ -1,5 +1,9 @@
 import Image from "next/image"
 import Link from "next/link"
+import Owl from "../assets/owl.png"
+import choice from "../assets/right-choice.jpg";
+import latina from "../assets/latina-handshake.jpg"
+import hand from "../assets/handshake-glasses.jpg"
 import { Button } from "@/components/ui/button"
 
 export default function LandingPage() {
@@ -9,7 +13,7 @@ export default function LandingPage() {
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-2">
             <Image
-              src="/placeholder.svg?height=32&width=32"
+              src={Owl}
               alt="SmartHire Logo"
               width={32}
               height={32}
@@ -23,7 +27,7 @@ export default function LandingPage() {
         </div>
       </header>
       <main className="flex-1">
-        <section className="container grid items-center gap-6 pb-8 pt-6 md:grid-cols-2 md:py-10">
+        <section className="container grid items-center gap-6 pb-8 pt-6 md:grid-cols-2 md:py-10 px-10">
           <div className="flex flex-col items-start gap-4">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">SmartHire</h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
@@ -42,10 +46,10 @@ export default function LandingPage() {
           </div>
           <div className="flex justify-center">
             <Image
-              src="/placeholder.svg?height=400&width=400"
+              src={latina}
               alt="SmartHire Platform"
-              width={400}
-              height={400}
+              /* width={400}
+              height={400} */
               className="rounded-lg object-cover"
               priority
             />
@@ -67,8 +71,8 @@ export default function LandingPage() {
           </div>
         </section>
       </main>
-      <footer className="border-t py-6">
-        <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
+      <footer className="py-6 px-10">
+        <div className="container flex flex-col items-center justify-center gap-4 md:flex-row">
           <p className="text-center text-sm text-muted-foreground md:text-left">
             &copy; {new Date().getFullYear()} SmartHire. Todos os direitos reservados.
           </p>

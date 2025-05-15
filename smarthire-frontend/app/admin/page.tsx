@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 
 export default function AdminPage() {
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [empresaBuscada, setEmpresaBuscada] = useState<Empresa | null>(null);
 
   const sidebarItems = [
     { id: "adicionar", label: "Adicionar uma empresa" },
@@ -45,7 +46,18 @@ export default function AdminPage() {
     }
   }
 
-  // GET - Listar (por nome)
+  async function buscarEmpresa(data: any) {
+    try {
+      const response = await fetch(`${API_URL}/${data.busca}`);
+      const result = await response.json();
+      setEmpresaBuscada(result);
+      console.log("Empresa encontrada: ", result);
+    } catch (error) {
+      console.error("Erro ao buscar empresa: ", error);
+      setEmpresaBuscada(null);
+    }
+  }
+
   async function listarEmpresas(data: any) {
     try {
       const response = await fetch(`${API_URL}/${data.busca}`)
@@ -56,7 +68,7 @@ export default function AdminPage() {
     }
   }
 
-  // PUT - Atualizar
+
   async function atualizarEmpresa(data: any) {
     try {
       const response = await fetch(`${API_URL}/${data.id}`, {
@@ -71,7 +83,7 @@ export default function AdminPage() {
     }
   }
 
-  // DELETE - Remover
+
   async function apagarEmpresa(data: any) {
     try {
       const response = await fetch(`${API_URL}/${data.id}`, {
@@ -90,7 +102,7 @@ export default function AdminPage() {
   return (
     <DashboardShell>
       <DashboardHeader heading="Área do Administrador" text="Gerencie as empresas cadastradas na plataforma." />
-      <div className="flex flex-col gap-8 md:flex-row">
+      <div className="flex flex-col gap-8 md:flex-row py-10">
         <DashboardSidebar items={sidebarItems} />
         <div className="flex-1 space-y-8">
           <CrudSection
@@ -126,15 +138,24 @@ export default function AdminPage() {
                 description="Visualize todas as empresas cadastradas na plataforma."
                 fields={[{ name: "busca", label: "Buscar por nome", type: "text" }]}
                 submitLabel="Buscar"
-                onSubmit={(data) => console.log("Buscar empresas:", data)}
+                onSubmit={buscarEmpresa}
                 showTable={true}
                 tableHeaders={["Nome", "CNPJ", "Telefone", "Email"]}
-                tableData={empresas.map((empresa) => [
-                  empresa.nome,
-                  empresa.cnpj,
-                  empresa.telefone,
-                  empresa.email,
-                ])}
+                tableData={
+                  empresaBuscada 
+                    ? [[ 
+                        empresaBuscada.nome,
+                        empresaBuscada.cnpj,
+                        empresaBuscada.telefone,
+                        empresaBuscada.email,
+                      ]]
+                    : empresas.map((empresa) => [
+                      empresa.nome,
+                      empresa.cnpj,
+                      empresa.telefone,
+                      empresa.email,
+                    ])
+                    }
               />
   
 
