@@ -2,7 +2,9 @@ package com.smarthire.resume.service;
 
 import com.smarthire.resume.domain.DTO.CandidatoDto;
 import com.smarthire.resume.domain.DTO.VagaResumoDto;
+import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
+import com.smarthire.resume.domain.model.Curriculo;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
@@ -67,6 +69,17 @@ public class CandidatoService {
         Candidato candidato = candidatoRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Candidato não encontrado."));
         candidatoRepository.delete(candidato);
+    }
+
+    public void criarComCurriculo(Curriculo curriculo) {
+        Candidato candidato = new Candidato();
+        candidato.setCurriculo(curriculo);
+        candidato.setNome(curriculo.getNome());
+        candidato.setEmail(curriculo.getEmail());
+        candidato.setTelefone(curriculo.getTelefone());
+        candidato.setSituacao(Situacao.TRIAGEM);
+
+        salvar(candidato);
     }
 
     public void adicionarCandidatoAVaga(UUID idCandidato, UUID idVaga) {
