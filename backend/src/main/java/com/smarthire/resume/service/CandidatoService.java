@@ -93,9 +93,11 @@ public class CandidatoService {
                 .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada."));
         if(candidato.getVaga() != null) {
             throw new BusinessRuleException("Candidato já está vinculado a uma vaga.");
-        }else {
-            candidato.setVaga(vaga);
-            candidatoRepository.save(candidato);
-        } 
+        }
+        if(!vaga.isActive()) {
+            throw new BusinessRuleException("Essa vaga não está aberta a candidaturas");
+        }
+        candidato.setVaga(vaga);
+        candidatoRepository.save(candidato);
     }
 }
