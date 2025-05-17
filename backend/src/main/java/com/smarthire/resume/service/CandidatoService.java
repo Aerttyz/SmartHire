@@ -1,6 +1,7 @@
 package com.smarthire.resume.service;
 
 import com.smarthire.resume.domain.DTO.CandidatoDto;
+import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.domain.DTO.VagaResumoDto;
 import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
@@ -16,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -39,26 +41,28 @@ public class CandidatoService {
 
     public CandidatoDto listarCandidatos(Candidato candidato) {
         Vaga vaga = candidato.getVaga();
-
-        VagaResumoDto vagaResumoDto = new VagaResumoDto();
-        if (vaga != null) {
-            vagaResumoDto.setId(vaga.getId());
-            vagaResumoDto.setNome(vaga.getNome());
+        Curriculo curriculo = candidato.getCurriculo();
+        if(curriculo == null) {
+            throw new BusinessRuleException("Candidato não possui currículo");
         }
 
-        CandidatoDto candidatoDto = new CandidatoDto();
-        candidatoDto.setId(candidato.getId());
-        candidatoDto.setNome(candidato.getNome());
-        candidatoDto.setEmail(candidato.getEmail());
-        candidatoDto.setTelefone(candidato.getTelefone());
-        candidatoDto.setExperiencia(candidato.getCurriculo().getExperiencia());
-        candidatoDto.setFormacaoAcademica(candidato.getCurriculo().getFormacaoAcademica());
-        candidatoDto.setHabilidades(candidato.getCurriculo().getHabilidades());
-        candidatoDto.setIdiomas(candidato.getCurriculo().getIdiomas());
-        candidatoDto.setVaga(vagaResumoDto);
+        VagaResumoDto vagaResumoDto = null;
+        if (vaga != null) {
+            vagaResumoDto = new VagaResumoDto(vaga.getId(), vaga.getNome());
+        }
 
-        return candidatoDto;
-    }   
+        return new CandidatoDto(
+                candidato.getId(),
+                candidato.getNome(),
+                candidato.getEmail(),
+                candidato.getTelefone(),
+                curriculo.getHabilidades(),
+                curriculo.getIdiomas(),
+                curriculo.getFormacaoAcademica(),
+                curriculo.getExperiencia(),
+                vagaResumoDto
+        );
+    }
 
     public Candidato buscarCandidatoPorNome(String nomeCandidato) {
         return candidatoRepository.findByNome(nomeCandidato)
