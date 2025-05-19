@@ -2,10 +2,13 @@ package com.smarthire.resume.controller;
 
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
+import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.model.Vaga;
+import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.service.VagaService;
+import com.smarthire.resume.domain.DTO.VagaRequestDTO;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -20,6 +23,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.catalina.connector.Response;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/vagas")
@@ -28,52 +33,47 @@ public class VagaController {
     private VagaService vagaService;
     @Autowired
     private VagaRepository vagaRepository;
+    @Autowired
+    private EmpresaRepository empresaRepository;
 
    @GetMapping
     public ResponseEntity<List<VagaRespostaDto>> listarTodas() {
-        List<Vaga> vagas = vagaRepository.findAll();
-        List<VagaRespostaDto> dtos = vagas.stream()
-                .map(vagaService::listar)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        List<VagaRespostaDto> vagas = vagaService.listarTodas();
+        return ResponseEntity.ok(vagas);
     }
 
     @GetMapping({"/{nomeVaga}"})
-    public ResponseEntity<Vaga> buscarVaga(@PathVariable String nomeVaga) {
-        Optional<Vaga> vagaOptional = vagaRepository.findByNome(nomeVaga);
-        if (vagaOptional.isPresent()) {
-            return ResponseEntity.ok(vagaOptional.get());
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<List<VagaRespostaDto>> buscarVaga(@PathVariable String nomeVaga) {
+        List<VagaRespostaDto> vagaRespostaDto = vagaService.listarPorNome(nomeVaga);
+        return ResponseEntity.ok(vagaRespostaDto);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
+    
     @PostMapping
     public ResponseEntity<?> adicionarvaga(@Valid @RequestBody VagaDto vaga) {
-        
         vagaService.salvar(vaga);
         return ResponseEntity.ok("Vaga cadastrada com sucesso");
     }
 
-
-    // REFATORAR - SAVIO
-    public ResponseEntity<Vaga> atualizarvagaPorNome(@PathVariable String nomeVaga,
-                                                               @Valid @RequestBody Vaga vaga) {
-        if (!vagaRepository.existsByNome(vaga.getNome())) {
+    // RETIRAR LÓGICA DE NEGÓCIO DO CONTROLLER --SAVIO
+    @PutMapping("/{id}")
+    public ResponseEntity<Vaga> atualizarvagaPorId(@PathVariable UUID id,
+                                                               @Valid @RequestBody VagaRequestDTO data) {
+        Optional<Vaga> vagaOptional = vagaRepository.findById(id);
+        if(vagaOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        vaga.setNome(nomeVaga);
+        Empresa empresaVaga = empresaRepository.findById(data.empresaId())
+                .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
 
-        return ResponseEntity.ok(vaga);
+        Vaga vaga = vagaOptional.get();
+        vaga.atualizarCom(data, empresaVaga);
+        return ResponseEntity.ok(vagaService.salvar(vaga));
     }
 
     
     @DeleteMapping({"/{id}"})
     public ResponseEntity<Void> removerVaga(@PathVariable UUID id) {
-        Optional<Vaga> vagaOptional = vagaRepository.findById(id);
-        if (vagaOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         vagaService.excluir(id);
         return ResponseEntity.noContent().build();
     }
