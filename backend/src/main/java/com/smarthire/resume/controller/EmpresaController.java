@@ -66,9 +66,5 @@ public class EmpresaController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(BusinessRuleException.class)
-    public ResponseEntity<String> capturar(BusinessRuleException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
 
 }
