@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface CandidatoRepository extends JpaRepository<Candidato, UUID> {
 
     Optional<Candidato> findByEmail(String email);
-    Optional<Candidato> findByNome(String nome);
+    List<Candidato> findByNomeContainingIgnoreCase(String nome);
     Optional<Candidato> findById(UUID id);
     boolean existsByNome(String nomeCandidato);
     List<Candidato> findByVaga_Id(UUID vagaId);

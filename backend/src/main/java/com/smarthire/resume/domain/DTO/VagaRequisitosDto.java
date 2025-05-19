@@ -1,19 +1,14 @@
 package com.smarthire.resume.domain.DTO;
-import lombok.*;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-public class VagaRequisitosDto {
-    private String habilidades;
-    private String idiomas;
-    private String formacaoAcademica;
-    private String experiencia;
+public record VagaRequisitosDto (
+    String habilidades,
+    String idiomas,
+    String formacaoAcademica,
+    String experiencia,
 
-    private Double pesoHabilidades;
-    private Double pesoIdiomas;
-    private Double pesoFormacaoAcademica;
-    private Double pesoExperiencia;
-}
+    Double pesoHabilidades,
+    Double pesoIdiomas,
+    Double pesoFormacaoAcademica,
+    Double pesoExperiencia
+){}

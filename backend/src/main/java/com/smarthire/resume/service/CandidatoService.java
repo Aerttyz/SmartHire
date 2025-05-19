@@ -1,6 +1,7 @@
 package com.smarthire.resume.service;
 
 import com.smarthire.resume.domain.DTO.CandidatoDto;
+import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.domain.DTO.VagaResumoDto;
 import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
@@ -14,9 +15,13 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -39,38 +44,59 @@ public class CandidatoService {
 
     public CandidatoDto listarCandidatos(Candidato candidato) {
         Vaga vaga = candidato.getVaga();
-
-        VagaResumoDto vagaResumoDto = new VagaResumoDto();
-        if (vaga != null) {
-            vagaResumoDto.setId(vaga.getId());
-            vagaResumoDto.setNome(vaga.getNome());
+        Curriculo curriculo = candidato.getCurriculo();
+        if(curriculo == null) {
+            throw new BusinessRuleException("Candidato não possui currículo");
         }
 
-        CandidatoDto candidatoDto = new CandidatoDto();
-        candidatoDto.setId(candidato.getId());
-        candidatoDto.setNome(candidato.getNome());
-        candidatoDto.setEmail(candidato.getEmail());
-        candidatoDto.setTelefone(candidato.getTelefone());
-        candidatoDto.setExperiencia(candidato.getCurriculo().getExperiencia());
-        candidatoDto.setFormacaoAcademica(candidato.getCurriculo().getFormacaoAcademica());
-        candidatoDto.setHabilidades(candidato.getCurriculo().getHabilidades());
-        candidatoDto.setIdiomas(candidato.getCurriculo().getIdiomas());
-        candidatoDto.setVaga(vagaResumoDto);
+        VagaResumoDto vagaResumoDto = null;
+        if (vaga != null) {
+            vagaResumoDto = new VagaResumoDto(vaga.getId(), vaga.getNome());
+        }
 
-        return candidatoDto;
-    }   
-
-    public Candidato buscarCandidatoPorNome(String nomeCandidato) {
-        return candidatoRepository.findByNome(nomeCandidato)
-                .orElseThrow(() -> new BusinessRuleException("Candidato não encontrado."));
+        return new CandidatoDto(
+                candidato.getId(),
+                candidato.getNome(),
+                candidato.getEmail(),
+                candidato.getTelefone(),
+                curriculo.getHabilidades(),
+                curriculo.getIdiomas(),
+                curriculo.getFormacaoAcademica(),
+                curriculo.getExperiencia(),
+                vagaResumoDto
+        );
     }
 
+    public List<CandidatoDto> listarTodos() {
+        List<Candidato> candidatos = candidatoRepository.findAll();
+        return candidatos.stream()
+                .map(this::listarCandidatos)
+                .collect(Collectors.toList());
+    }
+
+    public List<CandidatoDto> buscarCandidatoPorNome(String nomeCandidato) {
+        List<Candidato> candidatos = candidatoRepository.findByNomeContainingIgnoreCase(nomeCandidato);
+        List<CandidatoDto> candidatosDto = candidatos.stream()
+                .map(this::listarCandidatos)
+                .collect(Collectors.toList());
+        if (candidatosDto.isEmpty()) {
+            throw new BusinessRuleException("Candidato não encontrado.");
+        }
+        return candidatosDto;
+    }
+
+    @Transactional
     public void deletarCandidatoPorId(UUID id){
+        if (!candidatoRepository.existsById(id)) {
+            throw new BusinessRuleException("Candidato não encontrado.");
+        }
         Candidato candidato = candidatoRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Candidato não encontrado."));
         candidatoRepository.delete(candidato);
     }
 
+
+    @Transactional
     public void criarComCurriculo(Curriculo curriculo) {
         Candidato candidato = new Candidato();
         candidato.setCurriculo(curriculo);
@@ -81,17 +107,21 @@ public class CandidatoService {
 
         salvar(candidato);
     }
-
     public void adicionarCandidatoAVaga(UUID idCandidato, UUID idVaga) {
+        if (!candidatoRepository.existsById(idCandidato) || !vagaRepository.existsById(idVaga)) {
+            throw new BusinessRuleException("Candidato ou vaga não encontrado.");
+        }
         Candidato candidato = candidatoRepository.findById(idCandidato)
                 .orElseThrow(() -> new BusinessRuleException("Candidato não encontrado."));
         Vaga vaga = vagaRepository.findById(idVaga)
                 .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada."));
         if(candidato.getVaga() != null) {
             throw new BusinessRuleException("Candidato já está vinculado a uma vaga.");
-        }else {
-            candidato.setVaga(vaga);
-            candidatoRepository.save(candidato);
-        } 
+        }
+        if(!vaga.isActive()) {
+            throw new BusinessRuleException("Essa vaga não está aberta a candidaturas");
+        }
+        candidato.setVaga(vaga);
+        candidatoRepository.save(candidato);
     }
 }

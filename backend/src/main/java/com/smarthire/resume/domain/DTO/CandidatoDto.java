@@ -1,22 +1,21 @@
 package com.smarthire.resume.domain.DTO;
 
-import lombok.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class CandidatoDto {
-    private UUID id;
-    private String nome;
-    private String email;
-    private String telefone;
-    private List<String> habilidades;
-    private List<String> idiomas;
-    private List<String> formacaoAcademica;
-    private String experiencia;
-    private VagaResumoDto vaga;
-}
+public record CandidatoDto (
+        @NotNull UUID id,
+        @NotBlank String nome,
+        @Email @NotBlank String email,
+        @Pattern(regexp = "\\+?\\d{8,15}") String telefone,
+        List<String> habilidades,
+        List<String> idiomas,
+        List<String> formacaoAcademica,
+        String experiencia,
+        VagaResumoDto vaga
+) {}
