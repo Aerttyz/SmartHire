@@ -23,6 +23,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.catalina.connector.Response;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/vagas")
@@ -36,29 +38,24 @@ public class VagaController {
 
    @GetMapping
     public ResponseEntity<List<VagaRespostaDto>> listarTodas() {
-        List<Vaga> vagas = vagaRepository.findAll();
-        List<VagaRespostaDto> dtos = vagas.stream()
-                .map(vagaService::listar)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        List<VagaRespostaDto> vagas = vagaService.listarTodas();
+        return ResponseEntity.ok(vagas);
     }
 
     @GetMapping({"/{nomeVaga}"})
-    public ResponseEntity<Vaga> buscarVaga(@PathVariable String nomeVaga) {
-        Optional<Vaga> vagaOptional = vagaRepository.findByNome(nomeVaga);
-        if (vagaOptional.isPresent()) {
-            return ResponseEntity.ok(vagaOptional.get());
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<List<VagaRespostaDto>> buscarVaga(@PathVariable String nomeVaga) {
+        List<VagaRespostaDto> vagaRespostaDto = vagaService.listarPorNome(nomeVaga);
+        return ResponseEntity.ok(vagaRespostaDto);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
+    
     @PostMapping
-    public Vaga adicionarvaga(@Valid @RequestBody Vaga vaga) {
-        return vagaService.salvar(vaga);
+    public ResponseEntity<?> adicionarvaga(@Valid @RequestBody VagaDto vaga) {
+        vagaService.salvar(vaga);
+        return ResponseEntity.ok("Vaga cadastrada com sucesso");
     }
 
-
+    // RETIRAR LÓGICA DE NEGÓCIO DO CONTROLLER --SAVIO
     @PutMapping("/{id}")
     public ResponseEntity<Vaga> atualizarvagaPorId(@PathVariable UUID id,
                                                                @Valid @RequestBody VagaRequestDTO data) {
@@ -77,10 +74,6 @@ public class VagaController {
     
     @DeleteMapping({"/{id}"})
     public ResponseEntity<Void> removerVaga(@PathVariable UUID id) {
-        Optional<Vaga> vagaOptional = vagaRepository.findById(id);
-        if (vagaOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         vagaService.excluir(id);
         return ResponseEntity.noContent().build();
     }
