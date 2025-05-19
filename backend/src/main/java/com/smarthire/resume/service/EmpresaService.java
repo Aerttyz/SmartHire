@@ -28,8 +28,20 @@ public class EmpresaService {
         return empresaRepository.save(empresa);
     }
 
-    public List<Empresa> listar(Empresa empresa) {
-         return empresaRepository.findAll();
+    public List<Empresa> listarTodas(){
+        List<Empresa> empresas = empresaRepository.findAll();
+        if (empresas.isEmpty()) {
+            throw new BusinessRuleException("Nenhuma empresa encontrada.");
+        }
+        return empresas;
+    }
+
+    public List<Empresa> listarPorNome(String nomeEmpresa) {
+        List<Empresa> empresas = empresaRepository.findByNomeIgnoreCase(nomeEmpresa);
+        if (empresas.isEmpty()) {
+            throw new BusinessRuleException("Nenhuma empresa encontrada.");
+        }
+        return empresas;
     }
 
     @Transactional
