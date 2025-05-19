@@ -12,9 +12,12 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -58,18 +61,39 @@ public class CandidatoService {
         return candidatoDto;
     }   
 
-    public Candidato buscarCandidatoPorNome(String nomeCandidato) {
-        return candidatoRepository.findByNome(nomeCandidato)
-                .orElseThrow(() -> new BusinessRuleException("Candidato não encontrado."));
+    public List<CandidatoDto> listarTodos() {
+        List<Candidato> candidatos = candidatoRepository.findAll();
+        return candidatos.stream()
+                .map(this::listarCandidatos)
+                .collect(Collectors.toList());
     }
 
+    public List<CandidatoDto> buscarCandidatoPorNome(String nomeCandidato) {
+        List<Candidato> candidatos = candidatoRepository.findByNomeContainingIgnoreCase(nomeCandidato);
+        List<CandidatoDto> candidatosDto = candidatos.stream()
+                .map(this::listarCandidatos)
+                .collect(Collectors.toList());
+        if (candidatosDto.isEmpty()) {
+            throw new BusinessRuleException("Candidato não encontrado.");
+        }
+        return candidatosDto;
+    }
+
+    @Transactional
     public void deletarCandidatoPorId(UUID id){
+        if (!candidatoRepository.existsById(id)) {
+            throw new BusinessRuleException("Candidato não encontrado.");
+        }
         Candidato candidato = candidatoRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Candidato não encontrado."));
         candidatoRepository.delete(candidato);
     }
 
+    @Transactional
     public void adicionarCandidatoAVaga(UUID idCandidato, UUID idVaga) {
+        if (!candidatoRepository.existsById(idCandidato) || !vagaRepository.existsById(idVaga)) {
+            throw new BusinessRuleException("Candidato ou vaga não encontrado.");
+        }
         Candidato candidato = candidatoRepository.findById(idCandidato)
                 .orElseThrow(() -> new BusinessRuleException("Candidato não encontrado."));
         Vaga vaga = vagaRepository.findById(idVaga)

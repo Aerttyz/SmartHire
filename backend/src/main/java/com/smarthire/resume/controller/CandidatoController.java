@@ -40,24 +40,20 @@ public class CandidatoController {
     @Autowired
     private CandidatoRepository candidatoRepository;
 
+
     @GetMapping
     public ResponseEntity<List<CandidatoDto>> listar() {
-        List<Candidato> candidatos = candidatoRepository.findAll();
-        List<CandidatoDto> dtos = candidatos.stream()
-                .map(candidatoService::listarCandidatos)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        List<CandidatoDto> candidatos = candidatoService.listarTodos();
+        return ResponseEntity.ok(candidatos);
     }
 
     @GetMapping({"/{nomeCandidato}"})
-    public ResponseEntity<Candidato> buscarCandidato(@PathVariable String nomeCandidato) {
-        Optional<Candidato> candidatoOptional = candidatoRepository.findByNome(nomeCandidato);
-        if (candidatoOptional.isPresent()) {
-            return ResponseEntity.ok(candidatoOptional.get());
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<List<CandidatoDto>> buscarCandidato(@PathVariable String nomeCandidato) {
+        List<CandidatoDto> candidatos = candidatoService.buscarCandidatoPorNome(nomeCandidato);
+        return ResponseEntity.ok(candidatos);
     }
 
+    // RETIRAR LOGICA DE NEGOCIO DO CONTROLLER --SAVIO
     @PutMapping("/{id}")
     public ResponseEntity<Candidato> atualizarPeloId(@PathVariable UUID id,
                                                 @Valid @RequestBody CandidatoRequestDTO data) {
@@ -75,6 +71,7 @@ public class CandidatoController {
         return ResponseEntity.ok(candidatoService.salvar(candidato));
     }
 
+    // CONFIRMAR SE É NECESSÁRIO, SE NÃO RETIRAR 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public Candidato adicionarcandidato(@Valid @RequestBody Candidato candidato) {
@@ -83,19 +80,12 @@ public class CandidatoController {
 
     @PostMapping("/{idCandidato}/vaga/{idVaga}")
     public ResponseEntity<Void> adicionarCandidatoAVaga(@PathVariable UUID idCandidato, @PathVariable UUID idVaga) {
-        if (!candidatoRepository.existsById(idCandidato) || !vagaRepository.existsById(idVaga)) {
-            return ResponseEntity.notFound().build();
-        }
         candidatoService.adicionarCandidatoAVaga(idCandidato, idVaga);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping({"/{id}"})
     public ResponseEntity<Void> removerCandidato(@PathVariable UUID id) {
-        Optional<Candidato> candidatoOptional = candidatoRepository.findById(id);
-        if (candidatoOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         candidatoService.deletarCandidatoPorId(id);
         return ResponseEntity.noContent().build();
     }
