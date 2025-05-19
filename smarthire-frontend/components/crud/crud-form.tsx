@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea"
 export interface CrudFormField {
   name: string
   label: string
-  type: "text" | "email" | "password" | "textarea" | "file"
+  type: "text" | "email" | "password" | "textarea" | "file" | "checkbox"
   description?: string
 }
 
@@ -37,6 +37,8 @@ export function CrudForm({ fields, submitLabel, onSubmit, isDanger = false }: Cr
       (acc, field) => {
         if (field.type === "email") {
           acc[field.name] = z.string().email({ message: "Email inválido" })
+        } else if (field.type === "checkbox") {
+          acc[field.name] = z.boolean()
         } else if (field.type === "file") {
           acc[field.name] = z.any()
         } else {

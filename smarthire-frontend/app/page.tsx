@@ -1,9 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import Owl from "../assets/owl.png"
-import choice from "../assets/right-choice.jpg";
 import latina from "../assets/latina-handshake.jpg"
-import hand from "../assets/handshake-glasses.jpg"
 import { Button } from "@/components/ui/button"
 
 export default function LandingPage() {
@@ -27,7 +25,7 @@ export default function LandingPage() {
         </div>
       </header>
       <main className="flex-1">
-        <section className="container grid items-center gap-6 pb-8 pt-6 md:grid-cols-2 md:py-10 px-10">
+        <section className="container grid items-center gap-6 pb-8 pt-6 md:grid-cols-2 md:py-10 px-20">
           <div className="flex flex-col items-start gap-4">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">SmartHire</h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">

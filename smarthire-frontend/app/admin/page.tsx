@@ -71,7 +71,7 @@ export default function AdminPage() {
 
   async function atualizarEmpresa(data: any) {
     try {
-      const response = await fetch(`${API_URL}/${data.id}`, {
+      const response = await fetch(`${API_URL}/${data.nomeEmpresa}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
