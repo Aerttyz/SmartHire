@@ -1,10 +1,6 @@
 package com.smarthire.resume.infra;
 
-import com.smarthire.resume.exception.BusinessRuleException;
-import com.smarthire.resume.exception.EmptyPathException;
-import com.smarthire.resume.exception.FlaskConnectionException;
-import com.smarthire.resume.exception.InvalidPathException;
-import com.smarthire.resume.exception.PersistenceException;
+import com.smarthire.resume.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -34,9 +30,15 @@ public class RestExceptionHandler {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(treatedResponse);
     }
     @ExceptionHandler(PersistenceException.class) 
-        private ResponseEntity<RestErrorMessage> persistenceHandler(PersistenceException ex) {
-            RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
-        }
+    private ResponseEntity<RestErrorMessage> persistenceHandler(PersistenceException ex) {
+        RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
+    }
+    @ExceptionHandler(ItemNotFoundException.class)
+    private ResponseEntity<RestErrorMessage> itemNotFoundHandler(ItemNotFoundException ex) {
+        RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(treatedResponse);
+    }
+
 
 }
