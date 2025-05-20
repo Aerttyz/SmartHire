@@ -1,9 +1,6 @@
-package com.smarthire.resume.service;
+package com.smarthire.resume.domain.model;
 
 import org.springframework.security.core.userdetails.UserDetails;
-
-import com.smarthire.resume.domain.model.Empresa;
-
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.ArrayList;

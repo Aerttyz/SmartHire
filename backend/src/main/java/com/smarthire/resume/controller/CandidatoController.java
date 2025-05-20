@@ -62,13 +62,6 @@ public class CandidatoController {
         return ResponseEntity.ok(candidatoAtualizado);
     }
 
-    // CONFIRMAR SE É NECESSÁRIO, SE NÃO RETIRAR 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
-    public Candidato adicionarcandidato(@Valid @RequestBody Candidato candidato) {
-        return candidatoService.salvar(candidato);
-    }
-
     @PostMapping("/{idCandidato}/vaga/{idVaga}")
     public ResponseEntity<Void> adicionarCandidatoAVaga(@PathVariable UUID idCandidato, @PathVariable UUID idVaga) {
         candidatoService.adicionarCandidatoAVaga(idCandidato, idVaga);

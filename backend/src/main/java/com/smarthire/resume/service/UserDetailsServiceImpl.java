@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.smarthire.resume.domain.model.Empresa;
+import com.smarthire.resume.domain.model.UserDetailsImpls;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 
 @Service

@@ -14,6 +14,7 @@ import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 
 import com.smarthire.resume.exception.ItemNotFoundException;
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -75,7 +77,14 @@ public class CandidatoService {
     public List<CandidatoDto> listarTodos() {
         List<Candidato> candidatos = candidatoRepository.findAll();
         return candidatos.stream()
-                .map(this::listarCandidatos)
+                .map(c -> {
+                    try {
+                        return listarCandidatos(c);
+                    } catch ( BusinessRuleException e) {
+                        throw new BusinessRuleException("Erro ao listar candidatos: " + e.getMessage());
+                    }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

@@ -2,7 +2,7 @@ package com.smarthire.resume.security.jwt;
 
 import org.springframework.stereotype.Component;
 
-import com.smarthire.resume.service.UserDetailsImpls;
+import com.smarthire.resume.domain.model.UserDetailsImpls;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

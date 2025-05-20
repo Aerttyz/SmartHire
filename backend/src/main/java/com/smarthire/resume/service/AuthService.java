@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.smarthire.resume.domain.DTO.AcessDto;
 import com.smarthire.resume.domain.DTO.AuthDto;
+import com.smarthire.resume.domain.model.UserDetailsImpls;
 import com.smarthire.resume.security.jwt.JwtUtils;
 
 @Service
