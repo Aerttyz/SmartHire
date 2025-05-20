@@ -1,5 +1,6 @@
 package com.smarthire.resume.service;
 
+import com.smarthire.resume.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +18,9 @@ public class UserDetailsServiceImpl  implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Empresa empresa = empresaRepository.findByEmail(email).get();
-        return UserDetailsImpls.build(empresa);        
+        Empresa empresa = empresaRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com o e-mail: " + email));
+        return UserDetailsImpls.build(empresa);
     }
+
 }
