@@ -47,17 +47,11 @@ public class EmpresaController {
         return empresaService.salvar(empresa);
     }
 
-    // RETIRAR LOGICA DE NEGOCIO DO CONTROLLER --SAVIO
     @PutMapping("/{id}")
     public ResponseEntity<Empresa> atualizarEmpresaPorId(@PathVariable UUID id,
-                                                    @Valid @RequestBody EmpresaRequestDTO data) {
-        Optional<Empresa> empresaOptional = empresaRepository.findById(id);
-        if (empresaOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Empresa empresa = empresaOptional.get();
-        empresa.atualizarCom(data);
-        return ResponseEntity.ok(empresaService.salvar(empresa));
+                                                         @Valid @RequestBody EmpresaRequestDTO data) {
+        Empresa empresaAtualizada = empresaService.atualizarEmpresaPorId(id, data);
+        return ResponseEntity.ok(empresaAtualizada);
     }
 
     @DeleteMapping("/{id}")

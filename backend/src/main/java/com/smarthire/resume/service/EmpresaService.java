@@ -1,8 +1,10 @@
 package com.smarthire.resume.service;
 
+import com.smarthire.resume.domain.DTO.EmpresaRequestDTO;
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
+import com.smarthire.resume.exception.ItemNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -43,6 +45,19 @@ public class EmpresaService {
         }
         return empresas;
     }
+
+    public Empresa atualizarEmpresaPorId(UUID id, EmpresaRequestDTO data) {
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Empresa", id));
+
+        empresa.setNome(data.nome());
+        empresa.setCnpj(data.cnpj());
+        empresa.setEmail(data.email());
+        empresa.setTelefone(data.telefone());
+        
+        return empresaRepository.save(empresa);
+    }
+
 
     @Transactional
     public void excluir(UUID id) {
