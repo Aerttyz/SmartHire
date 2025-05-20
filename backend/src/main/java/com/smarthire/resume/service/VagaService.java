@@ -1,6 +1,5 @@
 package com.smarthire.resume.service;
 
-import com.smarthire.resume.domain.DTO.VagaRequestDTO;
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRequisitosDto;
@@ -103,12 +102,13 @@ public class VagaService {
                 .collect(Collectors.toList());
     }
 
-    public VagaRespostaDto atualizarVagaPorId(UUID id, VagaRequestDTO data) {
+    public VagaRespostaDto atualizarVagaPorId(UUID id, VagaDto data) {
+        validarPesos(data);
         Vaga vaga = vagaRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
         Empresa empresa = empresaRepository.findById(data.empresaId())
                 .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
-        vaga.atualizarCom(data, empresa);
+        vaga.vagaDtoMapper(data, empresa);
         Vaga vagaAtualizada = vagaRepository.save(vaga);
         return listar(vagaAtualizada);
     }

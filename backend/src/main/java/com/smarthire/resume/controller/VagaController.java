@@ -10,7 +10,6 @@ import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.service.PontuacaoVagaService;
 import com.smarthire.resume.service.VagaService;
-import com.smarthire.resume.domain.DTO.VagaRequestDTO;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -62,7 +61,7 @@ public class VagaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
-                                                              @Valid @RequestBody VagaRequestDTO data) {
+                                                              @Valid @RequestBody VagaDto data) {
         VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data);
         return ResponseEntity.ok(vagaAtualizada);
     }

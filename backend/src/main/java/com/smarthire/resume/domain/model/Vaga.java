@@ -1,6 +1,6 @@
 package com.smarthire.resume.domain.model;
 
-import com.smarthire.resume.domain.DTO.VagaRequestDTO;
+import com.smarthire.resume.domain.DTO.VagaDto;
 import java.util.List;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,10 +35,23 @@ public class Vaga {
     @OneToMany(mappedBy = "vaga", cascade = CascadeType.ALL)
     private List<Candidato> candidatos;
 
-    public void atualizarCom(VagaRequestDTO data, Empresa empresa) {
+    public void vagaDtoMapper(VagaDto data, Empresa empresa) {
         this.empresa = empresa;
         this.nome = data.nome();
-        this.descricao = data.descricao();
         this.isActive = data.isActive();
+
+        if (this.requisitos == null) {
+            this.requisitos = new VagaRequisitosModel();
+            this.requisitos.setVaga(this);
+        }
+
+        this.requisitos.setHabilidades(data.habilidades());
+        this.requisitos.setIdiomas(data.idiomas());
+        this.requisitos.setFormacaoAcademica(data.formacaoAcademica());
+        this.requisitos.setExperiencia(data.experiencia());
+        this.requisitos.setPesoHabilidades(data.pesoHabilidades());
+        this.requisitos.setPesoIdiomas(data.pesoIdiomas());
+        this.requisitos.setPesoFormacaoAcademica(data.pesoFormacaoAcademica());
+        this.requisitos.setPesoExperiencia(data.pesoExperiencia());
     }
 }
