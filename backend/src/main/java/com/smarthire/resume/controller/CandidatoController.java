@@ -53,22 +53,13 @@ public class CandidatoController {
         return ResponseEntity.ok(candidatos);
     }
 
-    // RETIRAR LOGICA DE NEGOCIO DO CONTROLLER --SAVIO
     @PutMapping("/{id}")
-    public ResponseEntity<Candidato> atualizarPeloId(@PathVariable UUID id,
-                                                @Valid @RequestBody CandidatoRequestDTO data) {
-        Optional<Candidato> candidatoOptional = candidatoRepository.findById(id);
-        if(candidatoOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Curriculo curriculo = curriculoRepository.findById(data.curriculoId())
-                .orElseThrow(() -> new BusinessRuleException("Currículo não encontrado"));
-        Vaga vaga = vagaRepository.findById(data.vagaId())
-                .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada"));
-        Situacao situacao = Situacao.valueOf(data.situacao());
-        Candidato candidato = candidatoOptional.get();
-        candidato.atualizarCom(data, curriculo, vaga, situacao);
-        return ResponseEntity.ok(candidatoService.salvar(candidato));
+    public ResponseEntity<Candidato> atualizarPeloId(
+            @PathVariable UUID id,
+            @Valid @RequestBody CandidatoRequestDTO data) {
+
+        Candidato candidatoAtualizado = candidatoService.atualizarCandidatoPorId(id, data);
+        return ResponseEntity.ok(candidatoAtualizado);
     }
 
     // CONFIRMAR SE É NECESSÁRIO, SE NÃO RETIRAR 

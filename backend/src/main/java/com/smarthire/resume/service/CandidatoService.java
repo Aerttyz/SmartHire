@@ -1,6 +1,7 @@
 package com.smarthire.resume.service;
 
 import com.smarthire.resume.domain.DTO.CandidatoDto;
+import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.domain.DTO.VagaResumoDto;
 import com.smarthire.resume.domain.enums.Situacao;
@@ -8,9 +9,11 @@ import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.Curriculo;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
+import com.smarthire.resume.domain.repository.CurriculoRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 
+import com.smarthire.resume.exception.ItemNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -30,6 +33,8 @@ public class CandidatoService {
 
     @Autowired
     private VagaRepository vagaRepository;
+    @Autowired
+    private CurriculoRepository curriculoRepository;
 
     @Transactional
     public Candidato salvar(Candidato candidato) {
@@ -83,6 +88,23 @@ public class CandidatoService {
             throw new BusinessRuleException("Candidato não encontrado.");
         }
         return candidatosDto;
+    }
+
+    public Candidato atualizarCandidatoPorId(UUID id, CandidatoRequestDTO data) {
+        Candidato candidato = candidatoRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Candidato", id));
+
+        Curriculo curriculo = curriculoRepository.findById(data.curriculoId())
+                .orElseThrow(() -> new BusinessRuleException("Currículo não encontrado"));
+
+        Vaga vaga = vagaRepository.findById(data.vagaId())
+                .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada"));
+
+        Situacao situacao = Situacao.valueOf(data.situacao());
+
+        candidato.atualizarCom(data, curriculo, vaga, situacao);
+
+        return candidatoRepository.save(candidato);
     }
 
     @Transactional
