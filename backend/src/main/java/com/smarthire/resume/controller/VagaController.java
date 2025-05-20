@@ -1,5 +1,6 @@
 package com.smarthire.resume.controller;
 
+import com.smarthire.resume.domain.DTO.CandidateScoreDTO;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.domain.model.Empresa;
@@ -7,6 +8,7 @@ import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
+import com.smarthire.resume.service.PontuacaoVagaService;
 import com.smarthire.resume.service.VagaService;
 import com.smarthire.resume.domain.DTO.VagaRequestDTO;
 
@@ -19,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,6 +38,8 @@ public class VagaController {
     private VagaRepository vagaRepository;
     @Autowired
     private EmpresaRepository empresaRepository;
+    @Autowired
+    private PontuacaoVagaService pontuacaoVagaService;
 
    @GetMapping
     public ResponseEntity<List<VagaRespostaDto>> listarTodas() {
@@ -66,6 +71,13 @@ public class VagaController {
     public ResponseEntity<Void> removerVaga(@PathVariable UUID id) {
         vagaService.excluir(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // endpoint adicionado nesse controller por haver apenas 1 operação de pontuação de candidatos
+    @GetMapping("/{idVaga}/pontuacoes")
+    public ResponseEntity<List<CandidateScoreDTO>> obterPontuacoesCandidatos(@PathVariable UUID idVaga) {
+        List<CandidateScoreDTO> pontuacoes = pontuacaoVagaService.obterPontuacoesDeCandidatos(idVaga);
+        return ResponseEntity.ok(pontuacoes);
     }
 
 }
