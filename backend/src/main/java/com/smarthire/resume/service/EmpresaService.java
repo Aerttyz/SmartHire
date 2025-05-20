@@ -5,6 +5,7 @@ import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.ItemNotFoundException;
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 import java.util.List;
+
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @AllArgsConstructor
 @Service
@@ -27,6 +31,9 @@ public class EmpresaService {
         if (cnpjEmUso) {
             throw new BusinessRuleException("CNPJ já cadastrado no sistema.");
         }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String senhaCriptografada = encoder.encode(empresa.getSenha());
+        empresa.setSenha(senhaCriptografada);
         return empresaRepository.save(empresa);
     }
 
