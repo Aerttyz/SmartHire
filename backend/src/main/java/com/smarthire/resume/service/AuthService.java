@@ -11,6 +11,7 @@ import com.smarthire.resume.domain.DTO.AcessDto;
 import com.smarthire.resume.domain.DTO.AuthDto;
 import com.smarthire.resume.domain.model.UserDetailsImpls;
 import com.smarthire.resume.security.jwt.JwtUtils;
+import com.smarthire.resume.exception.AuthenticationException;
 
 @Service
 public class AuthService {
@@ -23,8 +24,8 @@ public class AuthService {
 
     public AcessDto login(AuthDto authDto){
         try {
-             UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(authDto.getEmail(),
-                    authDto.getSenha());
+             UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(authDto.email(),
+                    authDto.senha());
 
             Authentication authentication = authenticationManager.authenticate(userAuth);
 
@@ -35,7 +36,7 @@ public class AuthService {
             AcessDto acessDto = new AcessDto(token);
             return acessDto;
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Acesso negado");
+            throw new AuthenticationException("E-mail ou senha inválidos");
         }
     }
 }

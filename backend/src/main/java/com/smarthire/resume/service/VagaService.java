@@ -1,6 +1,5 @@
 package com.smarthire.resume.service;
 
-import com.smarthire.resume.domain.DTO.VagaRequestDTO;
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRequisitosDto;
@@ -11,6 +10,7 @@ import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 
+import com.smarthire.resume.exception.InvalidScoreWeightsException;
 import com.smarthire.resume.exception.ItemNotFoundException;
 import jakarta.transaction.Transactional;
 
@@ -31,6 +31,7 @@ public class VagaService {
 
     @Transactional
     public void salvar(VagaDto dto) {
+        validarPesos(dto);
         Empresa empresa = empresaRepository.findById(dto.empresaId())
                 .orElseThrow(() -> new BusinessRuleException("Empresa com Id" + dto.empresaId() + "não encontrada."));
         Vaga vaga = new Vaga();
@@ -101,12 +102,13 @@ public class VagaService {
                 .collect(Collectors.toList());
     }
 
-    public VagaRespostaDto atualizarVagaPorId(UUID id, VagaRequestDTO data) {
+    public VagaRespostaDto atualizarVagaPorId(UUID id, VagaDto data) {
+        validarPesos(data);
         Vaga vaga = vagaRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
         Empresa empresa = empresaRepository.findById(data.empresaId())
                 .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
-        vaga.atualizarCom(data, empresa);
+        vaga.vagaDtoMapper(data, empresa);
         Vaga vagaAtualizada = vagaRepository.save(vaga);
         return listar(vagaAtualizada);
     }
@@ -116,6 +118,17 @@ public class VagaService {
         Vaga vaga = vagaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada."));
         vagaRepository.delete(vaga);
+    }
+
+    private void validarPesos(VagaDto dto) {
+        double somaPesos = dto.pesoHabilidades() +
+                dto.pesoIdiomas() +
+                dto.pesoFormacaoAcademica() +
+                dto.pesoExperiencia();
+
+        if (Math.abs(somaPesos - 1.0) > 0.0001) {
+            throw new InvalidScoreWeightsException("A soma dos pesos deve ser igual a 1.0. Valor atual: " + somaPesos);
+        }
     }
 
 }

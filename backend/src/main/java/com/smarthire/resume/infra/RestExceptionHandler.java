@@ -39,6 +39,20 @@ public class RestExceptionHandler {
         RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(treatedResponse);
     }
-
+    @ExceptionHandler(AuthenticationException.class)
+    private ResponseEntity<RestErrorMessage> authenticationHandler(AuthenticationException ex) {
+        RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(treatedResponse);
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    private ResponseEntity<RestErrorMessage> userNotFoundHandler(UserNotFoundException ex) {
+        RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(treatedResponse);
+    }
+    @ExceptionHandler(InvalidScoreWeightsException.class)
+    private ResponseEntity<RestErrorMessage> invalidScoreWeightHandler(InvalidScoreWeightsException ex) {
+        RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(treatedResponse);
+    }
 
 }

@@ -2,6 +2,7 @@ package com.smarthire.resume.controller;
 
 import java.util.Collections;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class AuthController {
     private EmpresaService empresaService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthDto authDto) {
+    public ResponseEntity<?> login(@RequestBody @Valid AuthDto authDto) {
         try {
             return ResponseEntity.ok(authService.login(authDto));
         } catch (BadCredentialsException e) {
