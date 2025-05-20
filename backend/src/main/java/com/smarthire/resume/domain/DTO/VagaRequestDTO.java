@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record VagaRequestDTO(
-        @NotBlank UUID empresaId,
+        @NotNull UUID empresaId,
         @NotBlank String nome,
         @NotBlank String descricao,
         @NotNull Boolean isActive

@@ -55,23 +55,13 @@ public class VagaController {
         return ResponseEntity.ok("Vaga cadastrada com sucesso");
     }
 
-    // RETIRAR LÓGICA DE NEGÓCIO DO CONTROLLER --SAVIO
     @PutMapping("/{id}")
-    public ResponseEntity<Vaga> atualizarvagaPorId(@PathVariable UUID id,
-                                                               @Valid @RequestBody VagaRequestDTO data) {
-        Optional<Vaga> vagaOptional = vagaRepository.findById(id);
-        if(vagaOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Empresa empresaVaga = empresaRepository.findById(data.empresaId())
-                .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
-
-        Vaga vaga = vagaOptional.get();
-        vaga.atualizarCom(data, empresaVaga);
-        return ResponseEntity.ok(vagaService.salvar(vaga));
+    public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
+                                                              @Valid @RequestBody VagaRequestDTO data) {
+        VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data);
+        return ResponseEntity.ok(vagaAtualizada);
     }
 
-    
     @DeleteMapping({"/{id}"})
     public ResponseEntity<Void> removerVaga(@PathVariable UUID id) {
         vagaService.excluir(id);

@@ -1,5 +1,6 @@
 package com.smarthire.resume.service;
 
+import com.smarthire.resume.domain.DTO.VagaRequestDTO;
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRequisitosDto;
@@ -10,6 +11,7 @@ import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 
+import com.smarthire.resume.exception.ItemNotFoundException;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +90,7 @@ public class VagaService {
         }
         return vagaRespostaDto;
     }
-    
+
     public List<VagaRespostaDto> listarTodas() {
         List<Vaga> vagas = vagaRepository.findAll();
         if (vagas.isEmpty()) {
@@ -98,6 +100,17 @@ public class VagaService {
                 .map(this::listar)
                 .collect(Collectors.toList());
     }
+
+    public VagaRespostaDto atualizarVagaPorId(UUID id, VagaRequestDTO data) {
+        Vaga vaga = vagaRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+        Empresa empresa = empresaRepository.findById(data.empresaId())
+                .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
+        vaga.atualizarCom(data, empresa);
+        Vaga vagaAtualizada = vagaRepository.save(vaga);
+        return listar(vagaAtualizada);
+    }
+
 
     public void excluir(UUID id) {
         Vaga vaga = vagaRepository.findById(id)
