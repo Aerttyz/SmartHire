@@ -35,6 +35,10 @@ public class Vaga {
     @OneToMany(mappedBy = "vaga", cascade = CascadeType.ALL)
     private List<Candidato> candidatos;
 
+    @OneToMany(mappedBy = "vaga", cascade = CascadeType.ALL)
+    @OrderBy("ordem ASC")
+    private List<Fase> fases;
+
     public void vagaDtoMapper(VagaDto data, Empresa empresa) {
         this.empresa = empresa;
         this.nome = data.nome();
