@@ -1,6 +1,7 @@
 package com.smarthire.resume.controller;
 
 import com.smarthire.resume.domain.DTO.CandidateScoreDTO;
+import com.smarthire.resume.domain.DTO.FaseDto;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.domain.model.Empresa;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.catalina.connector.Response;
+
 
 @AllArgsConstructor
 @RestController
@@ -58,6 +60,14 @@ public class VagaController {
         vagaService.salvar(vaga);
         return ResponseEntity.ok("Vaga cadastrada com sucesso");
     }
+
+    @PostMapping("/{id}/fases")
+    public ResponseEntity<?> adicionarFasesNaVaga(@PathVariable UUID id, 
+                                                            @Valid @RequestBody List<FaseDto> fasesDto) {
+        vagaService.cadastrarFase(id, fasesDto);
+        return ResponseEntity.ok("Fases adicionadas com sucesso");
+    }
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,

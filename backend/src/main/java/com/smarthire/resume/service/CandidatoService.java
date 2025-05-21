@@ -4,7 +4,6 @@ import com.smarthire.resume.domain.DTO.CandidatoDto;
 import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.domain.DTO.VagaResumoDto;
-import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.Curriculo;
 import com.smarthire.resume.domain.model.Vaga;
@@ -109,9 +108,9 @@ public class CandidatoService {
         Vaga vaga = vagaRepository.findById(data.vagaId())
                 .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada"));
 
-        Situacao situacao = Situacao.valueOf(data.situacao());
+        
 
-        candidato.atualizarCom(data, curriculo, vaga, situacao);
+        candidato.atualizarCom(data, curriculo, vaga);
 
         return candidatoRepository.save(candidato);
     }
@@ -134,7 +133,6 @@ public class CandidatoService {
         candidato.setNome(curriculo.getNome());
         candidato.setEmail(curriculo.getEmail());
         candidato.setTelefone(curriculo.getTelefone());
-        candidato.setSituacao(Situacao.TRIAGEM);
 
         salvar(candidato);
     }

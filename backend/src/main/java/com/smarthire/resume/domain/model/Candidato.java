@@ -1,13 +1,8 @@
 package com.smarthire.resume.domain.model;
-
-import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.UUID;
-
-
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -36,15 +31,11 @@ public class Candidato {
     @JoinColumn(name = "vaga_id")
     private Vaga vaga;
 
-    @Enumerated(EnumType.STRING)
-    private Situacao situacao;
-
-    public void atualizarCom(CandidatoRequestDTO data, Curriculo curriculo, Vaga vaga, Situacao situacao) {
+    public void atualizarCom(CandidatoRequestDTO data, Curriculo curriculo, Vaga vaga) {
         this.nome = data.nome();
         this.email = data.email();
         this.telefone = data.telefone();
         this.curriculo = curriculo;
         this.vaga = vaga;
-        this.situacao = situacao;
     }
 }

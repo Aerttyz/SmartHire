@@ -1,17 +1,20 @@
 package com.smarthire.resume.service;
 
 import com.smarthire.resume.domain.model.Empresa;
+import com.smarthire.resume.domain.DTO.FaseDto;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRequisitosDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.model.VagaRequisitosModel;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
+import com.smarthire.resume.domain.repository.FaseRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 
 import com.smarthire.resume.exception.InvalidScoreWeightsException;
 import com.smarthire.resume.exception.ItemNotFoundException;
+
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.smarthire.resume.domain.model.Fase;
+
 @Service
 public class VagaService {
 
@@ -28,6 +33,9 @@ public class VagaService {
     private VagaRepository vagaRepository;
     @Autowired
     private EmpresaRepository empresaRepository;
+
+    @Autowired
+    private FaseRepository faseRepository;
 
     @Transactional
     public void salvar(VagaDto dto) {
@@ -131,4 +139,21 @@ public class VagaService {
         }
     }
 
+    @Transactional
+    public void cadastrarFase(UUID id, List<FaseDto> fasesDto) {
+        Vaga vaga = vagaRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+
+        List<Fase> fases = fasesDto.stream()
+            .map(faseDto -> {
+                Fase fase = new Fase();
+                fase.setTitulo(faseDto.titulo());
+                fase.setDescricao(faseDto.descricao());
+                fase.setOrdem(faseDto.ordem());
+                fase.setVaga(vaga);
+                return fase;
+            })
+            .collect(Collectors.toList());
+        faseRepository.saveAll(fases);
+    }
 }

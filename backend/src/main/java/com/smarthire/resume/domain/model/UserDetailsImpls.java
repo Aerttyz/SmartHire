@@ -1,6 +1,10 @@
 package com.smarthire.resume.domain.model;
 
 import org.springframework.security.core.userdetails.UserDetails;
+
+import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.ArrayList;
@@ -10,6 +14,9 @@ import java.util.UUID;
 public class UserDetailsImpls implements UserDetails{
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     private String nome;
