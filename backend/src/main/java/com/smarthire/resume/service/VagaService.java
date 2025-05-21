@@ -1,5 +1,7 @@
 package com.smarthire.resume.service;
 
+import java.util.Collections;
+
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.DTO.FaseDto;
 import com.smarthire.resume.domain.DTO.VagaDto;
@@ -65,7 +67,7 @@ public class VagaService {
 
     public VagaRespostaDto listar(Vaga vaga) {
         VagaRequisitosDto requisitosDto = null;
-
+        
         if (vaga.getRequisitos() != null) {
             VagaRequisitosModel requisitos = vaga.getRequisitos();
 
@@ -80,12 +82,24 @@ public class VagaService {
                     requisitos.getPesoExperiencia()
             );
         }
+
+        List<FaseDto> fases = Collections.emptyList();
+        if (vaga.getFases() != null) {
+            fases = vaga.getFases().stream()
+                    .map(fase -> new FaseDto(
+                            fase.getTitulo(),
+                            fase.getDescricao(),
+                            fase.getOrdem()
+                    ))
+                    .collect(Collectors.toList());
+        }
         return new VagaRespostaDto(
                 vaga.getId(),
                 vaga.getNome(),
                 vaga.isActive(),
                 vaga.getEmpresa().getNome(),
-                requisitosDto
+                requisitosDto,
+                fases
         );
     }
 
