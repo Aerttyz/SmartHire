@@ -2,7 +2,7 @@ package com.smarthire.resume.exception;
 
 public class EmptyPathException extends RuntimeException {
     public EmptyPathException() {
-        super("Path is required");
+        super("O caminho é obrigatório");
     }
 
     public EmptyPathException(String message) {

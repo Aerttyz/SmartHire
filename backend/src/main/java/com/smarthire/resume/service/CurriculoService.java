@@ -17,10 +17,7 @@ import com.smarthire.resume.exception.PersistenceException;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -61,7 +58,10 @@ public class CurriculoService {
             ResponseEntity<Map> response = restTemplate.postForEntity(flaskUrl, entity, Map.class);
             return response.getBody();
         } catch (HttpClientErrorException ex) {
-            throw new InvalidPathException();
+            if(ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new InvalidPathException();
+            }
+            throw new FlaskConnectionException("Erro inesperado no serviço Flask. Tente novamente mais tarde");
         } catch (ResourceAccessException ex) {
             throw new FlaskConnectionException();
         }
