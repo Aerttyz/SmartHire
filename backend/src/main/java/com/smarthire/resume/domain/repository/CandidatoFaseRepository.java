@@ -12,4 +12,6 @@ import java.util.List;
 @Repository
 public interface CandidatoFaseRepository extends JpaRepository<CandidatoFase, UUID> {
     List<CandidatoFase> findByCandidato_IdIn(List<UUID> idCandidatos);
+
+    List<CandidatoFase> findByFase_Id(UUID idFase);
 }

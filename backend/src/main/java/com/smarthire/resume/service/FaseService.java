@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.smarthire.resume.domain.DTO.CandidatoDto;
 import com.smarthire.resume.domain.DTO.FaseDto;
+import com.smarthire.resume.domain.DTO.VagaResumoDto;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.CandidatoFase;
 import com.smarthire.resume.domain.model.Fase;
@@ -101,5 +103,58 @@ public class FaseService {
             })
             .collect(Collectors.toList());
         faseRepository.saveAll(fases);
+    }
+
+    public List<FaseDto> listarFases(UUID id) {
+        vagaRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+
+        List<Fase> fases = faseRepository.findByVaga_Id(id);
+        if (fases.isEmpty()) {
+            throw new BusinessRuleException("Nenhuma fase encontrada.");
+        }
+
+        return fases.stream()
+                .map(fase -> new FaseDto(
+                        fase.getTitulo(),
+                        fase.getDescricao(),
+                        fase.getOrdem()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<CandidatoDto> listarCandidatosNaFase(UUID idFase) {
+        try {
+            faseRepository.findById(idFase)
+                    .orElseThrow(() -> new ItemNotFoundException("Fase", idFase));
+        } catch (ItemNotFoundException e) {
+            throw new BusinessRuleException("Fase não encontrada.");
+        }
+        try {
+            List<CandidatoFase> candidatosNaFase = candidatoFaseRepository.findByFase_Id(idFase);
+            if (candidatosNaFase.isEmpty()) {
+                throw new BusinessRuleException("Nenhum candidato encontrado na fase.");
+            }
+            
+
+            return candidatosNaFase.stream()
+                .map(candidatoFase -> new CandidatoDto(
+                        candidatoFase.getCandidato().getId(),
+                        candidatoFase.getCandidato().getNome(),
+                        candidatoFase.getCandidato().getEmail(),
+                        candidatoFase.getCandidato().getTelefone(),
+                        candidatoFase.getCandidato().getCurriculo().getHabilidades(),
+                        candidatoFase.getCandidato().getCurriculo().getIdiomas(),
+                        candidatoFase.getCandidato().getCurriculo().getFormacaoAcademica(),
+                        candidatoFase.getCandidato().getCurriculo().getExperiencia(),
+                        new VagaResumoDto(
+                                candidatoFase.getCandidato().getVaga().getId(),
+                                candidatoFase.getCandidato().getVaga().getNome()
+                        )
+                ))
+                .collect(Collectors.toList());
+        } catch (BusinessRuleException e) {
+            throw new BusinessRuleException("Nenhum candidato encontrado na fase.");
+        }
     }
 }
