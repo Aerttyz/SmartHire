@@ -1,8 +1,6 @@
 package com.smarthire.resume.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
@@ -17,16 +15,11 @@ import com.smarthire.resume.exception.PersistenceException;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,7 +39,7 @@ public class CurriculoService {
     @Autowired
     private CandidatoService candidatoService;
 
-    public Map<String, Object> analyzeFolder(String path) {
+    public Map<String, Object> analisarCurriculos(String path) {
         if (path == null || path.isEmpty()) {
             throw new EmptyPathException();
         }
@@ -61,15 +54,18 @@ public class CurriculoService {
             ResponseEntity<Map> response = restTemplate.postForEntity(flaskUrl, entity, Map.class);
             return response.getBody();
         } catch (HttpClientErrorException ex) {
-            throw new InvalidPathException();
+            if(ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new InvalidPathException();
+            }
+            throw new FlaskConnectionException("Erro inesperado no serviço Flask. Tente novamente mais tarde");
         } catch (ResourceAccessException ex) {
             throw new FlaskConnectionException();
         }
     }
 
     @Transactional
-    public List<Curriculo> salvarCurriculo(String pasta) {
-        Map<String, Object> resultado = analyzeFolder(pasta);
+    public List<Curriculo> salvarCurriculo(String pasta, UUID idVaga) {
+        Map<String, Object> resultado = analisarCurriculos(pasta);
         Map<String, Object> mapaDeEntidades = (Map<String, Object>) resultado.get("entities");
 
         List<Curriculo> curriculosSalvos = new ArrayList<>();
@@ -133,7 +129,7 @@ public class CurriculoService {
             curriculoRepository.save(curriculo);
             curriculosSalvos.add(curriculo);
             
-            candidatoService.criarComCurriculo(curriculo);
+            candidatoService.criarComCurriculo(curriculo, idVaga);
 
         }
 
