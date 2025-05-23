@@ -25,8 +25,6 @@ public class EmpresaController {
 
     @Autowired
     private EmpresaService empresaService;
-    @Autowired
-    private EmpresaRepository empresaRepository;
 
     @GetMapping
     public ResponseEntity<List<Empresa>> listarEmpresas() {
@@ -38,12 +36,6 @@ public class EmpresaController {
     public ResponseEntity<List<Empresa>> buscarEmpresa(@PathVariable String nomeEmpresa) {
         List<Empresa> empresas = empresaService.listarPorNome(nomeEmpresa);
         return ResponseEntity.ok(empresas);
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
-    public Empresa adicionarEmpresa(@Valid @RequestBody Empresa empresa) {
-        return empresaService.salvar(empresa);
     }
 
     @PutMapping("/{id}")

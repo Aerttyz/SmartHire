@@ -8,9 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smarthire.resume.domain.DTO.AuthDto;
+import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.service.AuthService;
 import com.smarthire.resume.service.EmpresaService;
 
@@ -24,6 +26,8 @@ public class AuthController {
     
     @Autowired
     private AuthService authService;
+    @Autowired
+    private EmpresaService empresaService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthDto authDto) {
@@ -34,4 +38,11 @@ public class AuthController {
                 .body(Collections.singletonMap("error", "Email ou senha inválidos"));
         }
     }
+
+    @PostMapping("/cadastrar")
+    public ResponseEntity<?> cadastrarEmpresa(@Valid @RequestBody Empresa empresa) {
+        empresaService.salvar(empresa);
+        return ResponseEntity.status(HttpStatus.CREATED).body(empresa);
+    }
+
 }
