@@ -36,6 +36,8 @@ public class CandidatoService {
     private VagaRepository vagaRepository;
     @Autowired
     private CurriculoRepository curriculoRepository;
+    @Autowired
+    private VagaService vagaService;
 
     @Transactional
     public Candidato salvar(Candidato candidato) {
@@ -127,13 +129,15 @@ public class CandidatoService {
 
 
     @Transactional
-    public void criarComCurriculo(Curriculo curriculo) {
+    public void criarComCurriculo(Curriculo curriculo, UUID idVaga) {
         Candidato candidato = new Candidato();
         candidato.setCurriculo(curriculo);
         candidato.setNome(curriculo.getNome());
         candidato.setEmail(curriculo.getEmail());
         candidato.setTelefone(curriculo.getTelefone());
 
+        Vaga vaga = vagaService.listarPorId(idVaga);
+        candidato.setVaga(vaga);
         salvar(candidato);
     }
     public void adicionarCandidatoAVaga(UUID idCandidato, UUID idVaga) {

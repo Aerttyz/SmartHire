@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.smarthire.resume.domain.model.Curriculo;
 
@@ -18,11 +19,13 @@ public class CurriculoController {
     @Autowired
     private CurriculoService curriculoService;
 
-    @PostMapping("/analyze-folder")
-    public ResponseEntity<?> analyzeFolder(@RequestBody Map<String, String> requestBody) {
+    @PostMapping("/analisar-curriculos/{idVaga}")
+    public ResponseEntity<?> analyzeFolder(@PathVariable("idVaga") UUID idVaga,
+                                           @RequestBody Map<String, String> requestBody) {
+
         String path = requestBody.get("path");
 
-        List<Curriculo>result = curriculoService.salvarCurriculo(path);
+        List<Curriculo>result = curriculoService.salvarCurriculo(path, idVaga);
         return ResponseEntity.ok(result);
     }
 }

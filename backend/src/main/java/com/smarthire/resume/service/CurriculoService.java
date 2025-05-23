@@ -1,8 +1,6 @@
 package com.smarthire.resume.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import com.smarthire.resume.domain.enums.Situacao;
 import com.smarthire.resume.domain.model.Candidato;
@@ -22,8 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,7 +64,7 @@ public class CurriculoService {
     }
 
     @Transactional
-    public List<Curriculo> salvarCurriculo(String pasta) {
+    public List<Curriculo> salvarCurriculo(String pasta, UUID idVaga) {
         Map<String, Object> resultado = analyzeFolder(pasta);
         Map<String, Object> mapaDeEntidades = (Map<String, Object>) resultado.get("entities");
 
@@ -133,7 +129,7 @@ public class CurriculoService {
             curriculoRepository.save(curriculo);
             curriculosSalvos.add(curriculo);
             
-            candidatoService.criarComCurriculo(curriculo);
+            candidatoService.criarComCurriculo(curriculo, idVaga);
 
         }
 
