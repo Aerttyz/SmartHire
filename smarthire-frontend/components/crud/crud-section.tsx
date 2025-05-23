@@ -5,16 +5,16 @@ import { CrudForm, type FormField } from "@/components/crud/crud-form"
 import { CrudTable } from "@/components/crud/crud-table"
 
 interface CrudSectionProps {
-  id: string
-  title: string
-  description: string
-  fields: FormField[]
-  submitLabel: string
-  onSubmit: (data: any) => void
-  isDanger?: boolean
-  showTable?: boolean
-  tableHeaders?: string[]
-  tableData?: string[][]
+  id: string;
+  title: string;
+  description: string;
+  fields: FormField[];
+  submitLabel: string;
+  onSubmit: (data: any) => void;
+  isDanger?: boolean;
+  showTable?: boolean;
+  tableHeaders?: string[];
+  tableData?: string[][];
 }
 
 export function CrudSection({

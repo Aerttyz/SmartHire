@@ -2,7 +2,7 @@ package com.smarthire.resume.exception;
 
 public class FlaskConnectionException extends RuntimeException {
     public FlaskConnectionException() {
-        super("Connection to Flask service failed");
+        super("Conexão com o serviço Flask falhou");
     }
     public FlaskConnectionException(String message) {
         super(message);

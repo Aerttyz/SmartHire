@@ -33,24 +33,19 @@ public class CandidatoService {
     private VagaRepository vagaRepository;
     @Autowired
     private CurriculoRepository curriculoRepository;
+    @Autowired
+    private VagaService vagaService;
 
     @Transactional
     public Candidato salvar(Candidato candidato) {
-        boolean emailEmUso = candidatoRepository.findByEmail(candidato.getEmail())
-                .filter(e-> !e.equals(candidato))
-                .isPresent();
-        if (emailEmUso) {
-            throw new BusinessRuleException("E-mail já cadastrado no sistema.");
-        }
+        verificarEmailEmUso(candidato.getEmail(), candidato);
         return candidatoRepository.save(candidato);
     }
 
     public CandidatoDto listarCandidatos(Candidato candidato) {
         Vaga vaga = candidato.getVaga();
         Curriculo curriculo = candidato.getCurriculo();
-        if(curriculo == null) {
-            throw new BusinessRuleException("Candidato não possui currículo");
-        }
+        verificarNulidadeCurriculo(curriculo);
 
         VagaResumoDto vagaResumoDto = null;
         if (vaga != null) {
@@ -106,7 +101,8 @@ public class CandidatoService {
                 .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada"));
 
         
-
+        verificarNulidadeCurriculo(curriculo);
+        verificarVagaAtiva(vaga);
         candidato.atualizarCom(data, curriculo, vaga);
 
         return candidatoRepository.save(candidato);
@@ -119,18 +115,24 @@ public class CandidatoService {
         }
         Candidato candidato = candidatoRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Candidato não encontrado."));
+        if(candidato.getVaga() != null) {
+            throw new BusinessRuleException("Candidato não pode ser deletado, pois está vinculado a uma vaga.");
+        }
         candidatoRepository.delete(candidato);
     }
 
 
     @Transactional
-    public void criarComCurriculo(Curriculo curriculo) {
+    public void criarComCurriculo(Curriculo curriculo, UUID idVaga) {
         Candidato candidato = new Candidato();
+        verificarNulidadeCurriculo(curriculo);
         candidato.setCurriculo(curriculo);
         candidato.setNome(curriculo.getNome());
         candidato.setEmail(curriculo.getEmail());
         candidato.setTelefone(curriculo.getTelefone());
 
+        Vaga vaga = vagaService.listarPorId(idVaga);
+        candidato.setVaga(vaga);
         salvar(candidato);
     }
     public void adicionarCandidatoAVaga(UUID idCandidato, UUID idVaga) {
@@ -144,10 +146,27 @@ public class CandidatoService {
         if(candidato.getVaga() != null) {
             throw new BusinessRuleException("Candidato já está vinculado a uma vaga.");
         }
-        if(!vaga.isActive()) {
-            throw new BusinessRuleException("Essa vaga não está aberta a candidaturas");
-        }
+        verificarVagaAtiva(vaga);
         candidato.setVaga(vaga);
         candidatoRepository.save(candidato);
+    }
+
+    private void verificarNulidadeCurriculo(Curriculo curriculo) {
+        if(curriculo == null) {
+            throw new BusinessRuleException("Currículo não pode ser nulo.");
+        }
+    }
+    private void verificarEmailEmUso(String email, Candidato candidato) {
+        boolean emailEmUso = candidatoRepository.findByEmail(candidato.getEmail())
+                .filter(e-> !e.equals(candidato))
+                .isPresent();
+        if (emailEmUso) {
+            throw new BusinessRuleException("E-mail já cadastrado no sistema.");
+        }
+    }
+    private void verificarVagaAtiva(Vaga vaga) {
+        if(!vaga.isActive()) {
+            throw new BusinessRuleException("Essa vaga não está aberta a candidaturas.");
+        }
     }
 }

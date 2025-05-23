@@ -43,7 +43,7 @@ public class VagaService {
     public void salvar(VagaDto dto) {
         validarPesos(dto);
         Empresa empresa = empresaRepository.findById(dto.empresaId())
-                .orElseThrow(() -> new BusinessRuleException("Empresa com Id" + dto.empresaId() + "não encontrada."));
+                .orElseThrow(() -> new BusinessRuleException("Empresa com Id" + dto.empresaId() + " não encontrada."));
         Vaga vaga = new Vaga();
         vaga.setNome(dto.nome());
         vaga.setEmpresa(empresa);
@@ -122,6 +122,12 @@ public class VagaService {
         return vagas.stream()
                 .map(this::listar)
                 .collect(Collectors.toList());
+    }
+
+    public Vaga listarPorId(UUID id) {
+        Vaga vaga = vagaRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+        return vaga;
     }
 
     public VagaRespostaDto atualizarVagaPorId(UUID id, VagaDto data) {

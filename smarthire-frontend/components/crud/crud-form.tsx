@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea"
 export interface CrudFormField {
   name: string
   label: string
-  type: "text" | "email" | "password" | "textarea" | "file"
+  type: "text" | "email" | "password" | "textarea" | "file" | "number"
   description?: string
 }
 
@@ -39,6 +39,12 @@ export function CrudForm({ fields, submitLabel, onSubmit, isDanger = false }: Cr
           acc[field.name] = z.string().email({ message: "Email inválido" })
         } else if (field.type === "file") {
           acc[field.name] = z.any()
+        } else if (field.type === "number") {
+          acc[field.name] = z.coerce.number({
+            invalid_type_error: "Erro: Número inválido",
+          })
+          .min(0, {message: "O coeficiente de peso deve estar entre 0 e 1."})
+          .max(1, {message: "O coeficiente de peso deve estar entre 0 e 1."})
         } else {
           acc[field.name] = z.string()
         }
@@ -87,8 +93,18 @@ export function CrudForm({ fields, submitLabel, onSubmit, isDanger = false }: Cr
                         formField.onChange(e.target.files?.[0] || null)
                       }}
                     />
+                  ) : field.type === "number" ? (
+                    <Input 
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      {...formField} 
+                      placeholder={field.label} />
                   ) : (
-                    <Input type={field.type} {...formField} placeholder={field.label} />
+                    <Input 
+                      type={field.type} 
+                      {...formField} 
+                      placeholder={field.label} />
                   )}
                 </FormControl>
                 {field.description && <FormDescription>{field.description}</FormDescription>}
