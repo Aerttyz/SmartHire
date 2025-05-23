@@ -124,6 +124,12 @@ public class VagaService {
                 .collect(Collectors.toList());
     }
 
+    public Vaga listarPorId(UUID id) {
+        Vaga vaga = vagaRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+        return vaga;
+    }
+
     public VagaRespostaDto atualizarVagaPorId(UUID id, VagaDto data) {
         validarPesos(data);
         Vaga vaga = vagaRepository.findById(id)
