@@ -11,12 +11,15 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.smarthire.resume.domain.DTO.FaseDto;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.CandidatoFase;
 import com.smarthire.resume.domain.model.Fase;
+import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.CandidatoFaseRepository;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.FaseRepository;
+import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.ItemNotFoundException;
 
@@ -31,6 +34,8 @@ public class FaseService {
     private FaseRepository faseRepository;
     @Autowired
     private CandidatoRepository candidatoRepository;
+    @Autowired
+    private VagaRepository vagaRepository;
 
 
     @Transactional
@@ -78,5 +83,23 @@ public class FaseService {
             }
         }
         candidatoFaseRepository.saveAll(atualizarCandidatoNaFase);
+    }
+
+    @Transactional
+    public void cadastrarFase(UUID id, List<FaseDto> fasesDto) {
+        Vaga vaga = vagaRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+
+        List<Fase> fases = fasesDto.stream()
+            .map(faseDto -> {
+                Fase fase = new Fase();
+                fase.setTitulo(faseDto.titulo());
+                fase.setDescricao(faseDto.descricao());
+                fase.setOrdem(faseDto.ordem());
+                fase.setVaga(vaga);
+                return fase;
+            })
+            .collect(Collectors.toList());
+        faseRepository.saveAll(fases);
     }
 }

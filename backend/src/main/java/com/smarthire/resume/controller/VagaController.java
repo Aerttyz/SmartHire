@@ -59,15 +59,7 @@ public class VagaController {
     public ResponseEntity<?> adicionarvaga(@Valid @RequestBody VagaDto vaga) {
         vagaService.salvar(vaga);
         return ResponseEntity.ok("Vaga cadastrada com sucesso");
-    }
-
-    @PostMapping("/{id}/fases")
-    public ResponseEntity<?> adicionarFasesNaVaga(@PathVariable UUID id, 
-                                                            @Valid @RequestBody List<FaseDto> fasesDto) {
-        vagaService.cadastrarFase(id, fasesDto);
-        return ResponseEntity.ok("Fases adicionadas com sucesso");
-    }
-    
+    }    
 
     @PutMapping("/{id}")
     public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,

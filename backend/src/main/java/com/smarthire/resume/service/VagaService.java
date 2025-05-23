@@ -159,21 +159,5 @@ public class VagaService {
         }
     }
 
-    @Transactional
-    public void cadastrarFase(UUID id, List<FaseDto> fasesDto) {
-        Vaga vaga = vagaRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
-
-        List<Fase> fases = fasesDto.stream()
-            .map(faseDto -> {
-                Fase fase = new Fase();
-                fase.setTitulo(faseDto.titulo());
-                fase.setDescricao(faseDto.descricao());
-                fase.setOrdem(faseDto.ordem());
-                fase.setVaga(vaga);
-                return fase;
-            })
-            .collect(Collectors.toList());
-        faseRepository.saveAll(fases);
-    }
+    
 }
