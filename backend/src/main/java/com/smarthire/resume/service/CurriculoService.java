@@ -121,8 +121,6 @@ public class CurriculoService {
                 
                 curriculo.setExperiencia(jsonLimpo);
             } catch (Exception e) {
-                // impressao da stack trace apenas para desenvolvimento
-                e.printStackTrace(); 
                 throw new PersistenceException("Erro ao salvar currículo");
             }
 
