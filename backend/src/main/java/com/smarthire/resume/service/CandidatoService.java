@@ -2,7 +2,6 @@ package com.smarthire.resume.service;
 
 import com.smarthire.resume.domain.DTO.CandidatoDto;
 import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
-import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.domain.DTO.VagaResumoDto;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.Curriculo;
@@ -18,12 +17,10 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
