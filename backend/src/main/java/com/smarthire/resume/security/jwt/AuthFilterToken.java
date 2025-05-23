@@ -31,7 +31,7 @@ public class AuthFilterToken extends  OncePerRequestFilter {
 
       String path = request.getRequestURI();
 
-      if (path.startsWith("/auth") || path.startsWith("/vagas") || path.startsWith("/empresas") || path.startsWith("/candidatos/") || path.startsWith("/curriculos")) {
+      if (path.startsWith("/auth")) {
         filterChain.doFilter(request, response);
         return;
       }
