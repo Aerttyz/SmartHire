@@ -41,8 +41,10 @@ export default function AdminPage() {
       })
       const result = await response.json()
       console.log("Empresa adicionada:", result)
+      alert("Empresa adicionada com sucesso!");
     } catch (error) {
       console.error("Erro ao adicionar empresa:", error)
+      alert(`Erro ao adicionar empresa: ${error}`);
     }
   }
 
@@ -51,23 +53,14 @@ export default function AdminPage() {
       const response = await fetch(`${API_URL}/${data.busca}`);
       const result = await response.json();
       setEmpresaBuscada(result);
+      setEmpresas([]);
       console.log("Empresa encontrada: ", result);
     } catch (error) {
-      console.error("Erro ao buscar empresa: ", error);
+      console.error("Erro ao buscar empresa: ", error); 
+      alert(`Erro ao buscar empresa: ${error}`);
       setEmpresaBuscada(null);
     }
   }
-
-  async function listarEmpresas(data: any) {
-    try {
-      const response = await fetch(`${API_URL}/${data.busca}`)
-      const result = await response.json()
-      console.log("Empresa encontrada:", result)
-    } catch (error) {
-      console.error("Erro ao buscar empresa:", error)
-    }
-  }
-
 
   async function atualizarEmpresa(data: any) {
     try {
@@ -78,7 +71,9 @@ export default function AdminPage() {
       })
       const result = await response.json()
       console.log("Empresa atualizada:", result)
+      alert("Dados da empresa atualizados com sucesso!")
     } catch (error) {
+      alert(`Erro ao atualizar empresa: ${error}`)
       console.error("Erro ao atualizar empresa:", error)
     }
   }
@@ -91,6 +86,7 @@ export default function AdminPage() {
       })
       if (response.ok) {
         console.log("Empresa removida com sucesso")
+        alert("Empresa removida do sistema.")
       } else {
         console.error("Erro ao remover empresa")
       }
@@ -115,51 +111,37 @@ export default function AdminPage() {
               { name: "endereco", label: "Endereço", type: "text" },
               { name: "telefone", label: "Telefone", type: "text" },
               { name: "email", label: "Email", type: "email" },
+              { name: "senha", label: "Senha", type: "password" },
             ]}
             submitLabel="Adicionar Empresa"
             onSubmit={adicionarEmpresa}
           />
+ 
           <CrudSection
             id="listar"
             title="Listar empresas cadastradas"
             description="Visualize todas as empresas cadastradas na plataforma."
             fields={[{ name: "busca", label: "Buscar por nome", type: "text" }]}
             submitLabel="Buscar"
-            onSubmit={listarEmpresas}
-            showTable={false} // Desativei a tabela por enquanto
-            tableHeaders={[]}
-            tableData={[]}
+            onSubmit={buscarEmpresa}
+            showTable={true}
+            tableHeaders={["Nome", "CNPJ", "Telefone", "Email"]}
+            tableData={
+              empresaBuscada 
+                ? [[ empresaBuscada.nome,
+                     empresaBuscada.cnpj,
+                     empresaBuscada.telefone,
+                     empresaBuscada.email, ]]
+                : 
+                empresas.map((empresa) => [
+                  empresa.nome,
+                  empresa.cnpj,
+                  empresa.telefone,
+                  empresa.email,
+              ])
+                }
           />
-
- 
-              <CrudSection
-                id="listar"
-                title="Listar empresas cadastradas"
-                description="Visualize todas as empresas cadastradas na plataforma."
-                fields={[{ name: "busca", label: "Buscar por nome", type: "text" }]}
-                submitLabel="Buscar"
-                onSubmit={buscarEmpresa}
-                showTable={true}
-                tableHeaders={["Nome", "CNPJ", "Telefone", "Email"]}
-                tableData={
-                  empresaBuscada 
-                    ? [[ 
-                        empresaBuscada.nome,
-                        empresaBuscada.cnpj,
-                        empresaBuscada.telefone,
-                        empresaBuscada.email,
-                      ]]
-                    : empresas.map((empresa) => [
-                      empresa.nome,
-                      empresa.cnpj,
-                      empresa.telefone,
-                      empresa.email,
-                    ])
-                    }
-              />
   
-
-
           <CrudSection
             id="atualizar"
             title="Atualizar dados de empresa"
@@ -171,6 +153,7 @@ export default function AdminPage() {
               { name: "endereco", label: "Endereço", type: "text" },
               { name: "telefone", label: "Telefone", type: "text" },
               { name: "email", label: "Email", type: "email" },
+              { name: "senha", label: "Senha", type: "password" },
             ]}
             submitLabel="Atualizar Empresa"
             onSubmit={atualizarEmpresa}

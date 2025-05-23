@@ -26,13 +26,20 @@ public class AuthFilterToken extends  OncePerRequestFilter {
     private UserDetailsServiceImpl userDetailsService;
 
     @Override
-     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-                System.out.println("Filtro executado para a URL: " + request.getRequestURI());
+     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+      System.out.println("Filtro executado para a URL: " + request.getRequestURI());
+
+      String path = request.getRequestURI();
+
+      if (path.startsWith("/auth") || path.startsWith("/vagas") || path.startsWith("/empresas") || path.startsWith("/candidatos/") || path.startsWith("/curriculos")) {
+        filterChain.doFilter(request, response);
+        return;
+      }
+
         try {
             String jwt = getToken(request);
             if(jwt != null && jwtUtil.validateToken(jwt)){
-                
+
                 String email = jwtUtil.getEmailToken(jwt);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
@@ -49,6 +56,8 @@ public class AuthFilterToken extends  OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
     }
+
+
     private String getToken(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if(StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")){

@@ -1,17 +1,51 @@
 "use client"
 
+import { Vaga } from "@/api/vaga.api"
 import { CrudSection } from "@/components/crud/crud-section"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
+import { useEffect, useState } from "react"
 
 export default function VagasPage() {
+    const [vagas, setVagas] = useState<Vaga[]>([]);
+    const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
+    const API_URL = "http://localhost:8080/vagas";
+
   const sidebarItems = [
     { id: "adicionar", label: "Adicionar uma vaga" },
     { id: "listar", label: "Listar vagas cadastradas" },
     { id: "atualizar", label: "Atualizar dados de vaga" },
     { id: "apagar", label: "Apagar dados de vaga" },
   ]
+
+  
+    useEffect(() => {
+      fetch("http://localhost:8080/vagas")
+        .then((res) => res.json())
+        .then((data: Vaga[]) => {
+          setVagas(data);
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar vagas: ", error)
+        })
+    }, []);
+
+  async function adicionarVaga(data: any) {
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+      const result = await response.json()
+      console.log("Vaga adicionada:", result)
+      alert("Vaga cadastrada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao cadastrar vaga:", error)
+      alert(`Erro ao cadastrar vaga: ${error}`);
+    }
+  }
 
   return (
     <DashboardShell>
@@ -25,14 +59,20 @@ export default function VagasPage() {
             description="Preencha os campos abaixo para adicionar uma nova vaga."
             fields={[
               { name: "titulo", label: "Título da Vaga", type: "text" },
-              { name: "empresa", label: "Empresa", type: "text" },
-              { name: "descricao", label: "Descrição", type: "textarea" },
-              { name: "requisitos", label: "Requisitos", type: "textarea" },
-              { name: "salario", label: "Salário", type: "text" },
-              { name: "local", label: "Local", type: "text" },
+              { name: "empresaId", label: "ID Empresa", type: "text" },
+              { name: "habilidades", label: "Habilidades", type: "textarea" },
+              { name: "idiomas", label: "Idiomas", type: "text" },
+              { name: "formacaoAcademica", label: "Nível (Médio completo, Graduação, Pós-graduação, etc)", type: "text" },
+              { name: "experiencia", label: "Tempo de experiência", type: "text" },
+
+              { name: "pesoHabilidades", label: "Peso HABILIDADES", type: "number" },
+              { name: "pesoIdiomas", label: "Peso IDIOMAS", type: "number" },
+              { name: "pesoFormacao", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
+              { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number" },
             ]}
+
             submitLabel="Adicionar Vaga"
-            onSubmit={(data) => console.log("Adicionar vaga:", data)}
+            onSubmit={adicionarVaga}
           />
           <CrudSection
             id="listar"
@@ -42,11 +82,8 @@ export default function VagasPage() {
             submitLabel="Buscar"
             onSubmit={(data) => console.log("Buscar vagas:", data)}
             showTable={true}
-            tableHeaders={["Título", "Empresa", "Local", "Salário", "Ações"]}
-            tableData={[
-              ["Desenvolvedor Frontend", "Empresa A", "São Paulo, SP", "R$ 8.000,00", ""],
-              ["Desenvolvedor Backend", "Empresa B", "Rio de Janeiro, RJ", "R$ 9.000,00", ""],
-            ]}
+            tableHeaders={[]}
+            tableData={[]}
           />
           <CrudSection
             id="atualizar"

@@ -25,9 +25,6 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @Autowired
-    private EmpresaService empresaService;
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthDto authDto) {
         try {

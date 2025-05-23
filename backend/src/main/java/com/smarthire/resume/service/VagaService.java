@@ -43,7 +43,7 @@ public class VagaService {
     public void salvar(VagaDto dto) {
         validarPesos(dto);
         Empresa empresa = empresaRepository.findById(dto.empresaId())
-                .orElseThrow(() -> new BusinessRuleException("Empresa com Id" + dto.empresaId() + "não encontrada."));
+                .orElseThrow(() -> new BusinessRuleException("Empresa com Id" + dto.empresaId() + " não encontrada."));
         Vaga vaga = new Vaga();
         vaga.setNome(dto.nome());
         vaga.setEmpresa(empresa);
