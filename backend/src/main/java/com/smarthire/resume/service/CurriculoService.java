@@ -39,7 +39,7 @@ public class CurriculoService {
     @Autowired
     private CandidatoService candidatoService;
 
-    public Map<String, Object> analyzeFolder(String path) {
+    public Map<String, Object> analisarCurriculos(String path) {
         if (path == null || path.isEmpty()) {
             throw new EmptyPathException();
         }
@@ -65,7 +65,7 @@ public class CurriculoService {
 
     @Transactional
     public List<Curriculo> salvarCurriculo(String pasta, UUID idVaga) {
-        Map<String, Object> resultado = analyzeFolder(pasta);
+        Map<String, Object> resultado = analisarCurriculos(pasta);
         Map<String, Object> mapaDeEntidades = (Map<String, Object>) resultado.get("entities");
 
         List<Curriculo> curriculosSalvos = new ArrayList<>();

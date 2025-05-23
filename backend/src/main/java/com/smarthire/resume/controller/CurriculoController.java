@@ -13,14 +13,14 @@ import java.util.UUID;
 import com.smarthire.resume.domain.model.Curriculo;
 
 @RestController
-@RequestMapping("/resume")
+@RequestMapping("/curriculos")
 public class CurriculoController {
 
     @Autowired
     private CurriculoService curriculoService;
 
     @PostMapping("/analisar-curriculos/{idVaga}")
-    public ResponseEntity<?> analyzeFolder(@PathVariable("idVaga") UUID idVaga,
+    public ResponseEntity<?> analisarCurriculos(@PathVariable("idVaga") UUID idVaga,
                                            @RequestBody Map<String, String> requestBody) {
 
         String path = requestBody.get("path");
