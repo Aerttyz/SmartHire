@@ -21,7 +21,7 @@ export default function LandingPage() {
             />
             <span className="text-xl font-bold">SmartHire</span>
           </div>
-          <Link href="/login">
+          <Link href="/auth/login">
             <Button variant="outline">Entrar</Button>
           </Link>
         </div>

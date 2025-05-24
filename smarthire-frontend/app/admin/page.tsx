@@ -117,7 +117,7 @@ export default function AdminPage() {
             onSubmit={adicionarEmpresa}
           />
  
-          <CrudSection
+{/*           <CrudSection
             id="listar"
             title="Listar empresas cadastradas"
             description="Visualize todas as empresas cadastradas na plataforma."
@@ -140,7 +140,7 @@ export default function AdminPage() {
                   empresa.email,
               ])
                 }
-          />
+          /> */}
   
           <CrudSection
             id="atualizar"

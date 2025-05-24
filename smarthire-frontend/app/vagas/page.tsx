@@ -62,7 +62,7 @@ export default function VagasPage() {
               { name: "empresaId", label: "ID Empresa", type: "text" },
               { name: "habilidades", label: "Habilidades", type: "textarea" },
               { name: "idiomas", label: "Idiomas", type: "text" },
-              { name: "formacaoAcademica", label: "Nível (Médio completo, Graduação, Pós-graduação, etc)", type: "text" },
+              { name: "formacaoAcademica", label: "Formação acadêmica", type: "text" },
               { name: "experiencia", label: "Tempo de experiência", type: "text" },
 
               { name: "pesoHabilidades", label: "Peso HABILIDADES", type: "number" },
