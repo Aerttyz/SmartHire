@@ -2,6 +2,7 @@ package com.smarthire.resume.service;
 
 import com.smarthire.resume.domain.DTO.CandidatoDto;
 import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
+import com.smarthire.resume.domain.DTO.EmailDTO;
 import com.smarthire.resume.domain.DTO.VagaResumoDto;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.Curriculo;
@@ -99,12 +100,18 @@ public class CandidatoService {
 
         Vaga vaga = vagaRepository.findById(data.vagaId())
                 .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada"));
-
         
         verificarNulidadeCurriculo(curriculo);
         verificarVagaAtiva(vaga);
         candidato.atualizarCom(data, curriculo, vaga);
 
+        return candidatoRepository.save(candidato);
+    }
+
+    public Candidato atualizarEmailPorId(UUID id, EmailDTO email) {
+        Candidato candidato = candidatoRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Candidato", id));
+        candidato.updateEmail(email.email());
         return candidatoRepository.save(candidato);
     }
 

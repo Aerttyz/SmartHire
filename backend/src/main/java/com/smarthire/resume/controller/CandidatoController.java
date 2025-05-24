@@ -1,5 +1,6 @@
 package com.smarthire.resume.controller;
 import com.smarthire.resume.domain.DTO.CandidatoDto;
+import com.smarthire.resume.domain.DTO.EmailDTO;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
 import com.smarthire.resume.service.CandidatoService;
@@ -44,6 +45,13 @@ public class CandidatoController {
             @Valid @RequestBody CandidatoRequestDTO data) {
 
         Candidato candidatoAtualizado = candidatoService.atualizarCandidatoPorId(id, data);
+        return ResponseEntity.ok(candidatoAtualizado);
+    }
+
+    @PatchMapping("/{id}/email")
+    public ResponseEntity<Candidato> atualizarEmail(@PathVariable UUID id,
+                                                    @Valid @RequestBody EmailDTO data) {
+        Candidato candidatoAtualizado = candidatoService.atualizarEmailPorId(id, data);
         return ResponseEntity.ok(candidatoAtualizado);
     }
 

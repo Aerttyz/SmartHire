@@ -38,4 +38,9 @@ public class Candidato {
         this.curriculo = curriculo;
         this.vaga = vaga;
     }
+
+    public void updateEmail(String novoEmail) {
+        this.email = novoEmail;
+    }
+
 }
