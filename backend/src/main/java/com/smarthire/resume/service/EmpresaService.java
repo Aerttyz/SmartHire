@@ -95,4 +95,13 @@ public class EmpresaService {
         empresaRepository.delete(empresa);
     }
 
+    @Transactional
+    public void excluirPorEmail(String email) {
+        Empresa empresa = empresaRepository.findByEmail(email)
+          .orElseThrow(() -> new BusinessRuleException("Empresa autenticad anão encontrada."));
+        empresaRepository.delete(empresa);
+    }
+
+
+
 }

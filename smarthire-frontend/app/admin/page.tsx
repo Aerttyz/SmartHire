@@ -135,21 +135,41 @@ const token = document.cookie
   }
 
 
-  async function apagarEmpresa(data: any) {
-    try {
-      const response = await fetch(`${API_URL}/${data.id}`, {
-        method: "DELETE",
-      })
-      if (response.ok) {
-        console.log("Empresa removida com sucesso")
-        alert("Empresa removida do sistema.")
-      } else {
-        console.error("Erro ao remover empresa")
-      }
-    } catch (error) {
-      console.error("Erro ao apagar empresa:", error)
-    }
+async function apagarEmpresa() {
+  const confirmacao = window.confirm("Deseja mesmo excluir sua empresa? Esta ação é irreversível.");
+
+  if (!confirmacao) {
+    return; // Usuário cancelou
   }
+
+  try {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+
+    const response = await fetch("http://localhost:8080/empresas/me", {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      console.log("Empresa removida com sucesso");
+      alert("Empresa removida do sistema.");
+      
+      window.location.href = "/auth/login";
+    } else {
+      console.error("Erro ao remover empresa");
+      alert("Erro ao remover empresa.");
+    }
+  } catch (error) {
+    console.error("Erro ao apagar empresa:", error);
+    alert("Erro inesperado ao tentar excluir a empresa.");
+  }
+}
+
 
   return (
     <DashboardShell>
@@ -219,7 +239,7 @@ const token = document.cookie
             id="apagar"
             title="Apagar dados de empresa"
             description="Selecione uma empresa para remover do sistema."
-            fields={[{ name: "id", label: "ID da Empresa", type: "text" }]}
+            fields={[]}
             submitLabel="Apagar Empresa"
             onSubmit={apagarEmpresa}
             isDanger={true}

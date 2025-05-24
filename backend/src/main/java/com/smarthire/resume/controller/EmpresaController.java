@@ -7,6 +7,7 @@ import com.smarthire.resume.service.EmpresaService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,17 @@ public class EmpresaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removerEmpresa(@PathVariable UUID id) {
         empresaService.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> removerEmpresaPorEmail(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String email = authentication.getName();
+        empresaService.excluirPorEmail(email);
         return ResponseEntity.noContent().build();
     }
 
