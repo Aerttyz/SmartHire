@@ -14,6 +14,8 @@ import java.util.UUID;
 public class UserDetailsImpls implements UserDetails{
     private static final long serialVersionUID = 1L;
 
+    private Empresa empresa;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include

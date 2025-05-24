@@ -8,10 +8,9 @@ const api = axios.create({
 })
 
 export interface Empresa {
-  id: string;
+  id?: string;
   nome: string;
   cnpj: string;
-  endereco: string;
   telefone: string;
   email: string;
   senha: string;

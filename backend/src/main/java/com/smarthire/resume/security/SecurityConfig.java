@@ -41,12 +41,12 @@ public class SecurityConfig {
    }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.cors(Customizer.withDefaults())
       .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for stateless APIs
       .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      .authorizeHttpRequests(auth->
+      .authorizeHttpRequests(auth ->
         auth.requestMatchers("/**").permitAll()
       );
     http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);

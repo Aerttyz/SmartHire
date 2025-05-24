@@ -35,7 +35,6 @@ export default function LoginPage() {
                     fields={[
                       { name: "nome", label: "Nome da Empresa", type: "text" },
                       { name: "cnpj", label: "CNPJ", type: "text" },
-                      { name: "endereco", label: "Endereço", type: "text" },
                       { name: "telefone", label: "Telefone", type: "text" },
                       { name: "email", label: "Email", type: "email" },
                       { name: "senha", label: "Senha", type: "password" },

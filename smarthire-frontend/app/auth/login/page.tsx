@@ -8,8 +8,8 @@ import Link from "next/link"
 import { useState } from "react"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("")  ;
     
   const API_URL = "http://localhost:8080/auth/login";
 
@@ -27,13 +27,17 @@ export default function LoginPage() {
 
       const result = await response.json()
       const token = result.token;
-      document.cookie = 
-        `token=${token}; 
-          path=/; 
-          max-age=9000; 
-          secure
-        `
+      document.cookie = `token=${token}; path=/; max-age=9000`;
+      const token2 = document.cookie
+        .split(';')
+        .map(cookie => cookie.trim())
+        .find(cookie => cookie.startsWith('token='))
+        ?.split('=')[1];
       console.log("Empresa logada:", result)
+      console.log("Este é o token: ", token);
+      console.log("Este é o token2: ", token2);
+      console.log("Cookies atuais: ", document.cookie);
+
       alert("Empresa logada com sucesso!");
       window.location.href = "/dashboard";
 
@@ -73,9 +77,7 @@ export default function LoginPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Link href="/dashboard" className="w-full">
               <Button className="w-full" type="submit">Entrar</Button>
-            </Link>
             <div className="text-center text-sm">
               <Link href="#" className="text-muted-foreground hover:underline">
                 Esqueceu sua senha?

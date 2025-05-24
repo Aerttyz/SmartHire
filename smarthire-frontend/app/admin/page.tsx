@@ -9,7 +9,14 @@ import { useEffect, useState } from "react"
 
 export default function AdminPage() {
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [empresa, setEmpresa ] = useState<Empresa>({nome: "", cnpj: "", telefone: "", email: "", senha: "" });
   const [empresaBuscada, setEmpresaBuscada] = useState<Empresa | null>(null);
+
+const token = document.cookie
+        .split(';')
+        .map(cookie => cookie.trim())
+        .find(cookie => cookie.startsWith('token='))
+        ?.split('=')[1];
 
   const sidebarItems = [
     { id: "adicionar", label: "Adicionar uma empresa" },
@@ -19,18 +26,53 @@ export default function AdminPage() {
   ]
 
   const API_URL = "http://localhost:8080/empresas";
+  console.log("Cookies atuais: ", document.cookie);
+  console.log("Este é o novo token: ", token);
 
   useEffect(() => {
-    fetch("http://localhost:8080/empresas")
-      .then((res) => res.json())
-      .then((data: Empresa[]) => {
-        setEmpresas(data);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar empresas: ", error)
-      })
+    try {
+      const token = document.cookie
+          .split(';  ')
+          .find(row => row.startsWith('token='))
+          ?.split('=')[1];
+      console.log("Este é o token ", token );
+  
+      fetch("http://localhost:8080/empresas", {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}`}),
+          },
+        })
+        .then((res) => res.json())
+        .then((data: Empresa[]) => {
+          setEmpresas(data);
+        })
+
+    } catch (error) {
+      console.error("Erro ao buscar empresas: ", error)
+    }
   }, []);
 
+  async function carregarEmpresaLogada() {
+  try {
+    const response = await fetch(`${API_URL}/me`, {
+      method: "GET",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error("Erro ao buscar dados da empresa logada")
+    }
+
+    const empresa = await response.json()
+    setEmpresa(empresa)
+  } catch (error) {
+    console.error("Erro ao carregar empresa logada:", error)
+  }
+}
 
   async function adicionarEmpresa(data: any) {
     try {
@@ -50,25 +92,39 @@ export default function AdminPage() {
 
   async function buscarEmpresa(data: any) {
     try {
-      const response = await fetch(`${API_URL}/${data.busca}`);
+      const response = await fetch(`${API_URL}/${data.busca}`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}`}),
+        },
+      });
+
+      if (!response.ok) { throw new Error(`Erro do servidor: ${response.status}`); }
+
       const result = await response.json();
-      setEmpresaBuscada(result);
+      setEmpresaBuscada(result[0]);
       setEmpresas([]);
-      console.log("Empresa encontrada: ", result);
     } catch (error) {
-      console.error("Erro ao buscar empresa: ", error); 
-      alert(`Erro ao buscar empresa: ${error}`);
-      setEmpresaBuscada(null);
-    }
+        console.error("Erro ao buscar empresa: ", error); 
+        alert(`Erro ao buscar empresa: ${error}`);
+        setEmpresaBuscada(null);
+      }
   }
 
   async function atualizarEmpresa(data: any) {
     try {
-      const response = await fetch(`${API_URL}/${data.id}`, {
+      const response = await fetch(`${API_URL}/me`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && {Authorization: `Bearer ${token}`}),
+        },
         body: JSON.stringify(data),
       })
+
+      if (!response.ok) { throw new Error(`Erro do servidor: ${response.status}`); }
+
       const result = await response.json()
       console.log("Empresa atualizada:", result)
       alert("Dados da empresa atualizados com sucesso!")
@@ -108,7 +164,6 @@ export default function AdminPage() {
             fields={[
               { name: "nome", label: "Nome da Empresa", type: "text" },
               { name: "cnpj", label: "CNPJ", type: "text" },
-              { name: "endereco", label: "Endereço", type: "text" },
               { name: "telefone", label: "Telefone", type: "text" },
               { name: "email", label: "Email", type: "email" },
               { name: "senha", label: "Senha", type: "password" },
@@ -117,7 +172,7 @@ export default function AdminPage() {
             onSubmit={adicionarEmpresa}
           />
  
-{/*           <CrudSection
+          <CrudSection
             id="listar"
             title="Listar empresas cadastradas"
             description="Visualize todas as empresas cadastradas na plataforma."
@@ -128,10 +183,12 @@ export default function AdminPage() {
             tableHeaders={["Nome", "CNPJ", "Telefone", "Email"]}
             tableData={
               empresaBuscada 
-                ? [[ empresaBuscada.nome,
-                     empresaBuscada.cnpj,
-                     empresaBuscada.telefone,
-                     empresaBuscada.email, ]]
+                ? [[ 
+                  empresaBuscada.nome.toString() ?? "sem nome",
+                  empresaBuscada.cnpj.toString() ?? "cnpj",
+                  empresaBuscada.telefone.toString() ?? "tel",
+                  empresaBuscada.email.toString() ?? "email", 
+                ]]
                 : 
                 empresas.map((empresa) => [
                   empresa.nome,
@@ -140,17 +197,15 @@ export default function AdminPage() {
                   empresa.email,
               ])
                 }
-          /> */}
+          />
   
           <CrudSection
             id="atualizar"
-            title="Atualizar dados de empresa"
+            title="Atualizar dados cadastrais"
             description="Selecione uma empresa e atualize seus dados."
             fields={[
-              { name: "id", label: "ID da Empresa", type: "text" },
               { name: "nome", label: "Nome da Empresa", type: "text" },
               { name: "cnpj", label: "CNPJ", type: "text" },
-              { name: "endereco", label: "Endereço", type: "text" },
               { name: "telefone", label: "Telefone", type: "text" },
               { name: "email", label: "Email", type: "email" },
               { name: "senha", label: "Senha", type: "password" },
@@ -158,6 +213,8 @@ export default function AdminPage() {
             submitLabel="Atualizar Empresa"
             onSubmit={atualizarEmpresa}
           />
+
+          
           <CrudSection
             id="apagar"
             title="Apagar dados de empresa"

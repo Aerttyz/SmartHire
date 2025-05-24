@@ -1,6 +1,7 @@
 package com.smarthire.resume.service;
 
 import com.smarthire.resume.domain.DTO.EmpresaRequestDTO;
+import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
@@ -9,12 +10,13 @@ import com.smarthire.resume.exception.ItemNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import java.util.UUID;
 import java.util.List;
 
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @AllArgsConstructor
@@ -63,6 +65,26 @@ public class EmpresaService {
         empresa.setTelefone(data.telefone());
         
         return empresaRepository.save(empresa);
+    }
+
+    public EmpresaResponseDTO atualizarEmpresaPorIdEncapsulado(EmpresaRequestDTO data, Authentication authentication) {
+        String emailEmpresa = authentication.getName(); // pegando do JWT aq
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        Empresa empresa = empresaRepository.findByEmail(emailEmpresa)
+          .orElseThrow(() -> new UsernameNotFoundException("Empresa não encontrada (método de busca: findByEmail()."));
+
+        empresa.setNome(data.nome());
+        empresa.setCnpj(data.cnpj());
+        empresa.setTelefone(data.telefone());
+        empresa.setEmail(data.email());
+
+        if (data.senha() != null && !data.senha().isEmpty()) {
+            empresa.setSenha(encoder.encode(data.senha()));
+        }
+
+        empresaRepository.save(empresa);
+        return new EmpresaResponseDTO(empresa);
+
     }
 
 

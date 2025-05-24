@@ -7,5 +7,6 @@ public record EmpresaRequestDTO(
     @NotBlank String nome,
     @NotBlank String cnpj,
     @Email @NotBlank String email,
-    @NotBlank String telefone
+    @NotBlank String telefone,
+    @NotBlank String senha
 ){}

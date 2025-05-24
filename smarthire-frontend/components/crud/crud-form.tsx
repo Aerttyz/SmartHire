@@ -17,10 +17,10 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
 export interface CrudFormField {
-  name: string
-  label: string
-  type: "text" | "email" | "password" | "textarea" | "file" | "number"
-  description?: string
+  name: string;
+  label: string;
+  type: "text" | "email" | "password" | "textarea" | "file" | "number";
+  description?: string;
 }
 
 interface CrudFormProps {
@@ -36,17 +36,17 @@ export function CrudForm({ fields, submitLabel, onSubmit, isDanger = false }: Cr
     fields.reduce(
       (acc, field) => {
         if (field.type === "email") {
-          acc[field.name] = z.string().email({ message: "Email inválido" })
+          acc[field.name] = z.string().email({ message: "Email inválido" }).default("");
         } else if (field.type === "file") {
-          acc[field.name] = z.any()
+          acc[field.name] = z.any().default("");
         } else if (field.type === "number") {
           acc[field.name] = z.coerce.number({
             invalid_type_error: "Erro: Número inválido",
           })
           .min(0, {message: "O coeficiente de peso deve estar entre 0 e 1."})
-          .max(1, {message: "O coeficiente de peso deve estar entre 0 e 1."})
+          .max(1, {message: "O coeficiente de peso deve estar entre 0 e 1."}).default(0);
         } else {
-          acc[field.name] = z.string()
+          acc[field.name] = z.string().default("");
         }
         return acc
       },
