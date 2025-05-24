@@ -4,6 +4,7 @@ import com.smarthire.resume.exception.*;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,6 +34,12 @@ public class RestExceptionHandler {
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<RestErrorMessage> dataAccessHandler(DataAccessException ex) {
         RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao acessar dados. Contate o suporte.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
+    }
+
+    @ExceptionHandler(MailException.class)
+    public ResponseEntity<RestErrorMessage> mailSenderHandler(MailException ex) {
+        RestErrorMessage treatedResponse = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao enviar email.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
     }
 
