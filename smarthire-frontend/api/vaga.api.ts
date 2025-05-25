@@ -1,3 +1,4 @@
+import { FaseDto } from "@/lib/utils";
 import axios from "axios"
 
 const api = axios.create({
@@ -8,14 +9,22 @@ const api = axios.create({
 })
 
 export interface Vaga {
-  id: string
-  titulo: string
-  empresa: string
-  descricao: string
-  requisitos: string
-  salario: string
-  local: string
+  id?: string;
+  nome: string;
+  isActive: boolean | string;
+  habilidades: string;
+  idiomas: string;
+  formacaoAcademica: string;
+  experiencia: string;
+  pesoHabilidades: number;
+  pesoIdiomas: number;
+  pesoFormacaoAcademica: number;
+  pesoExperiencia: number;
+
+  empresaNome?: string;
+  fase?: FaseDto[];
 }
+
 
 export async function getVagas() {
   const response = await api.get<Vaga[]>("/")

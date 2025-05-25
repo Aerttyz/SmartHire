@@ -5,11 +5,21 @@ import { CrudSection } from "@/components/crud/crud-section"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
 export default function AdminPage() {
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [empresa, setEmpresa ] = useState<Empresa>({nome: "", cnpj: "", telefone: "", email: "", senha: "" });
   const [empresaBuscada, setEmpresaBuscada] = useState<Empresa | null>(null);
+
+const token = document.cookie
+        .split(';')
+        .map(cookie => cookie.trim())
+        .find(cookie => cookie.startsWith('token='))
+        ?.split('=')[1];
 
   const sidebarItems = [
     { id: "adicionar", label: "Adicionar uma empresa" },
@@ -19,18 +29,53 @@ export default function AdminPage() {
   ]
 
   const API_URL = "http://localhost:8080/empresas";
+  console.log("Cookies atuais: ", document.cookie);
+  console.log("Este é o novo token: ", token);
 
   useEffect(() => {
-    fetch("http://localhost:8080/empresas")
-      .then((res) => res.json())
-      .then((data: Empresa[]) => {
-        setEmpresas(data);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar empresas: ", error)
-      })
+    try {
+      const token = document.cookie
+          .split(';  ')
+          .find(row => row.startsWith('token='))
+          ?.split('=')[1];
+      console.log("Este é o token ", token );
+  
+      fetch("http://localhost:8080/empresas", {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}`}),
+          },
+        })
+        .then((res) => res.json())
+        .then((data: Empresa[]) => {
+          setEmpresas(data);
+        })
+
+    } catch (error) {
+      console.error("Erro ao buscar empresas: ", error)
+    }
   }, []);
 
+  async function carregarEmpresaLogada() {
+  try {
+    const response = await fetch(`${API_URL}/me`, {
+      method: "GET",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error("Erro ao buscar dados da empresa logada")
+    }
+
+    const empresa = await response.json()
+    setEmpresa(empresa)
+  } catch (error) {
+    console.error("Erro ao carregar empresa logada:", error)
+  }
+}
 
   async function adicionarEmpresa(data: any) {
     try {
@@ -50,25 +95,39 @@ export default function AdminPage() {
 
   async function buscarEmpresa(data: any) {
     try {
-      const response = await fetch(`${API_URL}/${data.busca}`);
+      const response = await fetch(`${API_URL}/${data.busca}`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}`}),
+        },
+      });
+
+      if (!response.ok) { throw new Error(`Erro do servidor: ${response.status}`); }
+
       const result = await response.json();
-      setEmpresaBuscada(result);
+      setEmpresaBuscada(result[0]);
       setEmpresas([]);
-      console.log("Empresa encontrada: ", result);
     } catch (error) {
-      console.error("Erro ao buscar empresa: ", error); 
-      alert(`Erro ao buscar empresa: ${error}`);
-      setEmpresaBuscada(null);
-    }
+        console.error("Erro ao buscar empresa: ", error); 
+        alert(`Erro ao buscar empresa: ${error}`);
+        setEmpresaBuscada(null);
+      }
   }
 
   async function atualizarEmpresa(data: any) {
     try {
-      const response = await fetch(`${API_URL}/${data.id}`, {
+      const response = await fetch(`${API_URL}/me`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && {Authorization: `Bearer ${token}`}),
+        },
         body: JSON.stringify(data),
       })
+
+      if (!response.ok) { throw new Error(`Erro do servidor: ${response.status}`); }
+
       const result = await response.json()
       console.log("Empresa atualizada:", result)
       alert("Dados da empresa atualizados com sucesso!")
@@ -79,21 +138,41 @@ export default function AdminPage() {
   }
 
 
-  async function apagarEmpresa(data: any) {
-    try {
-      const response = await fetch(`${API_URL}/${data.id}`, {
-        method: "DELETE",
-      })
-      if (response.ok) {
-        console.log("Empresa removida com sucesso")
-        alert("Empresa removida do sistema.")
-      } else {
-        console.error("Erro ao remover empresa")
-      }
-    } catch (error) {
-      console.error("Erro ao apagar empresa:", error)
-    }
+async function apagarEmpresa() {
+  const confirmacao = window.confirm("Deseja mesmo excluir sua empresa? Esta ação é irreversível.");
+
+  if (!confirmacao) {
+    return;
   }
+
+  try {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+
+    const response = await fetch("http://localhost:8080/empresas/me", {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      console.log("Empresa removida com sucesso");
+      alert("Empresa removida do sistema.");
+      
+      window.location.href = "/auth/login";
+    } else {
+      console.error("Erro ao remover empresa");
+      alert("Erro ao remover empresa.");
+    }
+  } catch (error) {
+    console.error("Erro ao apagar empresa:", error);
+    alert("Erro inesperado ao tentar excluir a empresa.");
+  }
+}
+
 
   return (
     <DashboardShell>
@@ -101,6 +180,36 @@ export default function AdminPage() {
       <div className="flex flex-col gap-8 md:flex-row py-10">
         <DashboardSidebar items={sidebarItems} />
         <div className="flex-1 space-y-8">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Vagas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Oportunidades</div>
+                <p className="text-xs text-muted-foreground">Crie e gerencie vagas de emprego</p>
+                <div className="mt-4">
+                  <Link href="/vagas">
+                    <Button>Acessar</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Currículos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Candidatos</div>
+                <p className="text-xs text-muted-foreground">Analise currículos com inteligência artificial</p>
+                <div className="mt-4">
+                  <Link href="/curriculos">
+                    <Button>Acessar</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           <CrudSection
             id="adicionar"
             title="Adicionar uma empresa"
@@ -108,7 +217,6 @@ export default function AdminPage() {
             fields={[
               { name: "nome", label: "Nome da Empresa", type: "text" },
               { name: "cnpj", label: "CNPJ", type: "text" },
-              { name: "endereco", label: "Endereço", type: "text" },
               { name: "telefone", label: "Telefone", type: "text" },
               { name: "email", label: "Email", type: "email" },
               { name: "senha", label: "Senha", type: "password" },
@@ -128,10 +236,12 @@ export default function AdminPage() {
             tableHeaders={["Nome", "CNPJ", "Telefone", "Email"]}
             tableData={
               empresaBuscada 
-                ? [[ empresaBuscada.nome,
-                     empresaBuscada.cnpj,
-                     empresaBuscada.telefone,
-                     empresaBuscada.email, ]]
+                ? [[ 
+                  empresaBuscada.nome.toString() ?? "sem nome",
+                  empresaBuscada.cnpj.toString() ?? "cnpj",
+                  empresaBuscada.telefone.toString() ?? "tel",
+                  empresaBuscada.email.toString() ?? "email", 
+                ]]
                 : 
                 empresas.map((empresa) => [
                   empresa.nome,
@@ -144,13 +254,11 @@ export default function AdminPage() {
   
           <CrudSection
             id="atualizar"
-            title="Atualizar dados de empresa"
+            title="Atualizar dados cadastrais"
             description="Selecione uma empresa e atualize seus dados."
             fields={[
-              { name: "id", label: "ID da Empresa", type: "text" },
               { name: "nome", label: "Nome da Empresa", type: "text" },
               { name: "cnpj", label: "CNPJ", type: "text" },
-              { name: "endereco", label: "Endereço", type: "text" },
               { name: "telefone", label: "Telefone", type: "text" },
               { name: "email", label: "Email", type: "email" },
               { name: "senha", label: "Senha", type: "password" },
@@ -158,11 +266,13 @@ export default function AdminPage() {
             submitLabel="Atualizar Empresa"
             onSubmit={atualizarEmpresa}
           />
+
+          
           <CrudSection
             id="apagar"
             title="Apagar dados de empresa"
             description="Selecione uma empresa para remover do sistema."
-            fields={[{ name: "id", label: "ID da Empresa", type: "text" }]}
+            fields={[]}
             submitLabel="Apagar Empresa"
             onSubmit={apagarEmpresa}
             isDanger={true}

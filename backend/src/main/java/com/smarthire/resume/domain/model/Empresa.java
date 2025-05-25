@@ -28,10 +28,10 @@ public class Empresa {
     private String senha;
     private String telefone;
 
-    public void atualizarCom(EmpresaRequestDTO data) {
-        this.cnpj = data.cnpj();
-        this.nome = data.nome();
-        this.email = data.email();
-        this.telefone = data.telefone();
-    }
+//    public void atualizarCom(EmpresaRequestDTO data) {
+//        this.cnpj = data.cnpj();
+//        this.nome = data.nome();
+//        this.email = data.email();
+//        this.telefone = data.telefone();
+//    }
 }

@@ -21,7 +21,7 @@ export default function LandingPage() {
             />
             <span className="text-xl font-bold">SmartHire</span>
           </div>
-          <Link href="/login">
+          <Link href="/auth/login">
             <Button variant="outline">Entrar</Button>
           </Link>
         </div>
@@ -38,7 +38,7 @@ export default function LandingPage() {
               Nossa plataforma conecta empresas e talentos de forma inteligente, economizando tempo e recursos no
               processo seletivo.
             </p>
-            <Link href="/login" className="w-full sm:w-auto">
+            <Link href="/auth/login" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto">
                 Começar agora
               </Button>
@@ -63,7 +63,7 @@ export default function LandingPage() {
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
               Junte-se a centenas de empresas que já transformaram seu processo de contratação.
             </p>
-            <Link href="/login">
+            <Link href="/auth/login">
               <Button size="lg" className="mt-4">
                 Acessar a plataforma
               </Button>

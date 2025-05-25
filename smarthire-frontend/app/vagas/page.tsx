@@ -5,47 +5,216 @@ import { CrudSection } from "@/components/crud/crud-section"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
+import { parseJwt } from "@/lib/utils"
 import { useEffect, useState } from "react"
 
 export default function VagasPage() {
-    const [vagas, setVagas] = useState<Vaga[]>([]);
-    const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
-    const API_URL = "http://localhost:8080/vagas";
+  
+  const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
+  const [vagas, setVagas] = useState<Vaga[]>([]);
+  const [vaga, setVaga] = useState<Vaga>({
+    nome: "",
+    isActive: true,
+    habilidades: "",
+    idiomas: "",
+    formacaoAcademica: "",
+    experiencia: "",
+    pesoHabilidades: 1,
+    pesoIdiomas: 1,
+    pesoFormacaoAcademica: 1,
+    pesoExperiencia: 1,
+  });
+
+const token = document.cookie
+        .split(';')
+        .map(cookie => cookie.trim())
+        .find(cookie => cookie.startsWith('token='))
+        ?.split('=')[1];
 
   const sidebarItems = [
     { id: "adicionar", label: "Adicionar uma vaga" },
-    { id: "listar", label: "Listar vagas cadastradas" },
+    { id: "listar", label: "Listar vaga cadastradas" },
     { id: "atualizar", label: "Atualizar dados de vaga" },
     { id: "apagar", label: "Apagar dados de vaga" },
   ]
 
-  
-    useEffect(() => {
-      fetch("http://localhost:8080/vagas")
-        .then((res) => res.json())
-        .then((data: Vaga[]) => {
-          setVagas(data);
-        })
-        .catch((error) => {
-          console.error("Erro ao buscar vagas: ", error)
-        })
-    }, []);
+  const API_URL = "http://localhost:8080/vagas";
+  console.log("Cookies atuais: ", document.cookie);
+  console.log("Este é o novo token: ", token);
 
-  async function adicionarVaga(data: any) {
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-      const result = await response.json()
-      console.log("Vaga adicionada:", result)
-      alert("Vaga cadastrada com sucesso!");
-    } catch (error) {
-      console.error("Erro ao cadastrar vaga:", error)
-      alert(`Erro ao cadastrar vaga: ${error}`);
+useEffect(() => {
+  if (!token) return;
+
+  fetch(`${API_URL}/me`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data: Vaga[]) => {
+      setVagas(data);
+    })
+    .catch((error) => {
+      console.error("Erro ao buscar vagas da empresa: ", error);
+    });
+}, [token]);
+
+  async function carregarVagaDaEmpresa() {
+  try {
+    const response = await fetch(`${API_URL}/me`, {
+      method: "GET",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error("Erro ao buscar dados da vaga empresa logada")
     }
+
+    const vaga = await response.json()
+    setVaga(vaga)
+  } catch (error) {
+    console.error("Erro ao carregar vaga da empresa logada:", error)
   }
+}
+
+async function adicionarVaga(data: any) {
+  const payload = {
+    nome: data.nome,
+    isActive: data.isActive,
+    habilidades: data["habilidades"],
+    idiomas: data["idiomas"],
+    formacaoAcademica: data["formacaoAcademica"],
+    experiencia: data["experiencia"],
+    pesoHabilidades: data["pesoHabilidades"],
+    pesoIdiomas: data["pesoIdiomas"],
+    pesoFormacaoAcademica: data["pesoFormacaoAcademica"],
+    pesoExperiencia: data["pesoExperiencia"],
+  };
+
+  try {
+    const response = await fetch("http://localhost:8080/vagas", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Erro ao adicionar vaga.");
+    }
+
+    const result = await response.text();
+    console.log("Vaga adicionada: ", result);
+    alert("Vaga cadastrada com sucesso!");
+  } catch (error: any) {
+    console.error("Erro ao adicionar vaga: ", error);
+    alert(`Erro ao adicionar vaga: ${error.message}`);
+  }
+}
+
+
+
+  async function buscarVaga(data: any) {
+    try {
+      const response = await fetch(`${API_URL}/${data.busca}`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}`}),
+        },
+      });
+
+      if (!response.ok) { throw new Error(`Erro do servidor: ${response.status}`); }
+
+      const result = await response.json();
+      setVagaBuscada(result[0]);
+      setVagas([]);
+    } catch (error) {
+        console.error("Erro ao buscar vaga: ", error); 
+        alert(`Erro ao buscar vaga: ${error}`);
+        setVagaBuscada(null);
+      }
+  }
+
+async function atualizarDadosVaga(data: any) {
+  try {
+    const vagaId = data.id;
+    const decodedToken = token ? parseJwt(token) : null;
+
+    if (!decodedToken || !decodedToken.empresaId) {
+      throw new Error("Token inválido ou empresaId não encontrado.");
+    }
+
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(vagaId)) {
+      throw new Error("O ID fornecido não é um UUID válido.");
+    }
+
+    const { id, ...payload } = data; // Desestrutura para pegar todos os dados, menos o id
+
+    payload.pesoHabilidades = Number(payload.pesoHabilidades);
+    payload.pesoIdiomas = Number(payload.pesoIdiomas);
+    payload.pesoFormacaoAcademica = Number(payload.pesoFormacaoAcademica);
+    payload.pesoExperiencia = Number(payload.pesoExperiencia);
+    payload.empresaId = decodedToken.empresaId;
+
+    const response = await fetch(`${API_URL}/${vagaId}`, { 
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify(payload), 
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Erro do servidor: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Vaga atualizada:", result);
+    alert("Dados da vaga atualizados com sucesso!");
+  } catch (error: any) {
+    alert(`Erro ao atualizar vaga: ${error.message || error}`);
+    console.error("Erro ao atualizar vaga:", error);
+  }
+}
+
+
+async function apagarVaga(data: any) {
+  const confirmacao = window.confirm("Deseja mesmo excluir esta vaga? Esta ação é irreversível.");
+  if (!confirmacao) return;
+
+  try {
+    const response = await fetch(`${API_URL}/${data.id}`, {
+      method: "DELETE",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
+    if (response.ok) {
+      console.log("Vaga removida com sucesso");
+      alert("Vaga removida do sistema.");
+      window.location.href = "/dashboard";
+    } else {
+      console.error("Erro ao remover vaga");
+      alert("Erro ao remover vaga.");
+    }
+  } catch (error) {
+    console.error("Erro ao apagar vaga:", error);
+    alert("Erro inesperado ao tentar excluir a vaga.");
+  }
+}
+
 
   return (
     <DashboardShell>
@@ -58,56 +227,88 @@ export default function VagasPage() {
             title="Adicionar uma vaga"
             description="Preencha os campos abaixo para adicionar uma nova vaga."
             fields={[
-              { name: "titulo", label: "Título da Vaga", type: "text" },
-              { name: "empresaId", label: "ID Empresa", type: "text" },
+              { name: "nome", label: "Título da Vaga", type: "text" },
               { name: "habilidades", label: "Habilidades", type: "textarea" },
               { name: "idiomas", label: "Idiomas", type: "text" },
-              { name: "formacaoAcademica", label: "Nível (Médio completo, Graduação, Pós-graduação, etc)", type: "text" },
+              { name: "formacaoAcademica", label: "Formação acadêmica", type: "text" },
               { name: "experiencia", label: "Tempo de experiência", type: "text" },
-
               { name: "pesoHabilidades", label: "Peso HABILIDADES", type: "number" },
               { name: "pesoIdiomas", label: "Peso IDIOMAS", type: "number" },
-              { name: "pesoFormacao", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
+              { name: "pesoFormacaoAcademica", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
               { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number" },
             ]}
-
             submitLabel="Adicionar Vaga"
-            onSubmit={adicionarVaga}
+            onSubmit={(data) => {
+              const payload = {
+                nome: data.nome,
+                isActive: true,
+                habilidades: data["habilidades"],
+                idiomas: data["idiomas"],
+                formacaoAcademica: data["formacaoAcademica"],
+                experiencia: data["experiencia"],
+                pesoHabilidades: Number(data["pesoHabilidades"]),
+                pesoIdiomas: Number(data["pesoIdiomas"]),
+                pesoFormacaoAcademica: Number(data["pesoFormacaoAcademica"]),
+                pesoExperiencia: Number(data["pesoExperiencia"]),
+              };
+
+              adicionarVaga(payload);
+            }}
           />
+
           <CrudSection
             id="listar"
             title="Listar vagas cadastradas"
             description="Visualize todas as vagas cadastradas na plataforma."
             fields={[{ name: "busca", label: "Buscar por título", type: "text" }]}
             submitLabel="Buscar"
-            onSubmit={(data) => console.log("Buscar vagas:", data)}
+            onSubmit={buscarVaga}
             showTable={true}
-            tableHeaders={[]}
-            tableData={[]}
+            tableHeaders={["Nome", "ID", "Ativa"]}
+            tableData={
+              vagaBuscada 
+                ? [[ 
+                  vagaBuscada.nome.toString() ?? "sem nome",
+                  vagaBuscada.id?.toString() ?? "sem id",
+                  vagaBuscada.isActive.toString() ?? "ativa?"
+                ]]
+                : 
+              vagas.map((vagas) => [
+                  vagas.nome,
+                  vagas.id!.toString(),
+                  vagas.isActive.toString()
+
+              ])
+            }
           />
+          
           <CrudSection
             id="atualizar"
             title="Atualizar dados de vaga"
             description="Selecione uma vaga e atualize seus dados."
             fields={[
               { name: "id", label: "ID da Vaga", type: "text" },
-              { name: "titulo", label: "Título da Vaga", type: "text" },
-              { name: "empresa", label: "Empresa", type: "text" },
-              { name: "descricao", label: "Descrição", type: "textarea" },
-              { name: "requisitos", label: "Requisitos", type: "textarea" },
-              { name: "salario", label: "Salário", type: "text" },
-              { name: "local", label: "Local", type: "text" },
+              { name: "nome", label: "Título da Vaga", type: "text" },
+              { name: "habilidades", label: "Habilidades", type: "textarea" },
+              { name: "idiomas", label: "Idiomas", type: "text" },
+              { name: "formacaoAcademica", label: "Formação acadêmica", type: "text" },
+              { name: "experiencia", label: "Tempo de experiência", type: "text" },
+              { name: "pesoHabilidades", label: "Peso HABILIDADES", type: "number" },
+              { name: "pesoIdiomas", label: "Peso IDIOMAS", type: "number" },
+              { name: "pesoFormacaoAcademica", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
+              { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number" },
             ]}
             submitLabel="Atualizar Vaga"
-            onSubmit={(data) => console.log("Atualizar vaga:", data)}
+            onSubmit={atualizarDadosVaga}
           />
+
           <CrudSection
             id="apagar"
             title="Apagar dados de vaga"
             description="Selecione uma vaga para remover do sistema."
             fields={[{ name: "id", label: "ID da Vaga", type: "text" }]}
             submitLabel="Apagar Vaga"
-            onSubmit={(data) => console.log("Apagar vaga:", data)}
+            onSubmit={apagarVaga}
             isDanger={true}
           />
         </div>

@@ -1,14 +1,14 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CrudForm, type FormField } from "@/components/crud/crud-form"
+import { CrudForm, CrudFormField, FormField } from "@/components/crud/crud-form"
 import { CrudTable } from "@/components/crud/crud-table"
 
 interface CrudSectionProps {
   id: string;
   title: string;
   description: string;
-  fields: FormField[];
+  fields: CrudFormField[];
   submitLabel: string;
   onSubmit: (data: any) => void;
   isDanger?: boolean;

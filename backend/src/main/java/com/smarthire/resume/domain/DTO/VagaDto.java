@@ -9,7 +9,7 @@ public record VagaDto (
     @NotBlank(message="O nome da vaga é obrigatório")
     String nome,
 
-    @NotNull(message="O ID da empresa é obrigatório")
+    // @NotNull(message="O ID da empresa é obrigatório")
     UUID empresaId,
     // analisar se pode-se colocar um default
     boolean isActive,
