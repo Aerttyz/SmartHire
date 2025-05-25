@@ -19,5 +19,6 @@ public interface VagaRepository extends JpaRepository<Vaga, UUID> {
     List<Vaga> findByNomeContainingIgnoreCaseAndEmpresa(String nome, Empresa empresa);
     boolean existsByNome(String nomeVaga);
     Optional<Vaga> findById(UUID id);
+    List<Vaga> findByEmpresaId(UUID empresaId);
     Optional<Vaga> findByIdAndEmpresa(UUID id, Empresa empresa);
 }

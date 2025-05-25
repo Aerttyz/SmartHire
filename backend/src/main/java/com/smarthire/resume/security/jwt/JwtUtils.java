@@ -56,7 +56,7 @@ public class JwtUtils {
 
     public String generateTokenFromUserDetailsImpl(UserDetailsImpls userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", userDetails.getUsername());
+        claims.put("email", userDetails.getId());
         claims.put("empresaId", userDetails.getId().toString());
 
         return Jwts.builder()

@@ -8,6 +8,8 @@ import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { useEffect, useState } from "react"
 
 export default function VagasPage() {
+  
+  const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
   const [vagas, setVagas] = useState<Vaga[]>([]);
   const [vaga, setVaga] = useState<Vaga>({
     nome: "",
@@ -21,8 +23,6 @@ export default function VagasPage() {
     pesoFormacaoAcademica: 1,
     pesoExperiencia: 1,
   });
-
-  const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
 
 const token = document.cookie
         .split(';')
@@ -44,7 +44,7 @@ const token = document.cookie
 useEffect(() => {
   if (!token) return;
 
-  fetch(API_URL, {
+  fetch(`${API_URL}/me`, {
     method: 'GET',
     headers: {
       "Content-Type": "application/json",
@@ -240,10 +240,22 @@ async function apagarVaga(data: any) {
             description="Visualize todas as vagas cadastradas na plataforma."
             fields={[{ name: "busca", label: "Buscar por título", type: "text" }]}
             submitLabel="Buscar"
-            onSubmit={(data) => console.log("Buscar vagas:", data)}
+            onSubmit={buscarVaga}
             showTable={true}
-            tableHeaders={[]}
-            tableData={[]}
+            tableHeaders={["Nome", "Ativa"]}
+            tableData={
+              vagaBuscada 
+                ? [[ 
+                  vagaBuscada.nome.toString() ?? "sem nome",
+                  vagaBuscada.isActive.toString() ?? "ativa?"
+                ]]
+                : 
+              vagas.map((vagas) => [
+                  vagas.nome,
+                  vagas.isActive.toString()
+
+              ])
+            }
           />
           <CrudSection
             id="atualizar"

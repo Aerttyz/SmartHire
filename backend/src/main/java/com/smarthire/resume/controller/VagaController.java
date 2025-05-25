@@ -3,6 +3,7 @@ package com.smarthire.resume.controller;
 import com.smarthire.resume.domain.DTO.CandidateScoreDTO;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
+import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.security.jwt.JwtUtils;
@@ -75,6 +76,19 @@ public class VagaController {
     public ResponseEntity<List<VagaRespostaDto>> listarTodas() {
         List<VagaRespostaDto> vagas = vagaService.listarTodas();
         return ResponseEntity.ok(vagas);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<VagaRespostaDto>> listarVagasDaEmpresa(HttpServletRequest request) {
+      //extrair o token
+      String token = request.getHeader("Authorization");
+      if (token != null && token.startsWith("Bearer ")) {
+        token = token.substring(7);
+      }
+
+      UUID empresaId = jwtUtils.getIdFromToken(token);
+      List<VagaRespostaDto> vagas = vagaService.listarTodasPorEmpresa(empresaId);
+      return ResponseEntity.ok(vagas);
     }
 
     @GetMapping({"/{nomeVaga}"})

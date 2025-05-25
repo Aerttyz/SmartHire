@@ -11,7 +11,7 @@ const api = axios.create({
 export interface Vaga {
   id?: string;
   nome: string;
-  isActive: boolean;
+  isActive: boolean | string;
   habilidades: string;
   idiomas: string;
   formacaoAcademica: string;

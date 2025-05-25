@@ -46,7 +46,7 @@ export default function LoginPage() {
         <CardFooter className="flex flex-col space-y-4">
           <br/>
           <div className="text-center text-sm">
-              Já possui conta? <Link href="/login" className="text-muted-foreground hover:underline">Cadastre-se aqui</Link>
+              Já possui conta? <Link href="/auth/login" className="text-muted-foreground hover:underline">Faça login aqui</Link>
           </div>
         </CardFooter>
       </Card>

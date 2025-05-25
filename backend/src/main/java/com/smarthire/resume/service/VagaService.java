@@ -210,6 +210,15 @@ public class VagaService {
         return vaga;
     }
 
+    public List<VagaRespostaDto> listarTodasPorEmpresa(UUID empresaId) {
+      List<Vaga> vagas = vagaRepository.findByEmpresaId(empresaId);
+
+      // sem excessão porque nenhuma empresa já entra com vagas
+      return vagas.stream()
+        .map(this::listar)
+        .collect(Collectors.toList());
+    }
+
     public VagaRespostaDto atualizarVagaPorId(UUID id, VagaDto data) {
         validarPesos(data);
         Vaga vaga = vagaRepository.findById(id)
