@@ -5,6 +5,7 @@ from app.utils.generate_llm_prompts import generate_gemini_prompt
 from app.services import gemini_api_service
 from app.utils import clean_text
 from app.exceptions import errors
+from app.logger import logger
 
 def extract_entities(path):
     texts = extract_text_from_pdf.open_folder(path)
@@ -12,6 +13,7 @@ def extract_entities(path):
         model_path = Path("app/nlp_models/output/model-best")
         nlp = spacy.load(model_path)
     except OSError as e:
+        logger.exception("Error loading model")
         raise errors.model_not_found(f"Model not found: {model_path}") from e
 
     all_resumes = {}
