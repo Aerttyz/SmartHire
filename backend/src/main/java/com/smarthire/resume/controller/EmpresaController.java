@@ -64,6 +64,4 @@ public class EmpresaController {
         empresaService.excluirPorEmail(email);
         return ResponseEntity.noContent().build();
     }
-
-
 }

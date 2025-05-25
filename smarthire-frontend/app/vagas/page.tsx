@@ -8,44 +8,189 @@ import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { useEffect, useState } from "react"
 
 export default function VagasPage() {
-    const [vagas, setVagas] = useState<Vaga[]>([]);
-    const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
-    const API_URL = "http://localhost:8080/vagas";
+  const [vagas, setVagas] = useState<Vaga[]>([]);
+  const [vaga, setVaga] = useState<Vaga>({
+    nome: "",
+    isActive: true,
+    habilidades: "",
+    idiomas: "",
+    formacaoAcademica: "",
+    experiencia: "",
+    pesoHabilidades: 1,
+    pesoIdiomas: 1,
+    pesoFormacaoAcademica: 1,
+    pesoExperiencia: 1,
+  });
+
+  const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
+
+const token = document.cookie
+        .split(';')
+        .map(cookie => cookie.trim())
+        .find(cookie => cookie.startsWith('token='))
+        ?.split('=')[1];
 
   const sidebarItems = [
-    { id: "adicionar", label: "Adicionar uma vaga" },
-    { id: "listar", label: "Listar vagas cadastradas" },
-    { id: "atualizar", label: "Atualizar dados de vaga" },
-    { id: "apagar", label: "Apagar dados de vaga" },
+    { id: "adicionar", label: "Adicionar uma empresa" },
+    { id: "listar", label: "Listar empresas cadastradas" },
+    { id: "atualizar", label: "Atualizar dados de empresa" },
+    { id: "apagar", label: "Apagar dados de empresa" },
   ]
 
-  
-    useEffect(() => {
-      fetch("http://localhost:8080/vagas")
-        .then((res) => res.json())
-        .then((data: Vaga[]) => {
-          setVagas(data);
-        })
-        .catch((error) => {
-          console.error("Erro ao buscar vagas: ", error)
-        })
-    }, []);
+  const API_URL = "http://localhost:8080/vagas";
+  console.log("Cookies atuais: ", document.cookie);
+  console.log("Este é o novo token: ", token);
 
-  async function adicionarVaga(data: any) {
+useEffect(() => {
+  if (!token) return;
+
+  fetch(API_URL, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data: Vaga[]) => {
+      setVagas(data);
+    })
+    .catch((error) => {
+      console.error("Erro ao buscar vagas da empresa: ", error);
+    });
+}, [token]);
+
+  async function carregarVagaDaEmpresa() {
+  try {
+    const response = await fetch(`${API_URL}/me`, {
+      method: "GET",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error("Erro ao buscar dados da vaga empresa logada")
+    }
+
+    const vaga = await response.json()
+    setVaga(vaga)
+  } catch (error) {
+    console.error("Erro ao carregar vaga da empresa logada:", error)
+  }
+}
+
+async function adicionarVaga(data: any) {
+  const payload = {
+    nome: data.nome,
+    isActive: data.isActive,
+    habilidades: data["habilidades"],
+    idiomas: data["idiomas"],
+    formacaoAcademica: data["formacaoAcademica"],
+    experiencia: data["experiencia"],
+    pesoHabilidades: data["pesoHabilidades"],
+    pesoIdiomas: data["pesoIdiomas"],
+    pesoFormacaoAcademica: data["pesoFormacaoAcademica"],
+    pesoExperiencia: data["pesoExperiencia"],
+  };
+
+  try {
+    const response = await fetch("http://localhost:8080/vagas", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Erro ao adicionar vaga.");
+    }
+
+    const result = await response.text();
+    console.log("Vaga adicionada: ", result);
+    alert("Vaga cadastrada com sucesso!");
+  } catch (error: any) {
+    console.error("Erro ao adicionar vaga: ", error);
+    alert(`Erro ao adicionar vaga: ${error.message}`);
+  }
+}
+
+
+
+  async function buscarVaga(data: any) {
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch(`${API_URL}/${data.busca}`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}`}),
+        },
+      });
+
+      if (!response.ok) { throw new Error(`Erro do servidor: ${response.status}`); }
+
+      const result = await response.json();
+      setVagaBuscada(result[0]);
+      setVagas([]);
+    } catch (error) {
+        console.error("Erro ao buscar vaga: ", error); 
+        alert(`Erro ao buscar vaga: ${error}`);
+        setVagaBuscada(null);
+      }
+  }
+
+  async function atualizarDadosVaga(data: any) {
+    try {
+      const response = await fetch(`${API_URL}/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && {Authorization: `Bearer ${token}`}),
+        },
         body: JSON.stringify(data),
       })
+
+      if (!response.ok) { throw new Error(`Erro do servidor: ${response.status}`); }
+
       const result = await response.json()
-      console.log("Vaga adicionada:", result)
-      alert("Vaga cadastrada com sucesso!");
+      console.log("Vaga atualizada:", result)
+      alert("Dados da vaga atualizados com sucesso!")
     } catch (error) {
-      console.error("Erro ao cadastrar vaga:", error)
-      alert(`Erro ao cadastrar vaga: ${error}`);
+      alert(`Erro ao atualizar vaga: ${error}`)
+      console.error("Erro ao atualizar vaga:", error)
     }
   }
+
+
+async function apagarVaga(data: any) {
+  const confirmacao = window.confirm("Deseja mesmo excluir esta vaga? Esta ação é irreversível.");
+  if (!confirmacao) return;
+
+  try {
+    const response = await fetch(`${API_URL}/${data.id}`, {
+      method: "DELETE",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
+    if (response.ok) {
+      console.log("Vaga removida com sucesso");
+      alert("Vaga removida do sistema.");
+      window.location.href = "/dashboard";
+    } else {
+      console.error("Erro ao remover vaga");
+      alert("Erro ao remover vaga.");
+    }
+  } catch (error) {
+    console.error("Erro ao apagar vaga:", error);
+    alert("Erro inesperado ao tentar excluir a vaga.");
+  }
+}
+
 
   return (
     <DashboardShell>
@@ -58,22 +203,37 @@ export default function VagasPage() {
             title="Adicionar uma vaga"
             description="Preencha os campos abaixo para adicionar uma nova vaga."
             fields={[
-              { name: "titulo", label: "Título da Vaga", type: "text" },
-              { name: "empresaId", label: "ID Empresa", type: "text" },
+              { name: "nome", label: "Título da Vaga", type: "text" },
               { name: "habilidades", label: "Habilidades", type: "textarea" },
               { name: "idiomas", label: "Idiomas", type: "text" },
               { name: "formacaoAcademica", label: "Formação acadêmica", type: "text" },
               { name: "experiencia", label: "Tempo de experiência", type: "text" },
-
               { name: "pesoHabilidades", label: "Peso HABILIDADES", type: "number" },
               { name: "pesoIdiomas", label: "Peso IDIOMAS", type: "number" },
-              { name: "pesoFormacao", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
+              { name: "pesoFormacaoAcademica", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
               { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number" },
             ]}
-
             submitLabel="Adicionar Vaga"
-            onSubmit={adicionarVaga}
+            onSubmit={(data) => {
+              const payload = {
+                nome: data.nome,
+                isActive: true,
+                habilidades: data["habilidades"],
+                idiomas: data["idiomas"],
+                formacaoAcademica: data["formacaoAcademica"],
+                experiencia: data["experiencia"],
+                pesoHabilidades: Number(data["pesoHabilidades"]),
+                pesoIdiomas: Number(data["pesoIdiomas"]),
+                pesoFormacaoAcademica: Number(data["pesoFormacaoAcademica"]),
+                pesoExperiencia: Number(data["pesoExperiencia"]),
+              };
+
+              adicionarVaga(payload);
+            }}
           />
+
+
+
           <CrudSection
             id="listar"
             title="Listar vagas cadastradas"

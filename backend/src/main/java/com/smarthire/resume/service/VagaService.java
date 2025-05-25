@@ -20,6 +20,9 @@ import com.smarthire.resume.exception.ItemNotFoundException;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,6 +41,83 @@ public class VagaService {
 
     @Autowired
     private FaseRepository faseRepository;
+
+    //--------------------------- serviços para o front ------------------------------------------
+    @Transactional
+    public void salvarAutenticado(VagaDto dto, Authentication authentication) {
+        validarPesos(dto);
+        Empresa empresa = obterEmpresaAutenticada(authentication);
+
+        Vaga vaga = new Vaga();
+        vaga.setNome(dto.nome());
+        vaga.setEmpresa(empresa);
+        vaga.setActive(dto.isActive());
+
+        VagaRequisitosModel requisitos = new VagaRequisitosModel();
+        requisitos.setHabilidades(dto.habilidades());
+        requisitos.setExperiencia(dto.experiencia());
+        requisitos.setFormacaoAcademica(dto.formacaoAcademica());
+        requisitos.setIdiomas(dto.idiomas());
+        requisitos.setPesoHabilidades(dto.pesoHabilidades());
+        requisitos.setPesoIdiomas(dto.pesoIdiomas());
+        requisitos.setPesoFormacaoAcademica(dto.pesoFormacaoAcademica());
+        requisitos.setPesoExperiencia(dto.pesoExperiencia());
+
+        requisitos.setVaga(vaga);
+        vaga.setRequisitos(requisitos);
+
+        vagaRepository.save(vaga);
+    }
+
+    public List<VagaRespostaDto> listarTodasAutenticado(Authentication authentication) {
+        Empresa empresa = obterEmpresaAutenticada(authentication);
+        List<Vaga> vagas = vagaRepository.findByEmpresa(empresa);
+        return vagas.stream().map(this::listar).collect(Collectors.toList());
+    }
+
+    public List<VagaRespostaDto> listarPorNomeAutenticado(String nome, Authentication authentication) {
+        Empresa empresa = obterEmpresaAutenticada(authentication);
+        List<Vaga> vagas = vagaRepository.findByNomeContainingIgnoreCaseAndEmpresa(nome, empresa);
+        return vagas.stream().map(this::listar).collect(Collectors.toList());
+    }
+
+    public VagaRespostaDto atualizarVagaAutenticado(UUID id, VagaDto dto, Authentication authentication) {
+        validarPesos(dto);
+        Empresa empresa = obterEmpresaAutenticada(authentication);
+
+        Vaga vaga = vagaRepository.findById(id)
+          .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+
+        if (!vaga.getEmpresa().getId().equals(empresa.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para atualizar esta vaga.");
+        }
+
+        vaga.vagaDtoMapper(dto, empresa);
+        Vaga vagaAtualizada = vagaRepository.save(vaga);
+        return listar(vagaAtualizada);
+    }
+
+    @Transactional
+    public void excluirAutenticado(UUID id, Authentication authentication) {
+        Empresa empresa = obterEmpresaAutenticada(authentication);
+
+        Vaga vaga = vagaRepository.findById(id)
+          .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+
+        if (!vaga.getEmpresa().getId().equals(empresa.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para excluir esta vaga.");
+        }
+
+        vagaRepository.delete(vaga);
+    }
+
+    private Empresa obterEmpresaAutenticada(Authentication authentication) {
+        String emailEmpresa = authentication.getName();
+        return empresaRepository.findByEmail(emailEmpresa)
+          .orElseThrow(() -> new UsernameNotFoundException("Empresa autenticada não encontrada."));
+    }
+
+    //--------------------------------- fim dos serviços para o front --------------------------------------
 
     @Transactional
     public void salvar(VagaDto dto) {
