@@ -5,6 +5,9 @@ import { CrudSection } from "@/components/crud/crud-section"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
 export default function AdminPage() {
@@ -139,7 +142,7 @@ async function apagarEmpresa() {
   const confirmacao = window.confirm("Deseja mesmo excluir sua empresa? Esta ação é irreversível.");
 
   if (!confirmacao) {
-    return; // Usuário cancelou
+    return;
   }
 
   try {
@@ -177,6 +180,36 @@ async function apagarEmpresa() {
       <div className="flex flex-col gap-8 md:flex-row py-10">
         <DashboardSidebar items={sidebarItems} />
         <div className="flex-1 space-y-8">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Vagas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Oportunidades</div>
+                <p className="text-xs text-muted-foreground">Crie e gerencie vagas de emprego</p>
+                <div className="mt-4">
+                  <Link href="/vagas">
+                    <Button>Acessar</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Currículos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Candidatos</div>
+                <p className="text-xs text-muted-foreground">Analise currículos com inteligência artificial</p>
+                <div className="mt-4">
+                  <Link href="/curriculos">
+                    <Button>Acessar</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           <CrudSection
             id="adicionar"
             title="Adicionar uma empresa"
