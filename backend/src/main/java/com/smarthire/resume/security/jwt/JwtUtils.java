@@ -78,22 +78,14 @@ public class JwtUtils {
     }
 
     public boolean validateToken(String authToken) {
-        try {
-            Claims claims = 
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken).getBody();
-            System.out.println("Claims: "+claims);
-            return true;
-        } catch (ExpiredJwtException e) {
-            e.printStackTrace();
-        } catch (MalformedJwtException e) {
-            e.printStackTrace();
-        } catch (UnsupportedJwtException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } 
-        return false;
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(authToken)
+                .getBody();
+        return true;
     }
+
     public Claims getClaims(String token) {
         return Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
