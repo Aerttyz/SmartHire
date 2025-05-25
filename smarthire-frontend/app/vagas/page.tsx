@@ -5,6 +5,7 @@ import { CrudSection } from "@/components/crud/crud-section"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
+import { parseJwt } from "@/lib/utils"
 import { useEffect, useState } from "react"
 
 export default function VagasPage() {
@@ -31,10 +32,10 @@ const token = document.cookie
         ?.split('=')[1];
 
   const sidebarItems = [
-    { id: "adicionar", label: "Adicionar uma empresa" },
-    { id: "listar", label: "Listar empresas cadastradas" },
-    { id: "atualizar", label: "Atualizar dados de empresa" },
-    { id: "apagar", label: "Apagar dados de empresa" },
+    { id: "adicionar", label: "Adicionar uma vaga" },
+    { id: "listar", label: "Listar vaga cadastradas" },
+    { id: "atualizar", label: "Atualizar dados de vaga" },
+    { id: "apagar", label: "Apagar dados de vaga" },
   ]
 
   const API_URL = "http://localhost:8080/vagas";
@@ -142,27 +143,50 @@ async function adicionarVaga(data: any) {
       }
   }
 
-  async function atualizarDadosVaga(data: any) {
-    try {
-      const response = await fetch(`${API_URL}/me`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && {Authorization: `Bearer ${token}`}),
-        },
-        body: JSON.stringify(data),
-      })
+async function atualizarDadosVaga(data: any) {
+  try {
+    const vagaId = data.id;
+    const decodedToken = token ? parseJwt(token) : null;
 
-      if (!response.ok) { throw new Error(`Erro do servidor: ${response.status}`); }
-
-      const result = await response.json()
-      console.log("Vaga atualizada:", result)
-      alert("Dados da vaga atualizados com sucesso!")
-    } catch (error) {
-      alert(`Erro ao atualizar vaga: ${error}`)
-      console.error("Erro ao atualizar vaga:", error)
+    if (!decodedToken || !decodedToken.empresaId) {
+      throw new Error("Token inválido ou empresaId não encontrado.");
     }
+
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(vagaId)) {
+      throw new Error("O ID fornecido não é um UUID válido.");
+    }
+
+    const { id, ...payload } = data; // Desestrutura para pegar todos os dados, menos o id
+
+    payload.pesoHabilidades = Number(payload.pesoHabilidades);
+    payload.pesoIdiomas = Number(payload.pesoIdiomas);
+    payload.pesoFormacaoAcademica = Number(payload.pesoFormacaoAcademica);
+    payload.pesoExperiencia = Number(payload.pesoExperiencia);
+    payload.empresaId = decodedToken.empresaId;
+
+    const response = await fetch(`${API_URL}/${vagaId}`, { 
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify(payload), 
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Erro do servidor: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Vaga atualizada:", result);
+    alert("Dados da vaga atualizados com sucesso!");
+  } catch (error: any) {
+    alert(`Erro ao atualizar vaga: ${error.message || error}`);
+    console.error("Erro ao atualizar vaga:", error);
   }
+}
 
 
 async function apagarVaga(data: any) {
@@ -232,8 +256,6 @@ async function apagarVaga(data: any) {
             }}
           />
 
-
-
           <CrudSection
             id="listar"
             title="Listar vagas cadastradas"
@@ -242,44 +264,51 @@ async function apagarVaga(data: any) {
             submitLabel="Buscar"
             onSubmit={buscarVaga}
             showTable={true}
-            tableHeaders={["Nome", "Ativa"]}
+            tableHeaders={["Nome", "ID", "Ativa"]}
             tableData={
               vagaBuscada 
                 ? [[ 
                   vagaBuscada.nome.toString() ?? "sem nome",
+                  vagaBuscada.id?.toString() ?? "sem id",
                   vagaBuscada.isActive.toString() ?? "ativa?"
                 ]]
                 : 
               vagas.map((vagas) => [
                   vagas.nome,
+                  vagas.id!.toString(),
                   vagas.isActive.toString()
 
               ])
             }
           />
+          
           <CrudSection
             id="atualizar"
             title="Atualizar dados de vaga"
             description="Selecione uma vaga e atualize seus dados."
             fields={[
               { name: "id", label: "ID da Vaga", type: "text" },
-              { name: "titulo", label: "Título da Vaga", type: "text" },
-              { name: "empresa", label: "Empresa", type: "text" },
-              { name: "descricao", label: "Descrição", type: "textarea" },
-              { name: "requisitos", label: "Requisitos", type: "textarea" },
-              { name: "salario", label: "Salário", type: "text" },
-              { name: "local", label: "Local", type: "text" },
+              { name: "nome", label: "Título da Vaga", type: "text" },
+              { name: "habilidades", label: "Habilidades", type: "textarea" },
+              { name: "idiomas", label: "Idiomas", type: "text" },
+              { name: "formacaoAcademica", label: "Formação acadêmica", type: "text" },
+              { name: "experiencia", label: "Tempo de experiência", type: "text" },
+              { name: "pesoHabilidades", label: "Peso HABILIDADES", type: "number" },
+              { name: "pesoIdiomas", label: "Peso IDIOMAS", type: "number" },
+              { name: "pesoFormacaoAcademica", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
+              { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number" },
             ]}
             submitLabel="Atualizar Vaga"
-            onSubmit={(data) => console.log("Atualizar vaga:", data)}
+            onSubmit={atualizarDadosVaga}
           />
+
           <CrudSection
             id="apagar"
             title="Apagar dados de vaga"
             description="Selecione uma vaga para remover do sistema."
             fields={[{ name: "id", label: "ID da Vaga", type: "text" }]}
             submitLabel="Apagar Vaga"
-            onSubmit={(data) => console.log("Apagar vaga:", data)}
+            onSubmit={apagarVaga}
             isDanger={true}
           />
         </div>

@@ -26,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -222,13 +223,31 @@ public class VagaService {
     public VagaRespostaDto atualizarVagaPorId(UUID id, VagaDto data) {
         validarPesos(data);
         Vaga vaga = vagaRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+          .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
         Empresa empresa = empresaRepository.findById(data.empresaId())
-                .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
+          .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
         vaga.vagaDtoMapper(data, empresa);
         Vaga vagaAtualizada = vagaRepository.save(vaga);
         return listar(vagaAtualizada);
     }
+
+//    public VagaRespostaDto atualizarVagaPorId(UUID id, VagaDto data, Authentication authentication) {
+//        validarPesos(data);
+//
+//        Vaga vaga = vagaRepository.findById(id)
+//                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+//
+//        String emailEmpresa = authentication.getName();
+//        Empresa empresaLogada = empresaRepository.findByEmail(emailEmpresa)
+//          .orElseThrow(() -> new BusinessRuleException("Empresa autenticada não encontrada"));
+//
+//        if (!vaga.getEmpresa().getId().equals(empresaLogada.getId())) {
+//            throw new BusinessRuleException("Você não tem permissão para atualizar esta vaga.");
+//        }
+//        vaga.vagaDtoMapper(data, empresaLogada);
+//        Vaga vagaAtualizada = vagaRepository.save(vaga);
+//        return listar(vagaAtualizada);
+//    }
 
 
     public void excluir(UUID id) {

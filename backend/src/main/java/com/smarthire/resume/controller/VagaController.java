@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -97,7 +98,6 @@ public class VagaController {
         return ResponseEntity.ok(vagaRespostaDto);
     }
 
-
     @PostMapping
     public ResponseEntity<?> adicionarvaga(@Valid @RequestBody VagaDto vaga,
                                            HttpServletRequest request) {
@@ -137,12 +137,21 @@ public class VagaController {
       return ResponseEntity.ok("Vaga cadastrada com sucesso");
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
-                                                              @Valid @RequestBody VagaDto data) {
-        VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data);
-        return ResponseEntity.ok(vagaAtualizada);
-    }
+  @PutMapping("/{id}")
+  public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
+                                                            @Valid @RequestBody VagaDto data) {
+    VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data);
+    return ResponseEntity.ok(vagaAtualizada);
+  }
+
+//    @PutMapping("/{id}")
+//    public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
+//                                                              @Valid @RequestBody VagaDto data,
+//                                                              Authentication authentication) {
+//        VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data, authentication);
+//        return ResponseEntity.ok(vagaAtualizada);
+//    }
+
 
     @DeleteMapping({"/{id}"})
     public ResponseEntity<Void> removerVaga(@PathVariable UUID id) {
