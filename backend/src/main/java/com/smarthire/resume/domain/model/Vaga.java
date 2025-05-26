@@ -3,6 +3,8 @@ package com.smarthire.resume.domain.model;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import java.util.List;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.*;
 
 import java.util.UUID;
@@ -38,6 +40,11 @@ public class Vaga {
     @OneToMany(mappedBy = "vaga", cascade = CascadeType.ALL)
     @OrderBy("ordem ASC")
     private List<Fase> fases;
+
+    @DecimalMin("0.0")
+    @DecimalMax("1.0")
+    @Column(name = "pontuacao_minima")
+    private Double pontuacaoMinima;
 
     public void vagaDtoMapper(VagaDto data, Empresa empresa) {
         this.empresa = empresa;

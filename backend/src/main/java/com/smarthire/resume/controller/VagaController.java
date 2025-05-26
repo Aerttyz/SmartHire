@@ -172,4 +172,10 @@ public class VagaController {
         return ResponseEntity.ok(pontuacoes);
     }
 
+    @PostMapping("/{vagaId}/enviar-emails")
+    public ResponseEntity<String> enviarEmails(@PathVariable UUID vagaId) {
+        pontuacaoVagaService.enviarEmailsParaTopCandidatos(vagaId);
+        return ResponseEntity.ok("Emails enviados para candidatos com pontuação mínima");
+    }
+
 }
