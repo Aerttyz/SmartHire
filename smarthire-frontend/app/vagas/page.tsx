@@ -10,7 +10,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
 
 export default function VagasPage() {
+  const API_URL = "http://localhost:8080/vagas";
   const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
   const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
   const [vagas, setVagas] = useState<Vaga[]>([]);
   const [vaga, setVaga] = useState<Vaga>({
@@ -26,12 +28,6 @@ export default function VagasPage() {
     pesoExperiencia: 1,
   });
 
-const token = document.cookie
-        .split(';')
-        .map(cookie => cookie.trim())
-        .find(cookie => cookie.startsWith('token='))
-        ?.split('=')[1];
-
   const sidebarItems = [
     { id: "adicionar", label: "Adicionar uma vaga" },
     { id: "listar", label: "Listar vaga cadastradas" },
@@ -39,33 +35,51 @@ const token = document.cookie
     { id: "apagar", label: "Apagar dados de vaga" },
   ]
 
-  const API_URL = "http://localhost:8080/vagas";
-  console.log("Cookies atuais: ", document.cookie);
-  console.log("Este é o novo token: ", token);
 
-useEffect(() => {
-  if (!token) return;
+    // novo useEffect para obter o token do cookie
+    useEffect(() => {
+        if (typeof document !== 'undefined') { 
+            const cookieToken = document.cookie
+                .split(';')
+                .map(cookie => cookie.trim())
+                .find(cookie => cookie.startsWith('token='))
+                ?.split('=')[1];
+            setToken(cookieToken || null);
+            console.log("Cookies atuais (no useEffect): ", document.cookie);
+            console.log("Este é o token extraído (no useEffect): ", cookieToken);
+        }
+    }, []);
 
-  fetch(`${API_URL}/me`, {
-    method: 'GET',
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((res) => res.json())
-    .then((data: Vaga[]) => {
-      setVagas(data);
-    })
-    .catch((error) => {
-      console.error("Erro ao buscar vagas da empresa: ", error);
-    });
-}, [token]);
+      useEffect(() => {
+        if (!token) {
+            console.log("Token não disponível ainda. Aguardando...");
+            return;
+        }
+
+        fetch(`${API_URL}/me`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then((res) => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error(err.message || res.statusText); });
+            }
+            return res.json();
+        })
+        .then((data: Vaga[]) => {
+            setVagas(data);
+        })
+        .catch((error) => {
+            console.error("Erro ao buscar vagas da empresa: ", error);
+        });
+    }, [token]); // só roda quando token for definido
+
 
    const handleEditVagaClick = (vagaId: string) => {
     console.log("Editando vaga com ID:", vagaId);
-    // Armazena o ID e navega para a tela de edição
-    // Você pode usar localStorage ou passar via query param/path param
     router.push(`/vagas/me/editar/${vagaId}`);
   };
 

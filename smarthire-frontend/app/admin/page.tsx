@@ -11,15 +11,11 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 
 export default function AdminPage() {
+  const API_URL = "http://localhost:8080/empresas";
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [empresa, setEmpresa ] = useState<Empresa>({nome: "", cnpj: "", telefone: "", email: "", senha: "" });
   const [empresaBuscada, setEmpresaBuscada] = useState<Empresa | null>(null);
-
-const token = document.cookie
-        .split(';')
-        .map(cookie => cookie.trim())
-        .find(cookie => cookie.startsWith('token='))
-        ?.split('=')[1];
+  const [token, setToken] = useState<string | null>(null);
 
   const sidebarItems = [
     { id: "adicionar", label: "Adicionar uma empresa" },
@@ -28,34 +24,45 @@ const token = document.cookie
     { id: "apagar", label: "Apagar dados de empresa" },
   ]
 
-  const API_URL = "http://localhost:8080/empresas";
-  console.log("Cookies atuais: ", document.cookie);
-  console.log("Este é o novo token: ", token);
-
   useEffect(() => {
-    try {
-      const token = document.cookie
-          .split(';  ')
-          .find(row => row.startsWith('token='))
+    if (typeof document !== 'undefined') {
+      const cookieToken = document.cookie
+          .split(';')
+          .map(cookie => cookie.trim())
+          .find(cookie => cookie.startsWith('token='))
           ?.split('=')[1];
-      console.log("Este é o token ", token );
-  
-      fetch("http://localhost:8080/empresas", {
-          method: 'GET',
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}`}),
-          },
-        })
-        .then((res) => res.json())
-        .then((data: Empresa[]) => {
-          setEmpresas(data);
-        })
+      setToken(cookieToken || null);
+      console.log("Cookies atuais (no useEffect para token): ", document.cookie);
+      console.log("Este é o token extraído (no useEffect para token): ", cookieToken);
+        }
+    }, []);
 
-    } catch (error) {
-      console.error("Erro ao buscar empresas: ", error)
-    }
-  }, []);
+    useEffect(() => {
+        if (!token) {
+            console.log("Token não disponível ainda para AdminPage. Aguarde");
+            return;
+        }
+
+        fetch(API_URL, { 
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    return res.json().then(err => { throw new Error(err.message || res.statusText); });
+                }
+                return res.json();
+            })
+            .then((data: Empresa[]) => {
+                setEmpresas(data);
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar empresas: ", error);
+            });
+    }, [token]);
 
   async function carregarEmpresaLogada() {
   try {
