@@ -16,10 +16,8 @@ def generate_gemini_prompt(text):
     return prompt.strip()
 
 def generate_gemini_prompt_to_comparation(candidates):
-    resultados = []
 
-    for candidato in candidates:
-        resultados = []
+    resultados = []
 
     for candidato in candidates:
         nome = candidato['nome']
