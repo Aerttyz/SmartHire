@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -26,6 +29,13 @@ public class RestExceptionHandler {
         );
         logger.error("Erro inesperado no servidor: ", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<RestErrorMessage> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+        logger.warn("Recurso não encontrado (rota): {}", ex.getRequestURL());
+        RestErrorMessage response = new RestErrorMessage(HttpStatus.NOT_FOUND, "Recurso não encontrado.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
