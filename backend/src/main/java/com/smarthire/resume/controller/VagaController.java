@@ -135,7 +135,8 @@ public class VagaController {
           vaga.pesoHabilidades(),
           vaga.pesoIdiomas(),
           vaga.pesoFormacaoAcademica(),
-          vaga.pesoExperiencia()
+          vaga.pesoExperiencia(),
+          vaga.pontuacaoMinima()
         );
         vagaService.salvar(vagaComId);
       }

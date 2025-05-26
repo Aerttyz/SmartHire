@@ -64,5 +64,7 @@ public class Vaga {
         this.requisitos.setPesoIdiomas(data.pesoIdiomas());
         this.requisitos.setPesoFormacaoAcademica(data.pesoFormacaoAcademica());
         this.requisitos.setPesoExperiencia(data.pesoExperiencia());
+
+        this.pontuacaoMinima = data.pontuacaoMinima();
     }
 }
