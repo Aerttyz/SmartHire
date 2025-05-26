@@ -6,10 +6,11 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { parseJwt } from "@/lib/utils"
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
 
 export default function VagasPage() {
-  
+  const router = useRouter();
   const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
   const [vagas, setVagas] = useState<Vaga[]>([]);
   const [vaga, setVaga] = useState<Vaga>({
@@ -60,6 +61,42 @@ useEffect(() => {
       console.error("Erro ao buscar vagas da empresa: ", error);
     });
 }, [token]);
+
+   const handleEditVagaClick = (vagaId: string) => {
+    console.log("Editando vaga com ID:", vagaId);
+    // Armazena o ID e navega para a tela de edição
+    // Você pode usar localStorage ou passar via query param/path param
+    router.push(`/vagas/me/editar/${vagaId}`);
+  };
+
+  const handleDeleteVagaClick = async (vagaId: string) => {
+    const confirmacao = window.confirm(`Deseja mesmo excluir a vaga com ID: ${vagaId}? Esta ação é irreversível.`);
+    if (!confirmacao) return;
+
+    try {
+      const response = await fetch(`${API_URL}/${vagaId}`, { 
+        method: "DELETE",
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (response.ok) {
+        console.log(`Vaga ${vagaId} removida com sucesso`);
+        alert("Vaga removida do sistema.");
+        // Atualizar a lista de vagas após a exclusão
+        setVagas(prevVagas => prevVagas.filter(vaga => vaga.id !== vagaId));
+        setVagaBuscada(null); // Limpar vaga buscada se for o caso
+      } else {
+        const errorData = await response.json();
+        console.error("Erro ao remover vaga: ", errorData);
+        alert(`Erro ao remover vaga: ${errorData.message || response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Erro ao apagar vaga:", error);
+      alert("Erro inesperado ao tentar excluir a vaga.");
+    }
+  };
 
   async function carregarVagaDaEmpresa() {
   try {
@@ -280,6 +317,8 @@ async function apagarVaga(data: any) {
 
               ])
             }
+            onDeleteClick={handleDeleteVagaClick}
+            onEditClick={handleEditVagaClick}
           />
           
           <CrudSection
@@ -298,6 +337,7 @@ async function apagarVaga(data: any) {
               { name: "pesoFormacaoAcademica", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
               { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number" },
             ]}
+
             submitLabel="Atualizar Vaga"
             onSubmit={atualizarDadosVaga}
           />

@@ -98,6 +98,12 @@ public class VagaController {
         return ResponseEntity.ok(vagaRespostaDto);
     }
 
+    @GetMapping({"/id/{id}"})
+    public ResponseEntity<VagaRespostaDto> buscarVagaPorId(@PathVariable UUID id) {
+        VagaRespostaDto vagaRespostaDto = vagaService.listarVagaPorId(id);
+        return ResponseEntity.ok(vagaRespostaDto);
+    }
+
     @PostMapping
     public ResponseEntity<?> adicionarvaga(@Valid @RequestBody VagaDto vaga,
                                            HttpServletRequest request) {

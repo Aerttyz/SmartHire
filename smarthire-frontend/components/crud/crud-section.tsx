@@ -15,6 +15,8 @@ interface CrudSectionProps {
   showTable?: boolean;
   tableHeaders?: string[];
   tableData?: string[][];
+  onEditClick?: (id: string) => void;
+  onDeleteClick?: (id: string) => void;
 }
 
 export function CrudSection({
@@ -28,6 +30,8 @@ export function CrudSection({
   showTable = false,
   tableHeaders = [],
   tableData = [],
+  onEditClick,
+  onDeleteClick,
 }: CrudSectionProps) {
   return (
     <section id={id} className="scroll-mt-20">
@@ -40,7 +44,11 @@ export function CrudSection({
           <CrudForm fields={fields} submitLabel={submitLabel} onSubmit={onSubmit} isDanger={isDanger} />
           {showTable && tableHeaders.length > 0 && (
             <div className="mt-6">
-              <CrudTable headers={tableHeaders} data={tableData} />
+              <CrudTable 
+                headers={tableHeaders} 
+                data={tableData} 
+                onEditClick={onEditClick}
+                onDeleteClick={onDeleteClick}/>
             </div>
           )}
         </CardContent>

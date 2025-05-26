@@ -195,6 +195,12 @@ public class VagaService {
         return vagaRespostaDto;
     }
 
+    public VagaRespostaDto listarVagaPorId(UUID id) {
+        Vaga vaga = vagaRepository.findById(id)
+          .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+        return listar(vaga);
+    }
+
     public List<VagaRespostaDto> listarTodas() {
         List<Vaga> vagas = vagaRepository.findAll();
         if (vagas.isEmpty()) {
