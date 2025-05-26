@@ -56,15 +56,14 @@ public class JwtUtils {
 
     public String generateTokenFromUserDetailsImpl(UserDetailsImpls userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", userDetails.getId());
-        claims.put("empresaId", userDetails.getId().toString());
-
+        claims.put("id", userDetails.getId());
+        
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject((userDetails.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact(); 
         
     }
 
