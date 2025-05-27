@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import Owl from "../../assets/owl.png"
 
 export function MainNav() {
   const pathname = usePathname()
@@ -12,7 +13,7 @@ export function MainNav() {
     <div className="flex items-center gap-6">
       <Link href="/dashboard" className="flex items-center gap-2">
         <Image
-          src="/placeholder.svg?height=32&width=32"
+          src={Owl}
           alt="SmartHire Logo"
           width={32}
           height={32}
