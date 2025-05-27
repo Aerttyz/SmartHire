@@ -3,7 +3,12 @@ package com.smarthire.resume.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smarthire.resume.domain.DTO.CandidateScoreDTO;
+import com.smarthire.resume.domain.model.Empresa;
+import com.smarthire.resume.domain.model.Vaga;
+import com.smarthire.resume.domain.repository.VagaRepository;
+import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.FlaskConnectionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -18,6 +23,13 @@ import java.util.UUID;
 public class PontuacaoVagaService {
     private final RestTemplate restTemplate = new RestTemplate();
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+
+    @Autowired
+    private VagaRepository vagaRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     public List<CandidateScoreDTO> obterPontuacoesDeCandidatos(UUID vagaId) {
         String flaskUrlComparacao = "http://localhost:5000/compare_resumes?vaga_id=" + vagaId.toString();
@@ -41,5 +53,42 @@ public class PontuacaoVagaService {
         } catch (Exception ex) {
             throw new FlaskConnectionException("Erro inesperado ao buscar pontuação dos candidatos");
         }
+    }
+
+    public double enviarEmailsParaTopCandidatos(UUID vagaId) {
+        List<CandidateScoreDTO> candidatos = obterPontuacoesDeCandidatos(vagaId);
+        Vaga vaga = vagaRepository.findById(vagaId)
+                .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada"));
+
+        Double pontuacaoMinima = vagaRepository.findPontuacaoMinimaById(vagaId);
+        String nomeVaga = vaga.getNome();
+        String nomeEmpresa = vaga.getEmpresa().getNome();
+
+        candidatos.stream()
+                .filter(c -> c.email() != null && !c.email().isEmpty())
+                .filter(c -> pontuacaoMinimaAtingida(c.score_total(), pontuacaoMinima))
+                .forEach(c -> {
+                    String assunto = "Oportunidade na vaga '" + nomeVaga + "' - " + nomeEmpresa;
+
+                    String corpo = String.format(
+                            "Olá %s,\n\n" +
+                                    "Parabéns! Você foi selecionado para continuar no processo seletivo da vaga '%s' na empresa %s.\n" +
+                                    "Acreditamos que seu perfil está alinhado com o que buscamos.\n\n" +
+                                    "Em breve, entraremos em contato com mais detalhes sobre os próximos passos.\n\n" +
+                                    "Atenciosamente,\n" +
+                                    "Equipe %s",
+                            c.nome() != null ? c.nome() : "Candidato",
+                            nomeVaga,
+                            nomeEmpresa,
+                            nomeEmpresa
+                    );
+
+                    emailService.enviarEmailTexto(c.email(), assunto, corpo);
+                });
+        return pontuacaoMinima;
+    }
+
+    private boolean pontuacaoMinimaAtingida(double scoreCandidato, double pontuacaoMinima) {
+        return scoreCandidato >= pontuacaoMinima;
     }
 }

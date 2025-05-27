@@ -1,4 +1,5 @@
 package com.smarthire.resume.domain.DTO;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -42,6 +43,9 @@ public record VagaDto (
     @NotNull(message = "O peso da experiência é obrigatório.")
     @DecimalMin(value = "0.0", message = "O peso da experiência não pode ser menor que 0.")
     @DecimalMax(value = "1.0", message = "O peso da experiência não pode ser maior que 1.")
-    Double pesoExperiencia
+    Double pesoExperiencia,
 
+    @DecimalMin("0.0")
+    @DecimalMax("1.0")
+    Double pontuacaoMinima
 ) {}

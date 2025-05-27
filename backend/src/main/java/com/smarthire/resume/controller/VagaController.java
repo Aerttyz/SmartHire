@@ -105,46 +105,25 @@ public class VagaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> adicionarvaga(@Valid @RequestBody VagaDto vaga,
-                                           HttpServletRequest request) {
-     //extrair o token
-      String token = request.getHeader("Authorization");
-      if (token != null && token.startsWith("Bearer ")) {
-        token = token.substring(7);
-      }
-
-      UUID empresaId = jwtUtils.getIdFromToken(token);
-      if (vaga.empresaId() != null) {
-        if (!empresaId.equals(vaga.empresaId())) {
-          return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body("ID da empresa informado não corresponde ao ID do token.");
+    public ResponseEntity<?> adicionarVaga(@Valid @RequestBody VagaDto vaga, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
         }
 
-        vagaService.salvar(vaga);
-      } else {
-        // se nao tiver o id explicito (caso do front) ele cria um novo dto
-        // com este id
-        VagaDto vagaComId = new VagaDto(
-          vaga.nome(),
-          empresaId,
-          vaga.isActive(),
-          vaga.habilidades(),
-          vaga.idiomas(),
-          vaga.formacaoAcademica(),
-          vaga.experiencia(),
-          vaga.pesoHabilidades(),
-          vaga.pesoIdiomas(),
-          vaga.pesoFormacaoAcademica(),
-          vaga.pesoExperiencia()
-        );
-        vagaService.salvar(vagaComId);
-      }
+        UUID empresaId = jwtUtils.getIdFromToken(token);
 
-      return ResponseEntity.ok("Vaga cadastrada com sucesso");
+        try {
+            vagaService.adicionarVagaComValidacao(vaga, empresaId);
+            return ResponseEntity.ok("Vaga cadastrada com sucesso");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
     }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
+
+    @PutMapping("/{id}")
+    public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
                                                             @Valid @RequestBody VagaDto data) {
     VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data);
     return ResponseEntity.ok(vagaAtualizada);
@@ -170,6 +149,12 @@ public class VagaController {
     public ResponseEntity<List<CandidateScoreDTO>> obterPontuacoesCandidatos(@PathVariable UUID idVaga) {
         List<CandidateScoreDTO> pontuacoes = pontuacaoVagaService.obterPontuacoesDeCandidatos(idVaga);
         return ResponseEntity.ok(pontuacoes);
+    }
+
+    @PostMapping("/{vagaId}/enviar-emails")
+    public ResponseEntity<String> enviarEmails(@PathVariable UUID vagaId) {
+        pontuacaoVagaService.enviarEmailsParaTopCandidatos(vagaId);
+        return ResponseEntity.ok("Emails enviados para candidatos com pontuação mínima");
     }
 
 }

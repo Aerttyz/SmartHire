@@ -118,6 +118,31 @@ public class VagaService {
           .orElseThrow(() -> new UsernameNotFoundException("Empresa autenticada não encontrada."));
     }
 
+    public void adicionarVagaComValidacao(VagaDto vaga, UUID empresaId) {
+        if (vaga.empresaId() != null) {
+            if (!empresaId.equals(vaga.empresaId())) {
+                throw new IllegalArgumentException("ID da empresa informado não corresponde ao ID do token.");
+            }
+            salvar(vaga);
+        } else {
+            VagaDto vagaComId = new VagaDto(
+                    vaga.nome(),
+                    empresaId,
+                    vaga.isActive(),
+                    vaga.habilidades(),
+                    vaga.idiomas(),
+                    vaga.formacaoAcademica(),
+                    vaga.experiencia(),
+                    vaga.pesoHabilidades(),
+                    vaga.pesoIdiomas(),
+                    vaga.pesoFormacaoAcademica(),
+                    vaga.pesoExperiencia(),
+                    vaga.pontuacaoMinima()
+            );
+            salvar(vagaComId);
+        }
+    }
+
     //--------------------------------- fim dos serviços para o front --------------------------------------
 
     @Transactional
@@ -273,5 +298,4 @@ public class VagaService {
         }
     }
 
-    
 }

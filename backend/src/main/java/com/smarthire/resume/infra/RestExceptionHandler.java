@@ -7,12 +7,18 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mail.MailException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -26,6 +32,35 @@ public class RestExceptionHandler {
         );
         logger.error("Erro inesperado no servidor: ", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(treatedResponse);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<RestErrorMessage> handleMissingParams(MissingServletRequestParameterException ex) {
+        String message = String.format("Parâmetro obrigatório ausente: %s", ex.getParameterName());
+        logger.warn(message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RestErrorMessage(HttpStatus.BAD_REQUEST, message));
+    }
+
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<RestErrorMessage> methodNotSupportedHandler(HttpRequestMethodNotSupportedException ex) {
+        logger.warn("Método HTTP não suportado: {}", ex.getMethod());
+        RestErrorMessage response = new RestErrorMessage(HttpStatus.METHOD_NOT_ALLOWED, "Método HTTP não permitido.");
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<RestErrorMessage> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        logger.warn("Corpo da requisição malformado ou inválido: ", ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new RestErrorMessage(HttpStatus.BAD_REQUEST, "Corpo da requisição malformado ou inválido."));
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<RestErrorMessage> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+        logger.warn("Recurso não encontrado (rota): {}", ex.getRequestURL());
+        RestErrorMessage response = new RestErrorMessage(HttpStatus.NOT_FOUND, "Recurso não encontrado.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

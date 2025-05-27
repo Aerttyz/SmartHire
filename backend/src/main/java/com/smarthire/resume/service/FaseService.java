@@ -38,13 +38,15 @@ public class FaseService {
     private CandidatoRepository candidatoRepository;
     @Autowired
     private VagaRepository vagaRepository;
+    @Autowired
+    private EmailService emailService;
 
 
     @Transactional
     public void adicionarCandidatoAFase(UUID idFase, List<UUID> idCandidatos) { 
         Fase fase = faseRepository.findById(idFase)
                 .orElseThrow(() -> new ItemNotFoundException("Fase", idFase));
-
+        Vaga vaga = fase.getVaga();
         List<Candidato> candidatos = candidatoRepository.findAllById(idCandidatos);
 
         Set<UUID> encontrados = candidatos.stream()
@@ -83,7 +85,26 @@ public class FaseService {
                 candidatoFase.setDataInicio(LocalDateTime.now());
                 atualizarCandidatoNaFase.add(candidatoFase);
             }
+            if (candidato.getEmail() != null && !candidato.getEmail().isEmpty()) {
+                String assunto = "Você avançou para a próxima fase da vaga '" + vaga.getNome() + "'";
+                String corpo = String.format(
+                        "Olá %s,\n\n" +
+                                "Parabéns! Você avançou para a fase '%s' no processo seletivo da vaga '%s' na empresa %s.\n" +
+                                "Estamos felizes com seu progresso e em breve você receberá mais informações sobre esta etapa.\n\n" +
+                                "Boa sorte!\n\n" +
+                                "Atenciosamente,\n" +
+                                "Equipe %s",
+                        candidato.getNome() != null ? candidato.getNome() : "Candidato",
+                        fase.getTitulo(),
+                        vaga.getNome(),
+                        vaga.getEmpresa().getNome(),
+                        vaga.getEmpresa().getNome()
+                );
+                emailService.enviarEmailTexto(candidato.getEmail(), assunto, corpo);
+            }
+
         }
+
         candidatoFaseRepository.saveAll(atualizarCandidatoNaFase);
     }
 
@@ -124,12 +145,9 @@ public class FaseService {
     }
 
     public List<CandidatoDto> listarCandidatosNaFase(UUID idFase) {
-        try {
-            faseRepository.findById(idFase)
-                    .orElseThrow(() -> new ItemNotFoundException("Fase", idFase));
-        } catch (ItemNotFoundException e) {
-            throw new BusinessRuleException("Fase não encontrada.");
-        }
+        faseRepository.findById(idFase)
+                .orElseThrow(() -> new BusinessRuleException("Fase não encontrada."));
+
         try {
             List<CandidatoFase> candidatosNaFase = candidatoFaseRepository.findByFase_Id(idFase);
             if (candidatosNaFase.isEmpty()) {
