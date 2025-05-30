@@ -3,6 +3,7 @@ package com.smarthire.resume.service;
 import com.smarthire.resume.domain.DTO.EmpresaRequestDTO;
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
 import com.smarthire.resume.domain.model.Empresa;
+import com.smarthire.resume.domain.model.UserDetailsImpls;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.ItemNotFoundException;
@@ -10,14 +11,15 @@ import com.smarthire.resume.exception.ItemNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.util.UUID;
 import java.util.List;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -55,6 +57,21 @@ public class EmpresaService {
         return empresas;
     }
 
+    public EmpresaResponseDTO buscarEmpresa() {
+        Authentication authentication = 
+            SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpls userDetails = 
+            (UserDetailsImpls) authentication.getPrincipal();
+        UUID empresaId = userDetails.getId();
+
+        Optional<Empresa> empresa = empresaRepository.findById(empresaId);
+        if (empresa.isEmpty()) {
+            throw new UsernameNotFoundException("Empresa não encontrada.");
+        }
+
+        return new EmpresaResponseDTO(empresa.get());
+    }
+
     public Empresa atualizarEmpresaPorId(UUID id, EmpresaRequestDTO data) {
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Empresa", id));
@@ -67,41 +84,10 @@ public class EmpresaService {
         return empresaRepository.save(empresa);
     }
 
-    public EmpresaResponseDTO atualizarEmpresaPorIdEncapsulado(EmpresaRequestDTO data, Authentication authentication) {
-        String emailEmpresa = authentication.getName(); // pegando do JWT aq
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        Empresa empresa = empresaRepository.findByEmail(emailEmpresa)
-          .orElseThrow(() -> new UsernameNotFoundException("Empresa não encontrada (método de busca: findByEmail()."));
-
-        empresa.setNome(data.nome());
-        empresa.setCnpj(data.cnpj());
-        empresa.setTelefone(data.telefone());
-        empresa.setEmail(data.email());
-
-        if (data.senha() != null && !data.senha().isEmpty()) {
-            empresa.setSenha(encoder.encode(data.senha()));
-        }
-
-        empresaRepository.save(empresa);
-        return new EmpresaResponseDTO(empresa);
-
-    }
-
-
     @Transactional
     public void excluir(UUID id) {
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada."));
         empresaRepository.delete(empresa);
     }
-
-    @Transactional
-    public void excluirPorEmail(String email) {
-        Empresa empresa = empresaRepository.findByEmail(email)
-          .orElseThrow(() -> new BusinessRuleException("Empresa autenticad anão encontrada."));
-        empresaRepository.delete(empresa);
-    }
-
-
-
 }

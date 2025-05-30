@@ -41,26 +41,13 @@ public class SecurityConfig {
    }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.cors(Customizer.withDefaults())
-      .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for stateless APIs
-      .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      .authorizeHttpRequests(auth ->
-        auth.requestMatchers("/**").permitAll()
-      );
-    http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
-    return http.build();
-  }
-
-//   @Bean
-//   public SecurityFilterChain securityFilterChain2(HttpSecurity http) throws Exception {
-//        http.cors(Customizer.withDefaults());
-//        http.csrf(csrf -> csrf.disable()).
-//            exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-//            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//            .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll().anyRequest().authenticated());
-//        http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
-//        return http.build();
-//    }
+  public SecurityFilterChain securityFilterChain2(HttpSecurity http) throws Exception {
+       http.cors(Customizer.withDefaults());
+       http.csrf(csrf -> csrf.disable()).
+           exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+           .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+           .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll().anyRequest().authenticated());
+       http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
+       return http.build();
+   }
 }
