@@ -27,16 +27,15 @@ public class EmpresaController {
         return ResponseEntity.ok(empresa);
     }
     
-    @PutMapping("/{id}")
-    public ResponseEntity<Empresa> atualizarEmpresaPorId(@PathVariable UUID id,
-    @Valid @RequestBody EmpresaRequestDTO data) {
-        Empresa empresaAtualizada = empresaService.atualizarEmpresaPorId(id, data);
+    @PutMapping
+    public ResponseEntity<Empresa> atualizarEmpresaPorId(@Valid @RequestBody EmpresaRequestDTO data) {
+        Empresa empresaAtualizada = empresaService.atualizarEmpresaPorId(data);
         return ResponseEntity.ok(empresaAtualizada);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removerEmpresa(@PathVariable UUID id) {
-        empresaService.excluir(id);
+    @DeleteMapping
+    public ResponseEntity<Void> removerEmpresa() {
+        empresaService.excluir();
         return ResponseEntity.noContent().build();
     }
 }

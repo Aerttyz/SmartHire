@@ -3,16 +3,15 @@ package com.smarthire.resume.service;
 import com.smarthire.resume.domain.DTO.EmpresaRequestDTO;
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
 import com.smarthire.resume.domain.model.Empresa;
-import com.smarthire.resume.domain.model.UserDetailsImpls;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
+import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.ItemNotFoundException;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,10 +20,16 @@ import java.util.UUID;
 import java.util.List;
 import java.util.Optional;
 
+import com.smarthire.resume.security.AuthUtils;
+
 @AllArgsConstructor
 @Service
 public class EmpresaService {
 
+    @Autowired
+    private VagaRepository vagaRepository;
+
+    @Autowired
     private EmpresaRepository empresaRepository;
 
     @Transactional
@@ -58,24 +63,18 @@ public class EmpresaService {
     }
 
     public EmpresaResponseDTO buscarEmpresa() {
-        Authentication authentication = 
-            SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpls userDetails = 
-            (UserDetailsImpls) authentication.getPrincipal();
-        UUID empresaId = userDetails.getId();
-
+        UUID empresaId = AuthUtils.getEmpresaId();
         Optional<Empresa> empresa = empresaRepository.findById(empresaId);
         if (empresa.isEmpty()) {
             throw new UsernameNotFoundException("Empresa não encontrada.");
         }
-
         return new EmpresaResponseDTO(empresa.get());
     }
 
-    public Empresa atualizarEmpresaPorId(UUID id, EmpresaRequestDTO data) {
+    public Empresa atualizarEmpresaPorId(EmpresaRequestDTO data) {
+        UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Empresa", id));
-
         empresa.setNome(data.nome());
         empresa.setCnpj(data.cnpj());
         empresa.setEmail(data.email());
@@ -85,9 +84,11 @@ public class EmpresaService {
     }
 
     @Transactional
-    public void excluir(UUID id) {
+    public void excluir() {
+        UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada."));
+        vagaRepository.deleteAllByEmpresa(empresa);
         empresaRepository.delete(empresa);
     }
 }
