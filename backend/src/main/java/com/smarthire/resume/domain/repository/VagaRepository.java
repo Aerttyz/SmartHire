@@ -25,5 +25,5 @@ public interface VagaRepository extends JpaRepository<Vaga, UUID> {
     Optional<Vaga> findByIdAndEmpresa(UUID id, Empresa empresa);
     @Query("SELECT v.pontuacaoMinima FROM Vaga v WHERE v.id = :vagaId")
     Double findPontuacaoMinimaById(@Param("vagaId") UUID vagaId);
-
+    void deleteAllByEmpresa(Empresa empresa);
 }

@@ -28,7 +28,6 @@ public class Vaga {
 
     private String nome;
 
-    private String descricao;
     private boolean isActive;
 
     @OneToOne(mappedBy = "vaga", cascade = CascadeType.ALL)
