@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,7 +27,7 @@ public class CandidatoFase {
     @EqualsAndHashCode.Include
     private UUID id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "candidato_id")
     private Candidato candidato;
 

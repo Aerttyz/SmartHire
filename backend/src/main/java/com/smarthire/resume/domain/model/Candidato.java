@@ -2,6 +2,9 @@ package com.smarthire.resume.domain.model;
 import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 @Getter
 @Setter
@@ -30,6 +33,9 @@ public class Candidato {
     @ManyToOne
     @JoinColumn(name = "vaga_id")
     private Vaga vaga;
+
+    @OneToOne(mappedBy = "candidato", cascade = CascadeType.ALL)
+    private CandidatoFase candidatoFase;
 
     public void atualizarCom(CandidatoRequestDTO data, Curriculo curriculo, Vaga vaga) {
         this.nome = data.nome();

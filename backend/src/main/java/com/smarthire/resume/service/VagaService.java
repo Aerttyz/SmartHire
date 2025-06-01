@@ -152,4 +152,10 @@ public class VagaService {
         }
     }
 
+     public Vaga listarPorId(UUID id) {
+        Vaga vaga = vagaRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
+        return vaga;
+    }
+
 }
