@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.List;
 import java.util.Optional;
 
+import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
 import com.smarthire.resume.security.AuthUtils;
 
 @AllArgsConstructor
@@ -71,14 +72,15 @@ public class EmpresaService {
         return new EmpresaResponseDTO(empresa.get());
     }
 
-    public Empresa atualizarEmpresaPorId(EmpresaRequestDTO data) {
+    public Empresa atualizarEmpresaPorId(EmpresaPatchRequestDto data) {
         UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Empresa", id));
-        empresa.setNome(data.nome());
-        empresa.setCnpj(data.cnpj());
-        empresa.setEmail(data.email());
-        empresa.setTelefone(data.telefone());
+        if (data.nome() != null && !data.nome().isBlank()) empresa.setNome(data.nome());
+        if (data.cnpj() != null && !data.cnpj().isBlank()) empresa.setCnpj(data.cnpj());
+        if (data.email() != null && !data.email().isBlank()) empresa.setEmail(data.email());
+        if (data.telefone() != null && !data.telefone().isBlank()) empresa.setTelefone(data.telefone());
+        if (data.senha() != null && !data.senha().isBlank()) empresa.setSenha(new BCryptPasswordEncoder().encode(data.senha()));
         
         return empresaRepository.save(empresa);
     }

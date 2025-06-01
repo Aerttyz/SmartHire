@@ -2,7 +2,6 @@ package com.smarthire.resume.controller;
 
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
 import com.smarthire.resume.domain.model.Empresa;
-import com.smarthire.resume.domain.DTO.EmpresaRequestDTO;
 import com.smarthire.resume.service.EmpresaService;
 
 import jakarta.validation.Valid;
@@ -12,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.UUID;
+import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
 
 @RestController
 @RequestMapping("/empresas")
@@ -27,8 +26,8 @@ public class EmpresaController {
         return ResponseEntity.ok(empresa);
     }
     
-    @PutMapping
-    public ResponseEntity<Empresa> atualizarEmpresaPorId(@Valid @RequestBody EmpresaRequestDTO data) {
+    @PatchMapping
+    public ResponseEntity<Empresa> atualizarEmpresaPorId(@Valid @RequestBody EmpresaPatchRequestDto data) {
         Empresa empresaAtualizada = empresaService.atualizarEmpresaPorId(data);
         return ResponseEntity.ok(empresaAtualizada);
     }

@@ -64,68 +64,10 @@ export default function AdminPage() {
             });
     }, [token]);
 
-  async function carregarEmpresaLogada() {
-  try {
-    const response = await fetch(`${API_URL}/me`, {
-      method: "GET",
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error("Erro ao buscar dados da empresa logada")
-    }
-
-    const empresa = await response.json()
-    setEmpresa(empresa)
-  } catch (error) {
-    console.error("Erro ao carregar empresa logada:", error)
-  }
-}
-
-  async function adicionarEmpresa(data: any) {
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-      const result = await response.json()
-      console.log("Empresa adicionada:", result)
-      alert("Empresa adicionada com sucesso!");
-    } catch (error) {
-      console.error("Erro ao adicionar empresa:", error)
-      alert(`Erro ao adicionar empresa: ${error}`);
-    }
-  }
-
-  async function buscarEmpresa(data: any) {
-    try {
-      const response = await fetch(`${API_URL}/${data.busca}`, {
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}`}),
-        },
-      });
-
-      if (!response.ok) { throw new Error(`Erro do servidor: ${response.status}`); }
-
-      const result = await response.json();
-      setEmpresaBuscada(result[0]);
-      setEmpresas([]);
-    } catch (error) {
-        console.error("Erro ao buscar empresa: ", error); 
-        alert(`Erro ao buscar empresa: ${error}`);
-        setEmpresaBuscada(null);
-      }
-  }
-
   async function atualizarEmpresa(data: any) {
     try {
-      const response = await fetch(`${API_URL}/me`, {
-        method: "PUT",
+      const response = await fetch(`${API_URL}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           ...(token && {Authorization: `Bearer ${token}`}),
@@ -158,7 +100,7 @@ async function apagarEmpresa() {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
 
-    const response = await fetch("http://localhost:8080/empresas/me", {
+    const response = await fetch("http://localhost:8080/empresas", {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -217,58 +159,17 @@ async function apagarEmpresa() {
               </CardContent>
             </Card>
           </div>
-          <CrudSection
-            id="adicionar"
-            title="Adicionar uma empresa"
-            description="Preencha os campos abaixo para adicionar uma nova empresa."
-            fields={[
-              { name: "nome", label: "Nome da Empresa", type: "text" },
-              { name: "cnpj", label: "CNPJ", type: "text" },
-              { name: "telefone", label: "Telefone", type: "text" },
-              { name: "email", label: "Email", type: "email" },
-              { name: "senha", label: "Senha", type: "password" },
-            ]}
-            submitLabel="Adicionar Empresa"
-            onSubmit={adicionarEmpresa}
-          />
- 
-          <CrudSection
-            id="listar"
-            title="Listar empresas cadastradas"
-            description="Visualize todas as empresas cadastradas na plataforma."
-            fields={[{ name: "busca", label: "Buscar por nome", type: "text" }]}
-            submitLabel="Buscar"
-            onSubmit={buscarEmpresa}
-            showTable={true}
-            tableHeaders={["Nome", "CNPJ", "Telefone", "Email"]}
-            tableData={
-              empresaBuscada 
-                ? [[ 
-                  empresaBuscada.nome.toString() ?? "sem nome",
-                  empresaBuscada.cnpj.toString() ?? "cnpj",
-                  empresaBuscada.telefone.toString() ?? "tel",
-                  empresaBuscada.email.toString() ?? "email", 
-                ]]
-                : 
-                empresas.map((empresa) => [
-                  empresa.nome,
-                  empresa.cnpj,
-                  empresa.telefone,
-                  empresa.email,
-              ])
-                }
-          />
   
           <CrudSection
             id="atualizar"
             title="Atualizar dados cadastrais"
             description="Selecione uma empresa e atualize seus dados."
             fields={[
-              { name: "nome", label: "Nome da Empresa", type: "text" },
-              { name: "cnpj", label: "CNPJ", type: "text" },
-              { name: "telefone", label: "Telefone", type: "text" },
-              { name: "email", label: "Email", type: "email" },
-              { name: "senha", label: "Senha", type: "password" },
+              { name: "nome", label: "Nome da Empresa", type: "text", required: false },
+              { name: "cnpj", label: "CNPJ", type: "text", required: false },
+              { name: "telefone", label: "Telefone", type: "text", required: false },
+              { name: "email", label: "Email", type: "email", required: false },
+              { name: "senha", label: "Senha", type: "password", required: false },
             ]}
             submitLabel="Atualizar Empresa"
             onSubmit={atualizarEmpresa}
