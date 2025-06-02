@@ -61,13 +61,7 @@ export default function AtualizarVagaPage({ params }: { params: { vagaId: string
 
   async function atualizarDadosVaga(data: any) {
     try {
-
-      const decodedToken = token ? parseJwt(token) : null;
-
-      if (!decodedToken || !decodedToken.empresaId) {
-        throw new Error("Token inválido ou empresaId não encontrado.");
-      }
-
+      
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       if (!uuidRegex.test(vagaId)) {
         throw new Error("O ID da URL não é um UUID válido.");
@@ -85,11 +79,8 @@ export default function AtualizarVagaPage({ params }: { params: { vagaId: string
         payload.isActive = false; // Defina um padrão caso não esteja presente (e.g., checkbox desmarcado)
       }
 
-
-      payload.empresaId = decodedToken.empresaId; // Adiciona o empresaId do token
-
       const response = await fetch(`${API_URL}/${vagaId}`, { // Usa o vagaId dos params na URL
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),

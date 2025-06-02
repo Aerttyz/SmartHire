@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+import com.smarthire.resume.domain.DTO.VagaPatchResposta;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/vagas")
@@ -51,9 +53,9 @@ public class VagaController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
-                                                            @Valid @RequestBody VagaDto data) {
+                                                            @Valid @RequestBody VagaPatchResposta data) {
     VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data);
     return ResponseEntity.ok(vagaAtualizada);
   }

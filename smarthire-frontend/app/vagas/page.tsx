@@ -5,7 +5,6 @@ import { CrudSection } from "@/components/crud/crud-section"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
-import { parseJwt } from "@/lib/utils"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
 
@@ -31,8 +30,6 @@ export default function VagasPage() {
   const sidebarItems = [
     { id: "adicionar", label: "Adicionar uma vaga" },
     { id: "listar", label: "Listar vaga cadastradas" },
-    { id: "atualizar", label: "Atualizar dados de vaga" },
-    { id: "apagar", label: "Apagar dados de vaga" },
   ]
 
 
@@ -56,7 +53,7 @@ export default function VagasPage() {
             return;
         }
 
-        fetch(`${API_URL}/me`, {
+        fetch(`${API_URL}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -75,7 +72,7 @@ export default function VagasPage() {
         .catch((error) => {
             console.error("Erro ao buscar vagas da empresa: ", error);
         });
-    }, [token]); // só roda quando token for definido
+    }, [token]); 
 
 
    const handleEditVagaClick = (vagaId: string) => {
@@ -112,26 +109,6 @@ export default function VagasPage() {
     }
   };
 
-  async function carregarVagaDaEmpresa() {
-  try {
-    const response = await fetch(`${API_URL}/me`, {
-      method: "GET",
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error("Erro ao buscar dados da vaga empresa logada")
-    }
-
-    const vaga = await response.json()
-    setVaga(vaga)
-  } catch (error) {
-    console.error("Erro ao carregar vaga da empresa logada:", error)
-  }
-}
-
 async function adicionarVaga(data: any) {
   const payload = {
     nome: data.nome,
@@ -144,6 +121,7 @@ async function adicionarVaga(data: any) {
     pesoIdiomas: data["pesoIdiomas"],
     pesoFormacaoAcademica: data["pesoFormacaoAcademica"],
     pesoExperiencia: data["pesoExperiencia"],
+    pontuacaoMinima: data["pontuacaoMinima"],
   };
 
   try {
@@ -170,8 +148,6 @@ async function adicionarVaga(data: any) {
   }
 }
 
-
-
   async function buscarVaga(data: any) {
     try {
       const response = await fetch(`${API_URL}/${data.busca}`, {
@@ -194,77 +170,6 @@ async function adicionarVaga(data: any) {
       }
   }
 
-async function atualizarDadosVaga(data: any) {
-  try {
-    const vagaId = data.id;
-    const decodedToken = token ? parseJwt(token) : null;
-
-    if (!decodedToken || !decodedToken.empresaId) {
-      throw new Error("Token inválido ou empresaId não encontrado.");
-    }
-
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(vagaId)) {
-      throw new Error("O ID fornecido não é um UUID válido.");
-    }
-
-    const { id, ...payload } = data; // Desestrutura para pegar todos os dados, menos o id
-
-    payload.pesoHabilidades = Number(payload.pesoHabilidades);
-    payload.pesoIdiomas = Number(payload.pesoIdiomas);
-    payload.pesoFormacaoAcademica = Number(payload.pesoFormacaoAcademica);
-    payload.pesoExperiencia = Number(payload.pesoExperiencia);
-    payload.empresaId = decodedToken.empresaId;
-
-    const response = await fetch(`${API_URL}/${vagaId}`, { 
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: JSON.stringify(payload), 
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `Erro do servidor: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log("Vaga atualizada:", result);
-    alert("Dados da vaga atualizados com sucesso!");
-  } catch (error: any) {
-    alert(`Erro ao atualizar vaga: ${error.message || error}`);
-    console.error("Erro ao atualizar vaga:", error);
-  }
-}
-
-
-async function apagarVaga(data: any) {
-  const confirmacao = window.confirm("Deseja mesmo excluir esta vaga? Esta ação é irreversível.");
-  if (!confirmacao) return;
-
-  try {
-    const response = await fetch(`${API_URL}/${data.id}`, {
-      method: "DELETE",
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    });
-
-    if (response.ok) {
-      console.log("Vaga removida com sucesso");
-      alert("Vaga removida do sistema.");
-      window.location.href = "/dashboard";
-    } else {
-      console.error("Erro ao remover vaga");
-      alert("Erro ao remover vaga.");
-    }
-  } catch (error) {
-    console.error("Erro ao apagar vaga:", error);
-    alert("Erro inesperado ao tentar excluir a vaga.");
-  }
-}
 
 
   return (
@@ -287,6 +192,7 @@ async function apagarVaga(data: any) {
               { name: "pesoIdiomas", label: "Peso IDIOMAS", type: "number" },
               { name: "pesoFormacaoAcademica", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
               { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number" },
+              { name: "pontuacaoMinima", label: "Pontuação Mínima", type: "number" },
             ]}
             submitLabel="Adicionar Vaga"
             onSubmit={(data) => {
@@ -301,6 +207,7 @@ async function apagarVaga(data: any) {
                 pesoIdiomas: Number(data["pesoIdiomas"]),
                 pesoFormacaoAcademica: Number(data["pesoFormacaoAcademica"]),
                 pesoExperiencia: Number(data["pesoExperiencia"]),
+                pontuacaoMinima: Number(data["pontuacaoMinima"]),
               };
 
               adicionarVaga(payload);
@@ -333,37 +240,6 @@ async function apagarVaga(data: any) {
             }
             onDeleteClick={handleDeleteVagaClick}
             onEditClick={handleEditVagaClick}
-          />
-          
-          <CrudSection
-            id="atualizar"
-            title="Atualizar dados de vaga"
-            description="Selecione uma vaga e atualize seus dados."
-            fields={[
-              { name: "id", label: "ID da Vaga", type: "text" },
-              { name: "nome", label: "Título da Vaga", type: "text" },
-              { name: "habilidades", label: "Habilidades", type: "textarea" },
-              { name: "idiomas", label: "Idiomas", type: "text" },
-              { name: "formacaoAcademica", label: "Formação acadêmica", type: "text" },
-              { name: "experiencia", label: "Tempo de experiência", type: "text" },
-              { name: "pesoHabilidades", label: "Peso HABILIDADES", type: "number" },
-              { name: "pesoIdiomas", label: "Peso IDIOMAS", type: "number" },
-              { name: "pesoFormacaoAcademica", label: "Peso FORMAÇÃO ACADÊMICA", type: "number" },
-              { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number" },
-            ]}
-
-            submitLabel="Atualizar Vaga"
-            onSubmit={atualizarDadosVaga}
-          />
-
-          <CrudSection
-            id="apagar"
-            title="Apagar dados de vaga"
-            description="Selecione uma vaga para remover do sistema."
-            fields={[{ name: "id", label: "ID da Vaga", type: "text" }]}
-            submitLabel="Apagar Vaga"
-            onSubmit={apagarVaga}
-            isDanger={true}
           />
         </div>
       </div>

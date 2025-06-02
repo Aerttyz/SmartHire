@@ -24,6 +24,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.Collections;
 
+import com.smarthire.resume.domain.DTO.VagaPatchResposta;
+
 
 @Service
 public class VagaService {
@@ -124,11 +126,10 @@ public class VagaService {
         .collect(Collectors.toList());
     }
 
-    public VagaRespostaDto atualizarVagaPorId(UUID id, VagaDto data) {
-        validarPesos(data);
+    public VagaRespostaDto atualizarVagaPorId(UUID id, VagaPatchResposta data) {
         Vaga vaga = vagaRepository.findById(id)
           .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
-        Empresa empresa = empresaRepository.findById(data.empresaId())
+        Empresa empresa = empresaRepository.findById(AuthUtils.getEmpresaId())
           .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
         vaga.vagaDtoMapper(data, empresa);
         Vaga vagaAtualizada = vagaRepository.save(vaga);

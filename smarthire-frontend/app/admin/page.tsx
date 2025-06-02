@@ -18,8 +18,6 @@ export default function AdminPage() {
   const [token, setToken] = useState<string | null>(null);
 
   const sidebarItems = [
-    { id: "adicionar", label: "Adicionar uma empresa" },
-    { id: "listar", label: "Listar empresas cadastradas" },
     { id: "atualizar", label: "Atualizar dados de empresa" },
     { id: "apagar", label: "Apagar dados de empresa" },
   ]

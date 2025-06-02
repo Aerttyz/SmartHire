@@ -1,13 +1,15 @@
 package com.smarthire.resume.domain.model;
 
-import com.smarthire.resume.domain.DTO.VagaDto;
 import java.util.List;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.*;
 
 import java.util.UUID;
+
+import com.smarthire.resume.domain.DTO.VagaPatchResposta;
 
 @Entity
 @Getter
@@ -45,25 +47,56 @@ public class Vaga {
     @Column(name = "pontuacao_minima")
     private Double pontuacaoMinima;
 
-    public void vagaDtoMapper(VagaDto data, Empresa empresa) {
+    public void vagaDtoMapper(VagaPatchResposta data, Empresa empresa) {
+        if (empresa != null) {
         this.empresa = empresa;
+    }
+
+    if (data.nome() != null && !data.nome().isBlank()) {
         this.nome = data.nome();
-        this.isActive = data.isActive();
+    }
 
-        if (this.requisitos == null) {
-            this.requisitos = new VagaRequisitosModel();
-            this.requisitos.setVaga(this);
-        }
+    this.isActive = data.isActive();
 
+    if (this.requisitos == null) {
+        this.requisitos = new VagaRequisitosModel();
+        this.requisitos.setVaga(this);
+    }
+
+    if (data.habilidades() != null && !data.habilidades().isBlank()) {
         this.requisitos.setHabilidades(data.habilidades());
-        this.requisitos.setIdiomas(data.idiomas());
-        this.requisitos.setFormacaoAcademica(data.formacaoAcademica());
-        this.requisitos.setExperiencia(data.experiencia());
-        this.requisitos.setPesoHabilidades(data.pesoHabilidades());
-        this.requisitos.setPesoIdiomas(data.pesoIdiomas());
-        this.requisitos.setPesoFormacaoAcademica(data.pesoFormacaoAcademica());
-        this.requisitos.setPesoExperiencia(data.pesoExperiencia());
+    }
 
+    if (data.idiomas() != null && !data.idiomas().isBlank()) {
+        this.requisitos.setIdiomas(data.idiomas());
+    }
+
+    if (data.formacaoAcademica() != null && !data.formacaoAcademica().isBlank()) {
+        this.requisitos.setFormacaoAcademica(data.formacaoAcademica());
+    }
+
+    if (data.experiencia() != null && !data.experiencia().isBlank()) {
+        this.requisitos.setExperiencia(data.experiencia());
+    }
+
+    if (data.pesoHabilidades() != null) {
+        this.requisitos.setPesoHabilidades(data.pesoHabilidades());
+    }
+
+    if (data.pesoIdiomas() != null) {
+        this.requisitos.setPesoIdiomas(data.pesoIdiomas());
+    }
+
+    if (data.pesoFormacaoAcademica() != null) {
+        this.requisitos.setPesoFormacaoAcademica(data.pesoFormacaoAcademica());
+    }
+
+    if (data.pesoExperiencia() != null) {
+        this.requisitos.setPesoExperiencia(data.pesoExperiencia());
+    }
+
+    if (data.pontuacaoMinima() != null) {
         this.pontuacaoMinima = data.pontuacaoMinima();
+    }
     }
 }
