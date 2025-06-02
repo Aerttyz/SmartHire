@@ -50,7 +50,7 @@ export default function AdminPage() {
                 Authorization: `Bearer ${token}`,
             },
         })
-            .then((res) => {
+            .then(async (res) => {
                 if (!res.ok) {
                     return res.json().then(err => { throw new Error(err.message || res.statusText); });
                 }
@@ -63,26 +63,6 @@ export default function AdminPage() {
                 console.error("Erro ao buscar empresas: ", error);
             });
     }, [token]);
-
-  async function carregarEmpresaLogada() {
-  try {
-    const response = await fetch(`${API_URL}/me`, {
-      method: "GET",
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error("Erro ao buscar dados da empresa logada")
-    }
-
-    const empresa = await response.json()
-    setEmpresa(empresa)
-  } catch (error) {
-    console.error("Erro ao carregar empresa logada:", error)
-  }
-}
 
   async function adicionarEmpresa(data: any) {
     try {

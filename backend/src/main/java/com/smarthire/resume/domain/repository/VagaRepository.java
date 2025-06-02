@@ -26,4 +26,8 @@ public interface VagaRepository extends JpaRepository<Vaga, UUID> {
     @Query("SELECT v.pontuacaoMinima FROM Vaga v WHERE v.id = :vagaId")
     Double findPontuacaoMinimaById(@Param("vagaId") UUID vagaId);
 
+    @Query("SELECT v.id FROM Vaga v where v.empresa.id = :empresaId")
+    List<UUID> findVagaIdsByEmpresaId(@Param("empresaId") UUID empresaId);
+
+    double countByEmpresaId(UUID empresaId);
 }

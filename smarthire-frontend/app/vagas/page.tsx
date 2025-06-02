@@ -35,8 +35,6 @@ export default function VagasPage() {
     { id: "apagar", label: "Apagar dados de vaga" },
   ]
 
-
-    // novo useEffect para obter o token do cookie
     useEffect(() => {
         if (typeof document !== 'undefined') { 
             const cookieToken = document.cookie

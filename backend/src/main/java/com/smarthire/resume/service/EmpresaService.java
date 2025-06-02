@@ -102,6 +102,12 @@ public class EmpresaService {
         empresaRepository.delete(empresa);
     }
 
+    public Empresa getEmpresaLogada(Authentication authentication) {
+        String email = authentication.getName();
+        return empresaRepository.findByEmail(email)
+          .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
+    }
+
 
 
 }

@@ -38,41 +38,6 @@ public class VagaController {
   @Autowired
   private JwtUtils jwtUtils;
 
-  // ----------------------- bloco de implementações para o front ---------------------------------------
-
-//  @GetMapping("/me")
-//  public ResponseEntity<List<VagaRespostaDto>> listarMinhasVagas(Authentication authentication) {
-//    List<VagaRespostaDto> vagas = vagaService.listarTodasAutenticado(authentication);
-//    return ResponseEntity.ok(vagas);
-//  }
-//
-//  @GetMapping("/me/{nome}")
-//  public ResponseEntity<List<VagaRespostaDto>> buscarMinhasVagasPorNome(@PathVariable String nome, Authentication authentication) {
-//    List<VagaRespostaDto> vagas = vagaService.listarPorNomeAutenticado(nome, authentication);
-//    return ResponseEntity.ok(vagas);
-//  }
-//
-//  @PostMapping("/me")
-//  public ResponseEntity<?> adicionarVaga(Authentication authentication, @Valid @RequestBody VagaDto vaga) {
-//    vagaService.salvarAutenticado(vaga, authentication);
-//    return ResponseEntity.ok("Vaga cadastrada com sucesso");
-//  }
-//
-//  @PutMapping("/me/{id}")
-//  public ResponseEntity<VagaRespostaDto> atualizarVaga(@PathVariable UUID id, @Valid @RequestBody VagaDto data, Authentication authentication) {
-//    VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaAutenticado(id, data, authentication);
-//    return ResponseEntity.ok(vagaAtualizada);
-//  }
-//
-//  @DeleteMapping("/me/{id}")
-//  public ResponseEntity<Void> removerVaga(@PathVariable UUID id, Authentication authentication) {
-//    vagaService.excluirAutenticado(id, authentication);
-//    return ResponseEntity.noContent().build();
-//  }
-
-
-  //--------------------- fim do bloco ------------------------------
-
    @GetMapping
     public ResponseEntity<List<VagaRespostaDto>> listarTodas() {
         List<VagaRespostaDto> vagas = vagaService.listarTodas();
@@ -128,14 +93,6 @@ public class VagaController {
     VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data);
     return ResponseEntity.ok(vagaAtualizada);
   }
-
-//    @PutMapping("/{id}")
-//    public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
-//                                                              @Valid @RequestBody VagaDto data,
-//                                                              Authentication authentication) {
-//        VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data, authentication);
-//        return ResponseEntity.ok(vagaAtualizada);
-//    }
 
 
     @DeleteMapping({"/{id}"})

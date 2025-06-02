@@ -6,9 +6,11 @@ import com.smarthire.resume.domain.DTO.EmailDTO;
 import com.smarthire.resume.domain.DTO.VagaResumoDto;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.Curriculo;
+import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.CurriculoRepository;
+import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 
@@ -18,9 +20,11 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,6 +40,8 @@ public class CandidatoService {
     private CurriculoRepository curriculoRepository;
     @Autowired
     private VagaService vagaService;
+    @Autowired
+    private EmpresaService empresaService;
 
     @Transactional
     public Candidato salvar(Candidato candidato) {
@@ -78,6 +84,12 @@ public class CandidatoService {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    public List<Candidato> listarTodosPorEmpresaId(UUID empresaId) {
+
+        List<Candidato> candidatos = candidatoRepository.findByEmpresaId(empresaId);
+        return candidatos;
     }
 
     public List<CandidatoDto> buscarCandidatoPorNome(String nomeCandidato) {
@@ -156,6 +168,30 @@ public class CandidatoService {
         verificarVagaAtiva(vaga);
         candidato.setVaga(vaga);
         candidatoRepository.save(candidato);
+    }
+
+
+
+    public double contarCandidatosEmpresaLogada(Authentication authentication) {
+        Empresa empresa = empresaService.getEmpresaLogada(authentication);
+        List<UUID> vagaIds = vagaRepository.findVagaIdsByEmpresaId(empresa.getId());
+        if(vagaIds.isEmpty()) {
+            return 0;
+        }
+
+        return candidatoRepository.countByVagaIdIn(vagaIds);
+    }
+
+    public double obterMediaCandidatoVaga(Authentication authentication) {
+        Empresa empresa = empresaService.getEmpresaLogada(authentication);
+
+        double numeroVagas = vagaRepository.countByEmpresaId(empresa.getId());
+        if(numeroVagas == 0) {
+            return 0;
+        }
+
+        double candidatos = contarCandidatosEmpresaLogada(authentication);
+        return candidatos/numeroVagas;
     }
 
     private void verificarNulidadeCurriculo(Curriculo curriculo) {
