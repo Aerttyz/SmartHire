@@ -15,25 +15,7 @@ export default function VagasPage() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [vagaBuscada, setVagaBuscada] = useState<Vaga | null>(null);
-  const [vagas, setVagas] = useState<Vaga[]>([
-    {
-      id: "63dbdc97-5d95-47d2-afa6-b2c242eafd68",
-      nome: "Desenvolvedor Django",
-      isActive: false,
-      empresaNome: "empresaDan",
-      requisitos: {
-        habilidades: "Python, Flask, Django",
-        idiomas: "Inglês",
-        formacaoAcademica: "Graduação em Tecnologia da Informação",
-        experiencia: "3 anos em Python com Tensor Flow",
-        pesoHabilidades: 0.0,
-        pesoIdiomas: 0.0,
-        pesoFormacaoAcademica: 0.0,
-        pesoExperiencia: 0.0,
-      },
-      fase: [],
-    },
-  ]);
+  const [vagas, setVagas] = useState<Vaga[]>([]);
   const [vaga, setVaga] = useState<Vaga>({
     nome: "",
     isActive: true,
@@ -212,7 +194,7 @@ export default function VagasPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/vagas/${vagaId}/upload-cv`,
+        `http://localhost:8080/curriculos/analisar-curriculos/${vagaId}`,
         {
           method: "POST",
           headers: {
