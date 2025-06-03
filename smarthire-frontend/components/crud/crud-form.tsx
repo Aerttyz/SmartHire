@@ -66,7 +66,7 @@ export function CrudForm({ fields, submitLabel, onSubmit, isDanger = false }: Cr
         let schema: any; // Use 'any' temporariamente para flexibilidade do Zod
 
         if (field.type === "email") {
-          schema = z.string().email({ message: "Email inválido" });
+          schema = z.string().email({ message: "Email inválido" }).or(z.literal(""));
         } else if (field.type === "file") {
           schema = z.any(); // Para arquivos, zod.any() geralmente é suficiente, ou uma validação mais complexa
         } else if (field.type === "number") {
@@ -84,7 +84,7 @@ export function CrudForm({ fields, submitLabel, onSubmit, isDanger = false }: Cr
 
         // Se o campo for obrigatório, adicione .min(1) ou .nonempty() para strings
         if (field.required) {
-          if (field.type === "text" || field.type === "textarea" || field.type === "email" || field.type === "password") {
+          if (field.type === "text" || field.type === "textarea" || field.type === "password") {
             schema = schema.min(1, { message: `${field.label} é obrigatório.` });
           }
           // Para outros tipos, a validação de required já está no schema (ex: number, boolean)

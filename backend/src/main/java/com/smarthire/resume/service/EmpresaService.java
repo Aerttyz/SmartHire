@@ -4,25 +4,33 @@ import com.smarthire.resume.domain.DTO.EmpresaRequestDTO;
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
+import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.ItemNotFoundException;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.util.UUID;
 import java.util.List;
+import java.util.Optional;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
+import com.smarthire.resume.security.AuthUtils;
 
 @AllArgsConstructor
 @Service
 public class EmpresaService {
 
+    @Autowired
+    private VagaRepository vagaRepository;
+
+    @Autowired
     private EmpresaRepository empresaRepository;
 
     @Transactional
@@ -55,59 +63,34 @@ public class EmpresaService {
         return empresas;
     }
 
-    public Empresa atualizarEmpresaPorId(UUID id, EmpresaRequestDTO data) {
+    public EmpresaResponseDTO buscarEmpresa() {
+        UUID empresaId = AuthUtils.getEmpresaId();
+        Optional<Empresa> empresa = empresaRepository.findById(empresaId);
+        if (empresa.isEmpty()) {
+            throw new UsernameNotFoundException("Empresa não encontrada.");
+        }
+        return new EmpresaResponseDTO(empresa.get());
+    }
+
+    public Empresa atualizarEmpresaPorId(EmpresaPatchRequestDto data) {
+        UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Empresa", id));
-
-        empresa.setNome(data.nome());
-        empresa.setCnpj(data.cnpj());
-        empresa.setEmail(data.email());
-        empresa.setTelefone(data.telefone());
+        if (data.nome() != null && !data.nome().isBlank()) empresa.setNome(data.nome());
+        if (data.cnpj() != null && !data.cnpj().isBlank()) empresa.setCnpj(data.cnpj());
+        if (data.email() != null && !data.email().isBlank()) empresa.setEmail(data.email());
+        if (data.telefone() != null && !data.telefone().isBlank()) empresa.setTelefone(data.telefone());
+        if (data.senha() != null && !data.senha().isBlank()) empresa.setSenha(new BCryptPasswordEncoder().encode(data.senha()));
         
         return empresaRepository.save(empresa);
     }
 
-    public EmpresaResponseDTO atualizarEmpresaPorIdEncapsulado(EmpresaRequestDTO data, Authentication authentication) {
-        String emailEmpresa = authentication.getName(); // pegando do JWT aq
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        Empresa empresa = empresaRepository.findByEmail(emailEmpresa)
-          .orElseThrow(() -> new UsernameNotFoundException("Empresa não encontrada (método de busca: findByEmail()."));
-
-        empresa.setNome(data.nome());
-        empresa.setCnpj(data.cnpj());
-        empresa.setTelefone(data.telefone());
-        empresa.setEmail(data.email());
-
-        if (data.senha() != null && !data.senha().isEmpty()) {
-            empresa.setSenha(encoder.encode(data.senha()));
-        }
-
-        empresaRepository.save(empresa);
-        return new EmpresaResponseDTO(empresa);
-
-    }
-
-
     @Transactional
-    public void excluir(UUID id) {
+    public void excluir() {
+        UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada."));
+        vagaRepository.deleteAllByEmpresa(empresa);
         empresaRepository.delete(empresa);
     }
-
-    @Transactional
-    public void excluirPorEmail(String email) {
-        Empresa empresa = empresaRepository.findByEmail(email)
-          .orElseThrow(() -> new BusinessRuleException("Empresa autenticad anão encontrada."));
-        empresaRepository.delete(empresa);
-    }
-
-    public Empresa getEmpresaLogada(Authentication authentication) {
-        String email = authentication.getName();
-        return empresaRepository.findByEmail(email)
-          .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
-    }
-
-
-
 }

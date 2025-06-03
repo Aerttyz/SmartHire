@@ -37,27 +37,9 @@ public class JwtUtils {
     @Value("${smarthire.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    private final EmpresaRepository empresaRepository;
-
-    public Empresa extractEmpresaFromToken(String token) {
-        String email = extractEmailFromToken(token);
-        return empresaRepository.findByEmail(email)
-          .orElseThrow(() -> new RuntimeException("Empresa não encontrada por email."));
-    }
-
-    public String extractEmailFromToken(String token) {
-        Claims claims = Jwts.parser()
-          .setSigningKey(jwtSecret.getBytes())
-          .parseClaimsJws(token)
-          .getBody();
-
-        return claims.getSubject();
-    }
-
     public String generateTokenFromUserDetailsImpl(UserDetailsImpls userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", userDetails.getId());
-        claims.put("empresaId", userDetails.getId().toString());
+        claims.put("id", userDetails.getId());
         
         return Jwts.builder()
                 .setClaims(claims)

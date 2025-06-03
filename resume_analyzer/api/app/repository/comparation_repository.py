@@ -7,7 +7,7 @@ def search_candidates_from_jobs(job_id):
         with connection.cursor() as cursor:
             query = """
                 SELECT 
-                    c.id, c.nome, c.email, c.telefone, c.situacao,
+                    c.id, c.nome, c.email, c.telefone, 
                     curr.id, curr.nome, curr.email, curr.telefone, curr.experiencia,
                     v.nome, v.is_active,
                     
@@ -62,14 +62,14 @@ def search_candidates_from_jobs(job_id):
                         'nome': row[10],
                         'ativa': row[11],
                         'requisitos': {
-                            'habilidades': row[15],
-                            'idiomas': row[16],
-                            'formacaoAcademica': row[17],
-                            'experiencia': row[18],
-                            'pesoHabilidades': row[19],
-                            'pesoIdiomas': row[20],
-                            'pesoFormacaoAcademica': row[21],
-                            'pesoExperiencia': row[22]
+                            'habilidades': row[14],
+                            'idiomas': row[15],
+                            'formacaoAcademica': row[16],
+                            'experiencia': row[17],
+                            'pesoHabilidades': row[18],
+                            'pesoIdiomas': row[19],
+                            'pesoFormacaoAcademica': row[20],
+                            'pesoExperiencia': row[21]
                         }
                     }
                 }

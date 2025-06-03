@@ -30,4 +30,6 @@ public interface VagaRepository extends JpaRepository<Vaga, UUID> {
     List<UUID> findVagaIdsByEmpresaId(@Param("empresaId") UUID empresaId);
 
     double countByEmpresaId(UUID empresaId);
+    void deleteAllByEmpresa(Empresa empresa);
+
 }

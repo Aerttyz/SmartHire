@@ -85,24 +85,7 @@ public class FaseService {
                 candidatoFase.setDataInicio(LocalDateTime.now());
                 atualizarCandidatoNaFase.add(candidatoFase);
             }
-            if (candidato.getEmail() != null && !candidato.getEmail().isEmpty()) {
-                String assunto = "Você avançou para a próxima fase da vaga '" + vaga.getNome() + "'";
-                String corpo = String.format(
-                        "Olá %s,\n\n" +
-                                "Parabéns! Você avançou para a fase '%s' no processo seletivo da vaga '%s' na empresa %s.\n" +
-                                "Estamos felizes com seu progresso e em breve você receberá mais informações sobre esta etapa.\n\n" +
-                                "Boa sorte!\n\n" +
-                                "Atenciosamente,\n" +
-                                "Equipe %s",
-                        candidato.getNome() != null ? candidato.getNome() : "Candidato",
-                        fase.getTitulo(),
-                        vaga.getNome(),
-                        vaga.getEmpresa().getNome(),
-                        vaga.getEmpresa().getNome()
-                );
-                emailService.enviarEmailTexto(candidato.getEmail(), assunto, corpo);
-            }
-
+            enviarEmailNotificacaoDeFase(candidato, fase, vaga);
         }
 
         candidatoFaseRepository.saveAll(atualizarCandidatoNaFase);
@@ -153,7 +136,7 @@ public class FaseService {
             if (candidatosNaFase.isEmpty()) {
                 throw new BusinessRuleException("Nenhum candidato encontrado na fase.");
             }
-            
+
 
             return candidatosNaFase.stream()
                 .map(candidatoFase -> new CandidatoDto(
@@ -173,6 +156,25 @@ public class FaseService {
                 .collect(Collectors.toList());
         } catch (BusinessRuleException e) {
             throw new BusinessRuleException("Nenhum candidato encontrado na fase.");
+        }
+    }
+    private void enviarEmailNotificacaoDeFase(Candidato candidato, Fase fase, Vaga vaga) {
+        if (candidato.getEmail() != null && !candidato.getEmail().isEmpty()) {
+            String assunto = "Você avançou para a próxima fase da vaga '" + vaga.getNome() + "'";
+            String corpo = String.format(
+                    "Olá %s,\n\n" +
+                            "Parabéns! Você avançou para a fase '%s' no processo seletivo da vaga '%s' na empresa %s.\n" +
+                            "Estamos felizes com seu progresso e em breve você receberá mais informações sobre esta etapa.\n\n" +
+                            "Boa sorte!\n\n" +
+                            "Atenciosamente,\n" +
+                            "Equipe %s",
+                    candidato.getNome() != null ? candidato.getNome() : "Candidato",
+                    fase.getTitulo(),
+                    vaga.getNome(),
+                    vaga.getEmpresa().getNome(),
+                    vaga.getEmpresa().getNome()
+            );
+            emailService.enviarEmailTexto(candidato.getEmail(), assunto, corpo);
         }
     }
 }

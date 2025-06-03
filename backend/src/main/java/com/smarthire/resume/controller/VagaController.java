@@ -3,57 +3,35 @@ package com.smarthire.resume.controller;
 import com.smarthire.resume.domain.DTO.CandidateScoreDTO;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
-import com.smarthire.resume.domain.model.Vaga;
-import com.smarthire.resume.domain.repository.EmpresaRepository;
-import com.smarthire.resume.domain.repository.VagaRepository;
-import com.smarthire.resume.security.jwt.JwtUtils;
 import com.smarthire.resume.service.PontuacaoVagaService;
 import com.smarthire.resume.service.VagaService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
+import com.smarthire.resume.domain.DTO.VagaPatchResposta;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/vagas")
 public class VagaController {
+
     @Autowired
     private VagaService vagaService;
     @Autowired
-    private VagaRepository vagaRepository;
-    @Autowired
-    private EmpresaRepository empresaRepository;
-    @Autowired
     private PontuacaoVagaService pontuacaoVagaService;
-  @Autowired
-  private JwtUtils jwtUtils;
 
-   @GetMapping
-    public ResponseEntity<List<VagaRespostaDto>> listarTodas() {
-        List<VagaRespostaDto> vagas = vagaService.listarTodas();
-        return ResponseEntity.ok(vagas);
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<List<VagaRespostaDto>> listarVagasDaEmpresa(HttpServletRequest request) {
-      //extrair o token
-      String token = request.getHeader("Authorization");
-      if (token != null && token.startsWith("Bearer ")) {
-        token = token.substring(7);
-      }
-
-      UUID empresaId = jwtUtils.getIdFromToken(token);
-      List<VagaRespostaDto> vagas = vagaService.listarTodasPorEmpresa(empresaId);
+    @GetMapping
+    public ResponseEntity<List<VagaRespostaDto>> listarVagasDaEmpresa() {
+      List<VagaRespostaDto> vagas = vagaService.listarTodasPorEmpresa();
       return ResponseEntity.ok(vagas);
     }
 
@@ -70,30 +48,17 @@ public class VagaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> adicionarVaga(@Valid @RequestBody VagaDto vaga, HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        UUID empresaId = jwtUtils.getIdFromToken(token);
-
-        try {
-            vagaService.adicionarVagaComValidacao(vaga, empresaId);
-            return ResponseEntity.ok("Vaga cadastrada com sucesso");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }
+    public ResponseEntity<?> adicionarVaga(@Valid @RequestBody VagaDto vaga) {
+        vagaService.salvar(vaga);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID id,
-                                                            @Valid @RequestBody VagaDto data) {
+                                                            @Valid @RequestBody VagaPatchResposta data) {
     VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data);
     return ResponseEntity.ok(vagaAtualizada);
   }
-
 
     @DeleteMapping({"/{id}"})
     public ResponseEntity<Void> removerVaga(@PathVariable UUID id) {
@@ -108,10 +73,10 @@ public class VagaController {
         return ResponseEntity.ok(pontuacoes);
     }
 
-    @PostMapping("/{vagaId}/enviar-emails")
+    @PostMapping("/{vagaId}/enviar-emails-inaptos")
     public ResponseEntity<String> enviarEmails(@PathVariable UUID vagaId) {
-        pontuacaoVagaService.enviarEmailsParaTopCandidatos(vagaId);
-        return ResponseEntity.ok("Emails enviados para candidatos com pontuação mínima");
+        pontuacaoVagaService.enviarEmailsParaCandidatosInaptos(vagaId);
+        return ResponseEntity.ok("Emails enviados para candidatos com pontuação abaixo da mínima");
     }
 
 }

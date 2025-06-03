@@ -55,7 +55,7 @@ public class PontuacaoVagaService {
         }
     }
 
-    public double enviarEmailsParaTopCandidatos(UUID vagaId) {
+    public double enviarEmailsParaCandidatosInaptos(UUID vagaId) {
         List<CandidateScoreDTO> candidatos = obterPontuacoesDeCandidatos(vagaId);
         Vaga vaga = vagaRepository.findById(vagaId)
                 .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada"));
@@ -66,15 +66,15 @@ public class PontuacaoVagaService {
 
         candidatos.stream()
                 .filter(c -> c.email() != null && !c.email().isEmpty())
-                .filter(c -> pontuacaoMinimaAtingida(c.score_total(), pontuacaoMinima))
+                .filter(c -> !pontuacaoMinimaAtingida(c.score_total(), pontuacaoMinima))
                 .forEach(c -> {
-                    String assunto = "Oportunidade na vaga '" + nomeVaga + "' - " + nomeEmpresa;
+                    String assunto = "Atualização sobre sua candidatura para '" + nomeVaga + "' - " + nomeEmpresa;
 
                     String corpo = String.format(
                             "Olá %s,\n\n" +
-                                    "Parabéns! Você foi selecionado para continuar no processo seletivo da vaga '%s' na empresa %s.\n" +
-                                    "Acreditamos que seu perfil está alinhado com o que buscamos.\n\n" +
-                                    "Em breve, entraremos em contato com mais detalhes sobre os próximos passos.\n\n" +
+                                    "Agradecemos seu interesse na vaga '%s' na empresa %s.\n\n" +
+                                    "Após análise cuidadosa, informamos que seu perfil não atendeu aos requisitos mínimos para avançar no processo seletivo desta vez.\n\n" +
+                                    "Mas não desanime! Continue acompanhando nossas oportunidades e não hesite em se candidatar a outras vagas que melhor se alinhem com suas habilidades.\n\n" +
                                     "Atenciosamente,\n" +
                                     "Equipe %s",
                             c.nome() != null ? c.nome() : "Candidato",

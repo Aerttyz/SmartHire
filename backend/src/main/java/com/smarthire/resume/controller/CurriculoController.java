@@ -7,9 +7,9 @@ import com.smarthire.resume.service.CurriculoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import com.smarthire.resume.domain.model.Curriculo;
@@ -26,9 +26,9 @@ public class CurriculoController {
 
     @PostMapping("/analisar-curriculos/{idVaga}")
     public ResponseEntity<?> analisarCurriculos(@PathVariable("idVaga") UUID idVaga,
-                                           @RequestBody Map<String, String> requestBody) {
-
-        String path = requestBody.get("path");
+                                           @RequestParam("file") MultipartFile file) throws Exception {
+        
+        String path = curriculoService.pegarCaminhoDoCurriculo(file, idVaga);
 
         List<Curriculo>result = curriculoService.salvarCurriculo(path, idVaga);
         return ResponseEntity.ok(result);

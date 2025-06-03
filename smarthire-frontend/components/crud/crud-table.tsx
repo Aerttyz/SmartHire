@@ -1,3 +1,4 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Brain, Edit, Trash } from "lucide-react"
@@ -8,10 +9,16 @@ interface CrudTableProps {
   onAnalyzeClick?: (id: string) => void;
   onEditClick?: (id: string) => void;
   onDeleteClick?: (id: string) => void;
+  customRenderers?: ((row: string[], rowIndex: number) => React.ReactNode)[];
 }
 
-
-export function CrudTable({ headers, data, onEditClick, onDeleteClick, onAnalyzeClick }: CrudTableProps) {
+export function CrudTable({
+  headers,
+  data,
+  onEditClick,
+  onDeleteClick,
+  customRenderers = [],
+}: CrudTableProps) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -20,17 +27,24 @@ export function CrudTable({ headers, data, onEditClick, onDeleteClick, onAnalyze
             {headers.map((header, index) => (
               <TableHead key={index}>{header}</TableHead>
             ))}
+            <TableHead className="text-center">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((row, rowIndex) => {
-            const vagaId = row[1]; 
+            const vagaId = row[1];
 
             return (
               <TableRow key={rowIndex}>
                 {row.map((cell, cellIndex) => (
                   <TableCell key={cellIndex}>{cell}</TableCell>
                 ))}
+                {customRenderers.map((renderer, customIndex) => (
+                  <TableCell key={`custom-${customIndex}`}>
+                    {renderer(row, rowIndex)}
+                  </TableCell>
+                ))}
+
                 <TableCell className="flex gap-2 justify-center">
                   <Button
                     variant="outline"
@@ -55,10 +69,10 @@ export function CrudTable({ headers, data, onEditClick, onDeleteClick, onAnalyze
                   </Button>
                 </TableCell>
               </TableRow>
-            )
+            );
           })}
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
