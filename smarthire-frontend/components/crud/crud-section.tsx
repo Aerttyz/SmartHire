@@ -21,6 +21,7 @@ interface CrudSectionProps {
   showTable?: boolean;
   tableHeaders?: string[];
   tableData?: string[][];
+  onAnalyzeClick?: (id: string) => void;
   onEditClick?: (id: string) => void;
   onDeleteClick?: (id: string) => void;
   customRenderers?: ((row: string[], rowIndex: number) => React.ReactNode)[];
@@ -37,6 +38,7 @@ export function CrudSection({
   showTable = false,
   tableHeaders = [],
   tableData = [],
+  onAnalyzeClick,
   onEditClick,
   onDeleteClick,
   customRenderers = [],
@@ -57,9 +59,10 @@ export function CrudSection({
           />
           {showTable && tableHeaders.length > 0 && (
             <div className="mt-6">
-              <CrudTable
-                headers={tableHeaders}
-                data={tableData}
+              <CrudTable 
+                headers={tableHeaders} 
+                data={tableData} 
+                onAnalyzeClick={onAnalyzeClick}
                 onEditClick={onEditClick}
                 onDeleteClick={onDeleteClick}
                 customRenderers={customRenderers}

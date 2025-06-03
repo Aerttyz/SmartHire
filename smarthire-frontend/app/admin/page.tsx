@@ -30,8 +30,8 @@ export default function AdminPage() {
           .find(cookie => cookie.startsWith('token='))
           ?.split('=')[1];
       setToken(cookieToken || null);
-      console.log("Cookies atuais (no useEffect para token): ", document.cookie);
-      console.log("Este é o token extraído (no useEffect para token): ", cookieToken);
+      console.log("Cookies atuais: ", document.cookie);
+      console.log("Este é o token extraído: ", cookieToken);
         }
     }, []);
 
@@ -48,7 +48,7 @@ export default function AdminPage() {
                 Authorization: `Bearer ${token}`,
             },
         })
-            .then((res) => {
+            .then(async (res) => {
                 if (!res.ok) {
                     return res.json().then(err => { throw new Error(err.message || res.statusText); });
                 }
@@ -61,6 +61,7 @@ export default function AdminPage() {
                 console.error("Erro ao buscar empresas: ", error);
             });
     }, [token]);
+  
 
   async function atualizarEmpresa(data: any) {
     try {

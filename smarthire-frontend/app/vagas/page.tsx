@@ -79,6 +79,33 @@ export default function VagasPage() {
       });
   }, [token]);
 
+        fetch(`${API_URL}/me`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then((res) => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error(err.message || res.statusText); });
+            }
+            return res.json();
+        })
+        .then((data: Vaga[]) => {
+            setVagas(data);
+        })
+        .catch((error) => {
+            console.error("Erro ao buscar vagas da empresa: ", error);
+        });
+    }, [token]); // só roda quando token for definido
+
+
+  const handleAnalyzeVagaClick = (vagaId: string) => {
+    console.log("Indo para tela de análise de currículos de vagaId: ", vagaId);
+    router.push(`/vagas/me/analisar/${vagaId}`);
+  }
+
   const handleEditVagaClick = (vagaId: string) => {
     console.log("Editando vaga com ID:", vagaId);
     router.push(`/vagas/me/editar/${vagaId}`);
@@ -347,6 +374,7 @@ export default function VagasPage() {
             }
             onDeleteClick={handleDeleteVagaClick}
             onEditClick={handleEditVagaClick}
+            onAnalyzeClick={handleAnalyzeVagaClick}
           />
         </div>
       </div>

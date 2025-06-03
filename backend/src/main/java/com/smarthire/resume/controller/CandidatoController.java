@@ -3,11 +3,14 @@ import com.smarthire.resume.domain.DTO.CandidatoDto;
 import com.smarthire.resume.domain.DTO.EmailDTO;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.DTO.CandidatoRequestDTO;
+import com.smarthire.resume.security.jwt.JwtUtils;
 import com.smarthire.resume.service.CandidatoService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +23,35 @@ public class CandidatoController {
 
     @Autowired
     private CandidatoService candidatoService;
+    @Autowired
+    private JwtUtils jwtUtils;
     
     @GetMapping
     public ResponseEntity<List<CandidatoDto>> listar() {
         List<CandidatoDto> candidatos = candidatoService.listarTodos();
+        return ResponseEntity.ok(candidatos);
+    }
+
+    private UUID extrairEmpresaId(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        return jwtUtils.getIdFromToken(token);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Integer> listarNumeroCandidatosEmpresaLogada(HttpServletRequest request) {
+        UUID empresaId = extrairEmpresaId(request);
+        List<CandidatoDto> candidatos = candidatoService.listarTodosPorEmpresaId(empresaId);
+        int numeroCandidatos = candidatos.size();
+        return ResponseEntity.ok(numeroCandidatos);
+    }
+
+    @GetMapping("/me/listar")
+    public ResponseEntity<List<CandidatoDto>> listarCandidatosEmpresaLogada(HttpServletRequest request) {
+        UUID empresaId = extrairEmpresaId(request);
+        List<CandidatoDto> candidatos = candidatoService.listarTodosPorEmpresaId(empresaId);
         return ResponseEntity.ok(candidatos);
     }
     
@@ -59,6 +87,12 @@ public class CandidatoController {
     public ResponseEntity<Void> removerCandidato(@PathVariable UUID id) {
         candidatoService.deletarCandidatoPorId(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me/media")
+    public ResponseEntity<Double> obterMediaCandidatoVaga(Authentication authentication) {
+        Double media = candidatoService.obterMediaCandidatoVaga(authentication);
+        return ResponseEntity.ok(media);
     }
 
 }
