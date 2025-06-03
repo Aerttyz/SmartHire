@@ -32,8 +32,8 @@ export default function AdminPage() {
           .find(cookie => cookie.startsWith('token='))
           ?.split('=')[1];
       setToken(cookieToken || null);
-      console.log("Cookies atuais (no useEffect para token): ", document.cookie);
-      console.log("Este é o token extraído (no useEffect para token): ", cookieToken);
+      console.log("Cookies atuais: ", document.cookie);
+      console.log("Este é o token extraído: ", cookieToken);
         }
     }, []);
 

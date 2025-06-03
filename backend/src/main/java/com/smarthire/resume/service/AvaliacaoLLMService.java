@@ -1,11 +1,14 @@
 package com.smarthire.resume.service;
 
+import com.smarthire.resume.domain.DTO.CandidatoTestDto;
 import com.smarthire.resume.domain.model.AvaliacaoLLM;
 import com.smarthire.resume.domain.DTO.CurriculoApiDto;
 import com.smarthire.resume.domain.DTO.VagaApiDto;
+import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.Curriculo;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.model.VagaRequisitosModel;
+import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.CurriculoRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import jakarta.transaction.Transactional;
@@ -36,6 +39,7 @@ public class AvaliacaoLLMService {
 
   private final CurriculoRepository curriculoRepository;
   private final VagaRepository vagaRepository;
+  private final CandidatoRepository candidatoRepository;
 
   private final RestTemplate restTemplate = new RestTemplate();
   private static final Logger logger = LoggerFactory.getLogger(AvaliacaoLLMService.class);
@@ -45,14 +49,22 @@ public class AvaliacaoLLMService {
 
   @Transactional
   public AvaliacaoLLM avaliarCandidatoParaVaga(UUID vagaId, UUID curriculoId) {
-    Curriculo curriculo = curriculoRepository.findById(curriculoId)
-      .orElseThrow(() -> new RuntimeException("Curriculo nao encontrado com ID: " + curriculoId));
+    Candidato candidato = candidatoRepository.findById(curriculoId)
+      .orElseThrow(() -> new RuntimeException("Candidato não encontrado"));
+
+    CandidatoTestDto curriculo = new CandidatoTestDto(
+      candidato.getId(),
+      candidato.getCurriculo().getHabilidades(),
+      candidato.getCurriculo().getIdiomas(),
+      candidato.getCurriculo().getFormacaoAcademica(),
+      candidato.getCurriculo().getExperiencia()
+    );
 
     Vaga vaga = vagaRepository.findById(vagaId)
       .orElseThrow(() -> new RuntimeException("Vaga nao encontrada com ID: " + vagaId));
 
     CurriculoApiDto curriculoDto = new CurriculoApiDto();
-    curriculoDto.setId(curriculo.getId());
+    curriculoDto.setId(candidato.getId());
     curriculoDto.setExperiencia(curriculo.getExperiencia());
     curriculoDto.setFormacaoAcademica(curriculo.getFormacaoAcademica());
     curriculoDto.setHabilidades(curriculo.getHabilidades());

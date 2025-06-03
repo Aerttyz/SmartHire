@@ -82,19 +82,19 @@ export default function AtualizarVagaPage({ params }: { params: { vagaId: string
       if (payload.isActive !== undefined) {
          payload.isActive = String(payload.isActive).toLowerCase() === 'true' || String(payload.isActive).toLowerCase() === 'on';
       } else {
-        payload.isActive = false; // Defina um padrão caso não esteja presente (e.g., checkbox desmarcado)
+        payload.isActive = false; 
       }
 
 
-      payload.empresaId = decodedToken.empresaId; // Adiciona o empresaId do token
+      payload.empresaId = decodedToken.empresaId;
 
-      const response = await fetch(`${API_URL}/${vagaId}`, { // Usa o vagaId dos params na URL
+      const response = await fetch(`${API_URL}/${vagaId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify(payload), // Envia o payload sem o 'id'
+        body: JSON.stringify(payload), 
       });
 
       if (!response.ok) {
@@ -105,7 +105,7 @@ export default function AtualizarVagaPage({ params }: { params: { vagaId: string
       const result = await response.json();
       console.log("Vaga atualizada:", result);
       alert("Dados da vaga atualizados com sucesso!");
-      router.push('/vagas'); // Redireciona de volta para a lista após sucesso
+      router.push('/vagas'); 
 
     } catch (error: any) {
       alert(`Erro ao atualizar vaga: ${error.message || error}`);
@@ -113,7 +113,6 @@ export default function AtualizarVagaPage({ params }: { params: { vagaId: string
     }
   }
 
-  // Se a vaga ainda não foi carregada, mostre um indicador de carregamento
   if (!vaga) {
     return (
       <DashboardShell>

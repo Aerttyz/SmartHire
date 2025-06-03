@@ -15,6 +15,7 @@ interface CrudSectionProps {
   showTable?: boolean;
   tableHeaders?: string[];
   tableData?: string[][];
+  onAnalyzeClick?: (id: string) => void;
   onEditClick?: (id: string) => void;
   onDeleteClick?: (id: string) => void;
 }
@@ -30,6 +31,7 @@ export function CrudSection({
   showTable = false,
   tableHeaders = [],
   tableData = [],
+  onAnalyzeClick,
   onEditClick,
   onDeleteClick,
 }: CrudSectionProps) {
@@ -47,6 +49,7 @@ export function CrudSection({
               <CrudTable 
                 headers={tableHeaders} 
                 data={tableData} 
+                onAnalyzeClick={onAnalyzeClick}
                 onEditClick={onEditClick}
                 onDeleteClick={onDeleteClick}/>
             </div>

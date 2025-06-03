@@ -86,10 +86,19 @@ public class CandidatoService {
                 .collect(Collectors.toList());
     }
 
-    public List<Candidato> listarTodosPorEmpresaId(UUID empresaId) {
+    public List<CandidatoDto> listarTodosPorEmpresaId(UUID empresaId) {
 
         List<Candidato> candidatos = candidatoRepository.findByEmpresaId(empresaId);
-        return candidatos;
+        return candidatos.stream()
+          .map(c -> {
+              try{
+                  return listarCandidatos(c);
+              } catch ( BusinessRuleException e) {
+                  throw new BusinessRuleException("Erro ao listar candidatos da empresa: " + e.getMessage());
+              }
+          })
+          .filter(Objects::nonNull)
+          .collect(Collectors.toList());
     }
 
     public List<CandidatoDto> buscarCandidatoPorNome(String nomeCandidato) {

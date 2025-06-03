@@ -1,16 +1,17 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Edit, Trash } from "lucide-react"
+import { Brain, Edit, Trash } from "lucide-react"
 
 interface CrudTableProps {
   headers: string[];
   data: string[][];
+  onAnalyzeClick?: (id: string) => void;
   onEditClick?: (id: string) => void;
   onDeleteClick?: (id: string) => void;
 }
 
 
-export function CrudTable({ headers, data, onEditClick, onDeleteClick }: CrudTableProps) {
+export function CrudTable({ headers, data, onEditClick, onDeleteClick, onAnalyzeClick }: CrudTableProps) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -31,6 +32,13 @@ export function CrudTable({ headers, data, onEditClick, onDeleteClick }: CrudTab
                   <TableCell key={cellIndex}>{cell}</TableCell>
                 ))}
                 <TableCell className="flex gap-2 justify-center">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => onAnalyzeClick && onAnalyzeClick(vagaId)} 
+                  >
+                    <Brain className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="outline"
                     size="icon"

@@ -32,18 +32,27 @@ public class CandidatoController {
         return ResponseEntity.ok(candidatos);
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<Integer> listarCandidatosEmpresaLogada(HttpServletRequest request) {
-        //extrair o token
+    private UUID extrairEmpresaId(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
+        return jwtUtils.getIdFromToken(token);
+    }
 
-        UUID empresaId = jwtUtils.getIdFromToken(token);
-        List<Candidato> candidatos = candidatoService.listarTodosPorEmpresaId(empresaId);
+    @GetMapping("/me")
+    public ResponseEntity<Integer> listarNumeroCandidatosEmpresaLogada(HttpServletRequest request) {
+        UUID empresaId = extrairEmpresaId(request);
+        List<CandidatoDto> candidatos = candidatoService.listarTodosPorEmpresaId(empresaId);
         int numeroCandidatos = candidatos.size();
         return ResponseEntity.ok(numeroCandidatos);
+    }
+
+    @GetMapping("/me/listar")
+    public ResponseEntity<List<CandidatoDto>> listarCandidatosEmpresaLogada(HttpServletRequest request) {
+        UUID empresaId = extrairEmpresaId(request);
+        List<CandidatoDto> candidatos = candidatoService.listarTodosPorEmpresaId(empresaId);
+        return ResponseEntity.ok(candidatos);
     }
     
     @GetMapping({"/{nomeCandidato}"})
