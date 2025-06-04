@@ -74,6 +74,12 @@ public class RestExceptionHandler {
         logger.warn("Erro de validação: {}", message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(treatedResponse);
     }
+    @ExceptionHandler(FileProcessingException.class)
+    public ResponseEntity<RestErrorMessage> handleFileProcessing(FileProcessingException ex) {
+        logger.error("Erro ao processar arquivo: ", ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new RestErrorMessage(HttpStatus.BAD_REQUEST, "Falha ao processar o arquivo enviado."));
+    }
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<RestErrorMessage> dataAccessHandler(DataAccessException ex) {

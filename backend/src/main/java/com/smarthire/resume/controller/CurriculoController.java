@@ -26,7 +26,7 @@ public class CurriculoController {
 
     @PostMapping("/analisar-curriculos/{idVaga}")
     public ResponseEntity<?> analisarCurriculos(@PathVariable("idVaga") UUID idVaga,
-                                           @RequestParam("file") MultipartFile file) throws Exception {
+                                           @RequestParam("file") MultipartFile file) {
         
         String path = curriculoService.pegarCaminhoDoCurriculo(file, idVaga);
 
