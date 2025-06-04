@@ -5,7 +5,6 @@ import { CrudSection } from "@/components/crud/crud-section"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
-import { parseJwt } from "@/lib/utils"
 import { useRouter } from "next/navigation"; 
 import { useEffect, useState } from "react"
 
@@ -130,14 +129,14 @@ export default function AtualizarVagaPage({ params }: { params: { vagaId: string
             description={`Editando a vaga com ID: ${vagaId}`}
             fields={[
               { name: "nome", label: "Título da Vaga", type: "text", defaultValue: vaga.nome },
-              { name: "habilidades", label: "Habilidades", type: "textarea", defaultValue: vaga.habilidades },
-              { name: "idiomas", label: "Idiomas", type: "text", defaultValue: vaga.idiomas },
-              { name: "formacaoAcademica", label: "Formação acadêmica", type: "text", defaultValue: vaga.formacaoAcademica },
-              { name: "experiencia", label: "Tempo de experiência", type: "text", defaultValue: vaga.experiencia },
-              { name: "pesoHabilidades", label: "Peso HABILIDADES", type: "number", defaultValue: vaga.pesoHabilidades?.toString() },
-              { name: "pesoIdiomas", label: "Peso IDIOMAS", type: "number", defaultValue: vaga.pesoIdiomas?.toString() },
-              { name: "pesoFormacaoAcademica", label: "Peso FORMAÇÃO ACADÊMICA", type: "number", defaultValue: vaga.pesoFormacaoAcademica?.toString() },
-              { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number", defaultValue: vaga.pesoExperiencia?.toString() },
+              { name: "habilidades", label: "Habilidades", type: "textarea", defaultValue: vaga.requisitos?.habilidades },
+              { name: "idiomas", label: "Idiomas", type: "text", defaultValue: vaga.requisitos?.idiomas },
+              { name: "formacaoAcademica", label: "Formação acadêmica", type: "text", defaultValue: vaga.requisitos?.formacaoAcademica },
+              { name: "experiencia", label: "Tempo de experiência", type: "text", defaultValue: vaga.requisitos?.experiencia },
+              { name: "pesoHabilidades", label: "Peso HABILIDADES", type: "number", defaultValue: vaga.requisitos?.pesoHabilidades?.toString() },
+              { name: "pesoIdiomas", label: "Peso IDIOMAS", type: "number", defaultValue: vaga.requisitos?.pesoIdiomas?.toString() },
+              { name: "pesoFormacaoAcademica", label: "Peso FORMAÇÃO ACADÊMICA", type: "number", defaultValue: vaga.requisitos?.pesoFormacaoAcademica?.toString() },
+              { name: "pesoExperiencia", label: "Peso EXPERIÊNCIA", type: "number", defaultValue: vaga.requisitos?.pesoExperiencia?.toString() },
               { name: "isActive", label: "Ativa", type: "checkbox", defaultValue: vaga.isActive },
             ]}
             submitLabel="Salvar Alterações"

@@ -99,7 +99,7 @@ export default function DashboardPage() {
               return;
           }
   
-          fetch(`${API_URL}/me`, {
+          fetch(`${API_URL}`, {
               method: 'GET',
               headers: {
                   "Content-Type": "application/json",

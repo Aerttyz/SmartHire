@@ -1,74 +1,60 @@
 package com.smarthire.resume.service;
 
-import com.smarthire.resume.domain.DTO.CandidatoTestDto;
-import com.smarthire.resume.domain.model.AvaliacaoLLM;
-import com.smarthire.resume.domain.DTO.CurriculoApiDto;
-import com.smarthire.resume.domain.DTO.VagaApiDto;
-import com.smarthire.resume.domain.model.Candidato;
-import com.smarthire.resume.domain.model.Curriculo;
-import com.smarthire.resume.domain.model.Vaga;
-import com.smarthire.resume.domain.model.VagaRequisitosModel;
-import com.smarthire.resume.domain.repository.CandidatoRepository;
-import com.smarthire.resume.domain.repository.CurriculoRepository;
-import com.smarthire.resume.domain.repository.VagaRepository;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-// import com.smarthire.resume.exception.ResourceNotFoundException;
-// import org.springframework.web.server.ResponseStatusException;
-// import org.springframework.http.HttpStatus;
 
+import com.smarthire.resume.domain.DTO.CandidatoAnaliseDto;
+import com.smarthire.resume.domain.DTO.VagaApiDto;
+import com.smarthire.resume.domain.model.AvaliacaoLLM;
+import com.smarthire.resume.domain.model.Candidato;
+import com.smarthire.resume.domain.model.Vaga;
+import com.smarthire.resume.domain.model.VagaRequisitosModel;
+import com.smarthire.resume.domain.repository.CandidatoRepository;
+import com.smarthire.resume.domain.repository.VagaRepository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class AvaliacaoLLMService {
 
-  private final CurriculoRepository curriculoRepository;
-  private final VagaRepository vagaRepository;
-  private final CandidatoRepository candidatoRepository;
+  @Autowired
+  CandidatoRepository candidatoRepository;
+
+  @Autowired
+  VagaRepository vagaRepository;
 
   private final RestTemplate restTemplate = new RestTemplate();
   private static final Logger logger = LoggerFactory.getLogger(AvaliacaoLLMService.class);
-
 
   private final String flaskUrl = "http://localhost:5000/avaliar";
 
   @Transactional
   public AvaliacaoLLM avaliarCandidatoParaVaga(UUID vagaId, UUID curriculoId) {
     Candidato candidato = candidatoRepository.findById(curriculoId)
-      .orElseThrow(() -> new RuntimeException("Candidato não encontrado"));
+        .orElseThrow(() -> new RuntimeException("Candidato não encontrado"));
 
-    CandidatoTestDto curriculo = new CandidatoTestDto(
-      candidato.getId(),
-      candidato.getCurriculo().getHabilidades(),
-      candidato.getCurriculo().getIdiomas(),
-      candidato.getCurriculo().getFormacaoAcademica(),
-      candidato.getCurriculo().getExperiencia()
-    );
+    CandidatoAnaliseDto curriculo = new CandidatoAnaliseDto(
+        candidato.getId(),
+        candidato.getCurriculo().getHabilidades(),
+        candidato.getCurriculo().getIdiomas(),
+        candidato.getCurriculo().getFormacaoAcademica(),
+        candidato.getCurriculo().getExperiencia());
 
     Vaga vaga = vagaRepository.findById(vagaId)
-      .orElseThrow(() -> new RuntimeException("Vaga nao encontrada com ID: " + vagaId));
-
-    CurriculoApiDto curriculoDto = new CurriculoApiDto();
-    curriculoDto.setId(candidato.getId());
-    curriculoDto.setExperiencia(curriculo.getExperiencia());
-    curriculoDto.setFormacaoAcademica(curriculo.getFormacaoAcademica());
-    curriculoDto.setHabilidades(curriculo.getHabilidades());
-    curriculoDto.setIdiomas(curriculo.getIdiomas());
+        .orElseThrow(() -> new RuntimeException("Vaga nao encontrada com ID: " + vagaId));
 
     // --- 2. Mapear Entidade Vaga para VagaApiDTO ---
     VagaApiDto vagaDto = new VagaApiDto();
@@ -101,7 +87,7 @@ public class AvaliacaoLLMService {
     }
 
     Map<String, Object> payload = new HashMap<>();
-    payload.put("curriculo", curriculoDto);
+    payload.put("curriculo", curriculo);
     payload.put("vaga", vagaDto);
 
     HttpHeaders headers = new HttpHeaders();
@@ -111,8 +97,7 @@ public class AvaliacaoLLMService {
     ResponseEntity<AvaliacaoLLM> responseEntity;
     try {
       responseEntity = restTemplate.postForEntity(
-        flaskUrl, requestEntity, AvaliacaoLLM.class
-      );
+          flaskUrl, requestEntity, AvaliacaoLLM.class);
     } catch (Exception e) {
       logger.error("Erro ao chamar API Python para avaliação: {}", e.getMessage());
       throw new RuntimeException("Erro ao comunicar com o serviço de avaliação de IA.", e);
