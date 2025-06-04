@@ -1,17 +1,22 @@
 package com.smarthire.resume.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.service.EmpresaService;
 
 import jakarta.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
 
 @RestController
 @RequestMapping("/empresas")
@@ -25,7 +30,12 @@ public class EmpresaController {
         EmpresaResponseDTO empresa = empresaService.buscarEmpresa();
         return ResponseEntity.ok(empresa);
     }
-    
+
+    @GetMapping
+    public ResponseEntity<List<EmpresaResponseDTO>> listarTodasEmpresas() {
+        return ResponseEntity.ok(empresaService.listarTodas());
+    }
+
     @PatchMapping
     public ResponseEntity<Empresa> atualizarEmpresaPorId(@Valid @RequestBody EmpresaPatchRequestDto data) {
         Empresa empresaAtualizada = empresaService.atualizarEmpresaPorId(data);
