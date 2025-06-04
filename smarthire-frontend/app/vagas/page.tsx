@@ -79,6 +79,11 @@ export default function VagasPage() {
       });
   }, [token]);
 
+  const handleAnalyzeVagaClick = (vagaId: string) => {
+    console.log("Indo para tela de análise de currículos de vagaId: ", vagaId);
+    router.push(`/vagas/me/analisar/${vagaId}`);
+  }
+
   const handleEditVagaClick = (vagaId: string) => {
     console.log("Editando vaga com ID:", vagaId);
     router.push(`/vagas/me/editar/${vagaId}`);
@@ -347,6 +352,7 @@ export default function VagasPage() {
             }
             onDeleteClick={handleDeleteVagaClick}
             onEditClick={handleEditVagaClick}
+            onAnalyzeClick={handleAnalyzeVagaClick}
           />
         </div>
       </div>
