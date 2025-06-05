@@ -46,21 +46,21 @@ def search_candidates_from_jobs(job_id):
             for row in rows:
                 candidato = {
                     'id': row[0],
-                    'nome': row[1],       # utilizado para envio de emails
-                    'email': row[2],      # utilizado para envio de emails
+                    'nome': row[1],
+                    'email': row[2],
                     'curriculo': {
-                        'idCurriculo': row[5],
-                        'nome': row[6],
-                        'email': row[7],
-                        'telefone': row[8],
-                        'experiencia': row[9],
-                        'idiomas': row[12],
-                        'habilidades': row[13],
-                        'formacaoAcademica': row[14]
+                        'idCurriculo': row[4],
+                        'nome': row[5],
+                        'email': row[6],
+                        'telefone': row[7],
+                        'experiencia': row[8],
+                        'idiomas': row[11],
+                        'habilidades': row[12],
+                        'formacaoAcademica': row[13]
                     },
                     'vaga': {
-                        'nome': row[10],
-                        'ativa': row[11],
+                        'nome': row[9],
+                        'ativa': row[10],
                         'requisitos': {
                             'habilidades': row[14],
                             'idiomas': row[15],
