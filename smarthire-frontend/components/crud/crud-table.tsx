@@ -9,6 +9,7 @@ interface CrudTableProps {
   onAnalyzeClick?: (id: string) => void;
   onEditClick?: (id: string) => void;
   onDeleteClick?: (id: string) => void;
+  idColumnIndex?: number;
   customRenderers?: ((row: string[], rowIndex: number) => React.ReactNode)[];
 }
 
@@ -17,6 +18,8 @@ export function CrudTable({
   data,
   onEditClick,
   onDeleteClick,
+  onAnalyzeClick,
+  idColumnIndex,
   customRenderers = [],
 }: CrudTableProps) {
   return (
@@ -32,7 +35,7 @@ export function CrudTable({
         </TableHeader>
         <TableBody>
           {data.map((row, rowIndex) => {
-            const vagaId = row[1];
+            const actionId = row[idColumnIndex ?? 1];
 
             return (
               <TableRow key={rowIndex}>
@@ -49,21 +52,21 @@ export function CrudTable({
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => onAnalyzeClick && onAnalyzeClick(vagaId)} 
+                    onClick={() => onAnalyzeClick && onAnalyzeClick(actionId)} 
                   >
                     <Brain className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => onEditClick && onEditClick(vagaId)} 
+                    onClick={() => onEditClick && onEditClick(actionId)} 
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => onDeleteClick && onDeleteClick(vagaId)}
+                    onClick={() => onDeleteClick && onDeleteClick(actionId)}
                   >
                     <Trash className="h-4 w-4" />
                   </Button>
