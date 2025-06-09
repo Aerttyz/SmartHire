@@ -1,27 +1,25 @@
 package com.smarthire.resume.service;
 
-import com.smarthire.resume.domain.DTO.EmpresaRequestDTO;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
 import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.repository.EmpresaRepository;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.ItemNotFoundException;
+import com.smarthire.resume.security.AuthUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.util.UUID;
-import java.util.List;
-import java.util.Optional;
-
-import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
-import com.smarthire.resume.security.AuthUtils;
 
 @AllArgsConstructor
 @Service
@@ -36,7 +34,7 @@ public class EmpresaService {
     @Transactional
     public Empresa salvar(Empresa empresa) {
         boolean cnpjEmUso = empresaRepository.findByCnpj(empresa.getCnpj())
-                .filter(e-> !e.equals(empresa))
+                .filter(e -> !e.equals(empresa))
                 .isPresent();
         if (cnpjEmUso) {
             throw new BusinessRuleException("CNPJ já cadastrado no sistema.");
@@ -47,12 +45,14 @@ public class EmpresaService {
         return empresaRepository.save(empresa);
     }
 
-    public List<Empresa> listarTodas(){
+    public List<EmpresaResponseDTO> listarTodas() {
         List<Empresa> empresas = empresaRepository.findAll();
         if (empresas.isEmpty()) {
             throw new BusinessRuleException("Nenhuma empresa encontrada.");
         }
-        return empresas;
+        return empresas.stream()
+                .map(EmpresaResponseDTO::new)
+                .toList();
     }
 
     public List<Empresa> listarPorNome(String nomeEmpresa) {
@@ -76,12 +76,17 @@ public class EmpresaService {
         UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Empresa", id));
-        if (data.nome() != null && !data.nome().isBlank()) empresa.setNome(data.nome());
-        if (data.cnpj() != null && !data.cnpj().isBlank()) empresa.setCnpj(data.cnpj());
-        if (data.email() != null && !data.email().isBlank()) empresa.setEmail(data.email());
-        if (data.telefone() != null && !data.telefone().isBlank()) empresa.setTelefone(data.telefone());
-        if (data.senha() != null && !data.senha().isBlank()) empresa.setSenha(new BCryptPasswordEncoder().encode(data.senha()));
-        
+        if (data.nome() != null && !data.nome().isBlank())
+            empresa.setNome(data.nome());
+        if (data.cnpj() != null && !data.cnpj().isBlank())
+            empresa.setCnpj(data.cnpj());
+        if (data.email() != null && !data.email().isBlank())
+            empresa.setEmail(data.email());
+        if (data.telefone() != null && !data.telefone().isBlank())
+            empresa.setTelefone(data.telefone());
+        if (data.senha() != null && !data.senha().isBlank())
+            empresa.setSenha(new BCryptPasswordEncoder().encode(data.senha()));
+
         return empresaRepository.save(empresa);
     }
 

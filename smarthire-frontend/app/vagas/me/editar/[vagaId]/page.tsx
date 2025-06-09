@@ -6,11 +6,11 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { useRouter } from "next/navigation"; 
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 
-export default function AtualizarVagaPage({ params }: { params: { vagaId: string } }) {
+export default function AtualizarVagaPage({ params }: { params: Promise<{ vagaId: string }> }) {
 
-  const { vagaId } = params;
+  const { vagaId } = use(params);
   const router = useRouter();
 
   const [vaga, setVaga] = useState<Vaga | null>(null); 
