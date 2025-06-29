@@ -14,15 +14,15 @@ import com.smarthire.resume.domain.DTO.EmailDTO;
 import com.smarthire.resume.domain.DTO.VagaResumoDto;
 import com.smarthire.resume.domain.model.Candidato;
 import com.smarthire.resume.domain.model.Curriculo;
-import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.CandidatoRepository;
 import com.smarthire.resume.domain.repository.CurriculoRepository;
-import com.smarthire.resume.domain.repository.EmpresaRepository;
+import com.smarthire.resume.domain.repository.EmpresaRepositoryJpa;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.ItemNotFoundException;
-import com.smarthire.resume.security.AuthUtils;
+import com.smarthirepro.core.security.AuthUtils;
+import com.smarthirepro.domain.model.Empresa;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -39,7 +39,7 @@ public class CandidatoService {
     @Autowired
     private VagaService vagaService;
     @Autowired
-    private EmpresaRepository empresaRepository;
+    private EmpresaRepositoryJpa empresaRepository;
 
     @Transactional
     public Candidato salvar(Candidato candidato) {

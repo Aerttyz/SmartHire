@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 
 import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
-import com.smarthire.resume.domain.model.Empresa;
-import com.smarthire.resume.domain.repository.EmpresaRepository;
+import com.smarthire.resume.domain.repository.EmpresaRepositoryJpa;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.ItemNotFoundException;
-import com.smarthire.resume.security.AuthUtils;
+import com.smarthirepro.core.security.AuthUtils;
+import com.smarthirepro.domain.model.Empresa;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ public class EmpresaService {
     private VagaRepository vagaRepository;
 
     @Autowired
-    private EmpresaRepository empresaRepository;
+    private EmpresaRepositoryJpa empresaRepository;
 
     @Transactional
     public Empresa salvar(Empresa empresa) {
@@ -82,8 +82,6 @@ public class EmpresaService {
             empresa.setCnpj(data.cnpj());
         if (data.email() != null && !data.email().isBlank())
             empresa.setEmail(data.email());
-        if (data.telefone() != null && !data.telefone().isBlank())
-            empresa.setTelefone(data.telefone());
         if (data.senha() != null && !data.senha().isBlank())
             empresa.setSenha(new BCryptPasswordEncoder().encode(data.senha()));
 

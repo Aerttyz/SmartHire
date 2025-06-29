@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
-import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.service.EmpresaService;
+import com.smarthirepro.domain.model.Empresa;
 
 import jakarta.validation.Valid;
 

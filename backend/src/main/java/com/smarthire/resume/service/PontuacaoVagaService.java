@@ -3,7 +3,6 @@ package com.smarthire.resume.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smarthire.resume.domain.DTO.CandidateScoreDTO;
-import com.smarthire.resume.domain.model.Empresa;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
