@@ -12,11 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
+import com.smarthirepro.core.service.IEmailService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.smarthirepro.core.dto.EmailRequest;
 
 @Service
 public class PontuacaoVagaService {
@@ -28,7 +29,7 @@ public class PontuacaoVagaService {
     private VagaRepository vagaRepository;
 
     @Autowired
-    private EmailService emailService;
+    private IEmailService emailService;
 
     public List<CandidateScoreDTO> obterPontuacoesDeCandidatos(UUID vagaId) {
         String flaskUrlComparacao = "http://localhost:5000/compare_resumes?vaga_id=" + vagaId.toString();
@@ -81,8 +82,9 @@ public class PontuacaoVagaService {
                             nomeEmpresa,
                             nomeEmpresa
                     );
+                    EmailRequest request = new EmailRequest(c.email(), assunto, corpo);
 
-                    emailService.enviarEmailTexto(c.email(), assunto, corpo);
+                    emailService.enviarEmail(request);
                 });
         return pontuacaoMinima;
     }

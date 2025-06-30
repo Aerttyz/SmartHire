@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 
+import com.smarthirepro.core.dto.EmailRequest;
+import com.smarthirepro.core.service.IEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +41,7 @@ public class FaseService {
     @Autowired
     private VagaRepository vagaRepository;
     @Autowired
-    private EmailService emailService;
+    private IEmailService emailService;
 
 
     @Transactional
@@ -174,7 +176,8 @@ public class FaseService {
                     vaga.getEmpresa().getNome(),
                     vaga.getEmpresa().getNome()
             );
-            emailService.enviarEmailTexto(candidato.getEmail(), assunto, corpo);
+            EmailRequest request = new EmailRequest(candidato.getEmail(), assunto, corpo);
+            emailService.enviarEmail(request);
         }
     }
 }
