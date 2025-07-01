@@ -17,9 +17,7 @@ public interface VagaRepository extends JpaRepository<Vaga, UUID> {
 
     List<Vaga> findByNome(String nomeVaga);
 
-    List<Vaga> findByEmpresa(Empresa empresa);
-
-    List<Vaga> findByNomeContainingIgnoreCaseAndEmpresa(String nome, Empresa empresa);
+    List<Vaga> findByNomeContainingIgnoreCaseAndEmpresaId(String nome, UUID empresaId);
 
     boolean existsByNome(String nomeVaga);
 
@@ -27,16 +25,16 @@ public interface VagaRepository extends JpaRepository<Vaga, UUID> {
 
     List<Vaga> findByEmpresaId(UUID empresaId);
 
-    Optional<Vaga> findByIdAndEmpresa(UUID id, Empresa empresa);
+//    Optional<Vaga> findByIdAndEmpresa(UUID id, Empresa empresa);
 
     @Query("SELECT v.pontuacaoMinima FROM Vaga v WHERE v.id = :vagaId")
     Double findPontuacaoMinimaById(@Param("vagaId") UUID vagaId);
 
-    @Query("SELECT v.id FROM Vaga v where v.empresa.id = :empresaId")
+    @Query("SELECT v.id FROM Vaga v where v.empresaId = :empresaId")
     List<UUID> findVagaIdsByEmpresaId(@Param("empresaId") UUID empresaId);
 
     double countByEmpresaId(UUID empresaId);
 
-    void deleteAllByEmpresa(Empresa empresa);
+    void deleteAllByEmpresaId(UUID empresaId);
 
 }

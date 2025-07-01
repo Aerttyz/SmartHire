@@ -38,9 +38,8 @@ public class Vaga {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "empresa_id")
-    private Empresa empresa;
+    @Column(name = "empresa_id", nullable = false)
+    private UUID empresaId;
 
     private String nome;
 

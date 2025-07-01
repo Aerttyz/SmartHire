@@ -20,7 +20,7 @@ public interface CandidatoRepository extends JpaRepository<Candidato, UUID> {
     boolean existsByNome(String nomeCandidato);
     List<Candidato> findByVaga_Id(UUID vagaId);
 
-    @Query("SELECT c FROM Candidato c WHERE c.vaga.empresa.id = :empresaId")
+    @Query("SELECT c FROM Candidato c WHERE c.vaga.empresaId = :empresaId")
     List<Candidato> findByEmpresaId(@Param("empresaId") UUID empresaId);
 
 

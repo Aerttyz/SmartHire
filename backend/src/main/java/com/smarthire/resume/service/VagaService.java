@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.smarthire.resume.domain.DTO.FaseDto;
@@ -31,16 +32,17 @@ public class VagaService {
     private VagaRepository vagaRepository;
     @Autowired
     private EmpresaRepositoryJpa empresaRepository;
+    @Autowired
+    private EmpresaService empresaService;
 
     @Transactional
     public void salvar(VagaDto dto) {
         validarPesos(dto);
-        UUID id = AuthUtils.getEmpresaId();
-        Empresa empresa = empresaRepository.findById(id)
-                .orElseThrow(() -> new BusinessRuleException("Empresa com Id" + dto.empresaId() + " não encontrada."));
+        Empresa empresaLogada = empresaService.getEmpresaAutenticada();
+        UUID id = empresaLogada.getId();
         Vaga vaga = new Vaga();
         vaga.setNome(dto.nome());
-        vaga.setEmpresa(empresa);
+        vaga.setEmpresaId(id);
         vaga.setActive(dto.isActive());
         vaga.setPontuacaoMinima(dto.pontuacaoMinima());
 
@@ -61,6 +63,8 @@ public class VagaService {
     }
 
     private VagaRespostaDto listar(Vaga vaga) {
+        Empresa empresa = empresaService.findById(vaga.getEmpresaId())
+                .orElseThrow(() -> new BusinessRuleException("Dados da empresa não encontrados."));
         VagaRequisitosDto requisitosDto = null;
 
         if (vaga.getRequisitos() != null) {
@@ -90,9 +94,10 @@ public class VagaService {
                 vaga.getId(),
                 vaga.getNome(),
                 vaga.isActive(),
-                vaga.getEmpresa().getNome(),
+                empresa.getNome(),
                 requisitosDto,
-                fases);
+                fases
+        );
     }
 
     public List<VagaRespostaDto> listarPorNome(String nomeVaga) {

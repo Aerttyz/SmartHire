@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import com.smarthirepro.core.dto.EmailRequest;
 import com.smarthirepro.core.service.IEmailService;
+import com.smarthirepro.domain.model.Empresa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,8 @@ public class FaseService {
     private VagaRepository vagaRepository;
     @Autowired
     private IEmailService emailService;
+    @Autowired
+    private EmpresaService empresaService;
 
 
     @Transactional
@@ -162,6 +165,8 @@ public class FaseService {
     }
     private void enviarEmailNotificacaoDeFase(Candidato candidato, Fase fase, Vaga vaga) {
         if (candidato.getEmail() != null && !candidato.getEmail().isEmpty()) {
+            Empresa empresa = empresaService.findById(vaga.getEmpresaId())
+                    .orElseThrow(() -> new BusinessRuleException("Não foi possível encontrar os dados da empresa para a vaga."));
             String assunto = "Você avançou para a próxima fase da vaga '" + vaga.getNome() + "'";
             String corpo = String.format(
                     "Olá %s,\n\n" +
@@ -173,8 +178,8 @@ public class FaseService {
                     candidato.getNome() != null ? candidato.getNome() : "Candidato",
                     fase.getTitulo(),
                     vaga.getNome(),
-                    vaga.getEmpresa().getNome(),
-                    vaga.getEmpresa().getNome()
+                    empresa.getNome(),
+                    empresa.getNome()
             );
             EmailRequest request = new EmailRequest(candidato.getEmail(), assunto, corpo);
             emailService.enviarEmail(request);

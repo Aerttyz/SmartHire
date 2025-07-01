@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,19 @@ public class EmpresaService {
         return new EmpresaResponseDTO(empresa.get());
     }
 
+    public Empresa getEmpresaAutenticada() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!(principal instanceof String)) {
+            throw new IllegalStateException("O principal da autenticação não é do tipo String. Tipo encontrado: " + principal.getClass().getName());
+        }
+
+        String emailEmpresa = (String) principal;
+
+        return empresaRepository.findByEmail(emailEmpresa)
+                .orElseThrow(() -> new UsernameNotFoundException("Empresa com email " + emailEmpresa + " não encontrada no banco de dados."));
+    }
+
     public Empresa atualizarEmpresaPorId(EmpresaPatchRequestDto data) {
         UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
@@ -88,12 +102,16 @@ public class EmpresaService {
         return empresaRepository.save(empresa);
     }
 
+    public Optional<Empresa> findById(UUID id) {
+        return empresaRepository.findById(id);
+    }
+
     @Transactional
     public void excluir() {
         UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada."));
-        vagaRepository.deleteAllByEmpresa(empresa);
+        vagaRepository.deleteAllByEmpresaId(id);
         empresaRepository.delete(empresa);
     }
 }

@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smarthire.resume.domain.DTO.CandidateScoreDTO;
 import com.smarthire.resume.domain.model.Vaga;
+import com.smarthire.resume.domain.repository.EmpresaRepositoryJpa;
 import com.smarthire.resume.domain.repository.VagaRepository;
 import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.FlaskConnectionException;
+import com.smarthirepro.domain.model.Empresa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,8 @@ public class PontuacaoVagaService {
 
     @Autowired
     private VagaRepository vagaRepository;
+    @Autowired
+    private EmpresaService empresaService;
 
     @Autowired
     private IEmailService emailService;
@@ -56,13 +60,17 @@ public class PontuacaoVagaService {
     }
 
     public double enviarEmailsParaCandidatosInaptos(UUID vagaId) {
+
         List<CandidateScoreDTO> candidatos = obterPontuacoesDeCandidatos(vagaId);
         Vaga vaga = vagaRepository.findById(vagaId)
                 .orElseThrow(() -> new BusinessRuleException("Vaga não encontrada"));
 
+        Empresa empresa = empresaService.findById(vaga.getEmpresaId())
+                .orElseThrow(() -> new BusinessRuleException("Não foi possível encontrar os dados da empresa para a vaga."));
+
         Double pontuacaoMinima = vagaRepository.findPontuacaoMinimaById(vagaId);
         String nomeVaga = vaga.getNome();
-        String nomeEmpresa = vaga.getEmpresa().getNome();
+        String nomeEmpresa = empresa.getNome();
 
         candidatos.stream()
                 .filter(c -> c.email() != null && !c.email().isEmpty())
