@@ -13,11 +13,11 @@ import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
 import com.smarthire.resume.domain.repository.EmpresaRepositoryJpa;
 import com.smarthire.resume.domain.repository.VagaRepository;
-import com.smarthire.resume.exception.BusinessRuleException;
-import com.smarthire.resume.exception.ItemNotFoundException;
+import com.smarthirepro.core.exception.BusinessRuleException;
 import com.smarthirepro.core.security.AuthUtils;
 import com.smarthirepro.domain.model.Empresa;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -75,7 +75,7 @@ public class EmpresaService {
     public Empresa atualizarEmpresaPorId(EmpresaPatchRequestDto data) {
         UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException("Empresa", id));
+                .orElseThrow(() -> new EntityNotFoundException());
         if (data.nome() != null && !data.nome().isBlank())
             empresa.setNome(data.nome());
         if (data.cnpj() != null && !data.cnpj().isBlank())

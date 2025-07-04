@@ -11,9 +11,10 @@ import org.springframework.stereotype.Repository;
 
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthirepro.domain.model.Empresa;
+import com.smarthirepro.domain.repositories.CargoRepository;
 
 @Repository
-public interface VagaRepository extends JpaRepository<Vaga, UUID> {
+public interface VagaRepository extends JpaRepository<Vaga, UUID>, CargoRepository {
 
     List<Vaga> findByNome(String nomeVaga);
 
@@ -23,6 +24,7 @@ public interface VagaRepository extends JpaRepository<Vaga, UUID> {
 
     boolean existsByNome(String nomeVaga);
 
+    @Override
     Optional<Vaga> findById(UUID id);
 
     List<Vaga> findByEmpresaId(UUID empresaId);

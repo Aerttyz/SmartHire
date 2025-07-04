@@ -1,6 +1,5 @@
 package com.smarthire.resume.service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -8,7 +7,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.smarthire.resume.domain.DTO.FaseDto;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRequisitosDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
@@ -54,7 +52,7 @@ public class VagaService {
         requisitos.setPesoFormacaoAcademica(dto.pesoFormacaoAcademica());
         requisitos.setPesoExperiencia(dto.pesoExperiencia());
 
-        requisitos.setVaga(vaga);
+        requisitos.setCargo(vaga);
         vaga.setRequisitos(requisitos);
 
         vagaRepository.save(vaga);
@@ -64,7 +62,7 @@ public class VagaService {
         VagaRequisitosDto requisitosDto = null;
 
         if (vaga.getRequisitos() != null) {
-            VagaRequisitosModel requisitos = vaga.getRequisitos();
+            VagaRequisitosModel requisitos = (VagaRequisitosModel) vaga.getRequisitos();
 
             requisitosDto = new VagaRequisitosDto(
                     requisitos.getHabilidades(),
@@ -77,22 +75,12 @@ public class VagaService {
                     requisitos.getPesoExperiencia());
         }
 
-        List<FaseDto> fases = Collections.emptyList();
-        if (vaga.getFases() != null) {
-            fases = vaga.getFases().stream()
-                    .map(fase -> new FaseDto(
-                            fase.getTitulo(),
-                            fase.getDescricao(),
-                            fase.getOrdem()))
-                    .collect(Collectors.toList());
-        }
         return new VagaRespostaDto(
                 vaga.getId(),
                 vaga.getNome(),
                 vaga.isActive(),
                 vaga.getEmpresa().getNome(),
-                requisitosDto,
-                fases);
+                requisitosDto);
     }
 
     public List<VagaRespostaDto> listarPorNome(String nomeVaga) {

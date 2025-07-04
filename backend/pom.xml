@@ -103,12 +103,12 @@
 		<dependency>
 			<groupId>com.github.Aerttyz.SmartHire-PRO</groupId>
 			<artifactId>smarthirepro-domain</artifactId>
-			<version>5665de4</version>
+			<version>d2e10b67cd</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.Aerttyz.SmartHire-PRO</groupId>
 			<artifactId>smarthire-pro-core</artifactId>
-			<version>5665de4</version>
+			<version>d2e10b67cd</version>
 		</dependency>
 	</dependencies>
 
