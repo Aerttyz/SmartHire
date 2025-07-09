@@ -3,10 +3,9 @@ from app.repository.comparation_repository import search_candidates_from_jobs
 from app.exceptions.errors import application_exception
 from app.logger import logger
 
-def search_candidates_from_jobs_service(job_id):
+def search_candidates_from_jobs_service(prompts):
     try:
-        candidates = search_candidates_from_jobs(job_id)
-        response = generate_gemini_prompt_to_comparation(candidates)
+        response = generate_gemini_prompt_to_comparation(prompts)
         return response
     except ValueError as e:
         logger.exception("ValueError during candidate comparison ")

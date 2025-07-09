@@ -22,14 +22,11 @@ def extract_entities_route():
         raise
 
     
-@resume_bp.route('/compare_resumes', methods=['GET'])
+@resume_bp.route('/compare_resumes', methods=['POST'])
 def compare_resumes_route():
-    job_id = request.args.get('vaga_id')
+    prompts = request.get_json() 
 
-    if not job_id:
-        raise application_exception("vaga_id is required", status_code=400)
-
-    candidates = compare_to_job_service.search_candidates_from_jobs_service(job_id)
+    candidates = compare_to_job_service.search_candidates_from_jobs_service(prompts)
     return jsonify({"candidates": candidates}), 200
 
 

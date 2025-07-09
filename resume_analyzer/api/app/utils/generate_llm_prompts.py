@@ -15,48 +15,25 @@ def generate_gemini_prompt(text):
     """
     return prompt.strip()
 
-def generate_gemini_prompt_to_comparation(candidates):
+def generate_gemini_prompt_to_comparation(prompts):
 
     resultados = []
 
-    for candidato in candidates:
-        nome = candidato['nome']
-        email = candidato['email']
-        comparacao = candidato['comparacao']
-
-        prompt = "Você é um avaliador de compatibilidade entre currículos e vagas de emprego.\n"
-        prompt += "Com base nas informações fornecidas, atribua uma pontuação de compatibilidade total entre 0 e 1, considerando os seguintes critérios:\n\n"
-
-        for criterio, info in comparacao.items():
-            valor_candidato = info['candidato']
-            valor_vaga = info['vaga']
-            peso = info['peso']
-
-            prompt += f"- {criterio.capitalize()} (peso: {peso}):\n"
-            prompt += f"  - Candidato: {valor_candidato}\n"
-            prompt += f"  - Vaga: {valor_vaga}\n\n"
-
-        prompt += (
-            "Para cada critério, avalie a compatibilidade entre candidato e vaga de 0 a 1, "
-            "multiplique pelo peso, e ao final, retorne apenas a soma total como um número entre 0 e 1 "
-            "(ex: 0.75). Responda **apenas** com o número final."
-        )
-
-        resposta = gemini_response(prompt)
-
+    for prompt in prompts:
         try:
+            resposta = gemini_response(prompt)
             score_text = resposta.text.strip()
-            score_total = float(score_text)
+
         except Exception as e:
-            print(f"Erro ao processar resposta para {nome}: {e}")
-            score_total = 0.0
+            print(f"Erro ao processar resposta: {e}")
+            score_text = "0.0"
 
         resultados.append({
-            "nome": nome,
-            "email": email,
-            "score_total": round(score_total, 3) 
+            "score_total": score_text
         })
-        print (resposta)
+        print(resposta)
+
+    print(f"Resultados: {resultados}")
     return resultados
 
 def criar_prompt_para_avaliacao_fit(curriculo_info, vaga_info):
