@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.smarthire.resume.domain.DTO.CandidateScoreDTO;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
+import com.smarthire.resume.service.AnaliseService;
 import com.smarthire.resume.service.PontuacaoVagaService;
 import com.smarthire.resume.service.VagaService;
 
@@ -32,6 +32,8 @@ public class VagaController {
     private VagaService vagaService;
     @Autowired
     private PontuacaoVagaService pontuacaoVagaService;
+    @Autowired
+    private AnaliseService analiseService;
 
     @GetMapping
     public ResponseEntity<List<VagaRespostaDto>> listarVagasDaEmpresa() {
@@ -73,10 +75,9 @@ public class VagaController {
 
     // endpoint adicionado nesse controller por haver apenas 1 operação de pontuação
     // de candidatos
-    @GetMapping("/{idVaga}/pontuacoes")
-    public ResponseEntity<List<CandidateScoreDTO>> obterPontuacoesCandidatos(@PathVariable UUID idVaga) {
-        List<CandidateScoreDTO> pontuacoes = pontuacaoVagaService.obterPontuacoesDeCandidatos(idVaga);
-        return ResponseEntity.ok(pontuacoes);
+    @PostMapping("/{idVaga}/pontuacoes")
+    public ResponseEntity<String> obterPontuacoesCandidatos(@PathVariable UUID idVaga) {
+        return ResponseEntity.ok(analiseService.realizarAnalise(idVaga));
     }
 
     @PostMapping("/{vagaId}/enviar-emails-inaptos")

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.model.VagaRequisitosModel;
 import com.smarthire.resume.domain.repository.CandidatoRepositoryJpa;
@@ -32,7 +31,6 @@ public class SmartHireAnalise extends AnaliseTemplate<Vaga> {
     @Autowired
     private PromptService promptService;
     private final RestTemplate restTemplate = new RestTemplate();
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public List<String> definirCriterios(UUID id) {
@@ -83,6 +81,6 @@ public class SmartHireAnalise extends AnaliseTemplate<Vaga> {
 
     @Override
     public String criarRelatorio(String resultado) {
-        return "aaaaa";
+        return resultado;
     }
 }
