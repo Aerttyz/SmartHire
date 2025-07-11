@@ -14,7 +14,7 @@ import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.model.VagaRequisitosModel;
 import com.smarthire.resume.domain.repository.EmpresaRepositoryJpa;
 import com.smarthire.resume.domain.repository.VagaRepository;
-import com.smarthire.resume.exception.BusinessRuleException;
+import com.smarthirepro.core.exception.BusinessRuleException;
 import com.smarthire.resume.exception.InvalidScoreWeightsException;
 import com.smarthire.resume.exception.ItemNotFoundException;
 import com.smarthirepro.core.security.AuthUtils;

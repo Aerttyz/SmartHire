@@ -17,7 +17,7 @@ import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.model.VagaRequisitosModel;
 import com.smarthire.resume.domain.repository.CandidatoRepositoryJpa;
 import com.smarthire.resume.domain.repository.VagaRequisitosRepository;
-import com.smarthire.resume.exception.FlaskConnectionException;
+import com.smarthirepro.core.exception.FlaskConnectionException;
 import com.smarthirepro.core.service.impl.AnaliseTemplate;
 import com.smarthirepro.domain.model.Candidato;
 
