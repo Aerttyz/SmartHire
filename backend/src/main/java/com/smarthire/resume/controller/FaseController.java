@@ -29,4 +29,11 @@ public class FaseController {
         faseService.cadastrarFase(id, fasesDto);
         return ResponseEntity.ok("Fases adicionadas com sucesso");
     }
+
+    @PostMapping("/{idFase}/candidatos")
+    public ResponseEntity<?> adicionarCandidatoAFase(@PathVariable UUID idFase,
+            @RequestBody List<UUID> idCandidatos) {
+        faseService.adicionarCandidatoAFase(idFase, idCandidatos);
+        return ResponseEntity.ok("Candidatos adicionados à fase com sucesso");
+    }
 }

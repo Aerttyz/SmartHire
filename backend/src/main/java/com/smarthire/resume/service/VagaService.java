@@ -14,9 +14,9 @@ import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.model.VagaRequisitosModel;
 import com.smarthire.resume.domain.repository.EmpresaRepositoryJpa;
 import com.smarthire.resume.domain.repository.VagaRepository;
-import com.smarthirepro.core.exception.BusinessRuleException;
 import com.smarthire.resume.exception.InvalidScoreWeightsException;
 import com.smarthire.resume.exception.ItemNotFoundException;
+import com.smarthirepro.core.exception.BusinessRuleException;
 import com.smarthirepro.core.security.AuthUtils;
 import com.smarthirepro.domain.model.Empresa;
 
@@ -106,16 +106,6 @@ public class VagaService {
                 .map(this::listar)
                 .collect(Collectors.toList());
     }
-
-    // public VagaRespostaDto atualizarVagaPorId(UUID id, VagaPatchResposta data) {
-    // Vaga vaga = vagaRepository.findById(id)
-    // .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
-    // Empresa empresa = empresaRepository.findById(AuthUtils.getEmpresaId())
-    // .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
-    // vaga.vagaDtoMapper(data, empresa);
-    // Vaga vagaAtualizada = vagaRepository.save(vaga);
-    // return listar(vagaAtualizada);
-    // }
 
     public void excluir(UUID id) {
         Vaga vaga = vagaRepository.findById(id)
