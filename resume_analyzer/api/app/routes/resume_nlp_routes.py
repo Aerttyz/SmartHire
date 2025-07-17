@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify
 from app.services import resume_nlp_service, compare_to_job_service
 from app.exceptions.errors import application_exception, path_not_found
 from app.services import avaliacao_service
-from app.services import progressao_service
 
 resume_bp = Blueprint('resume', __name__)
 

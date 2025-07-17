@@ -78,9 +78,4 @@ public class SmartHireAnalise extends AnaliseTemplate<Vaga> {
             throw new FlaskConnectionException("Erro inesperado ao buscar pontuação dos candidatos");
         }
     }
-
-    @Override
-    public String criarRelatorio(String resultado) {
-        return resultado;
-    }
 }
