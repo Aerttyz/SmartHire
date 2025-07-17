@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.services import resume_nlp_service, compare_to_job_service
 from app.exceptions.errors import application_exception, path_not_found
 from app.services import avaliacao_service
+from app.services import progressao_service
 
 resume_bp = Blueprint('resume', __name__)
 
@@ -33,14 +34,10 @@ def compare_resumes_route():
 @resume_bp.route('/avaliar', methods=['POST'])
 def avaliar_compatibilidade_route():
     data = request.get_json()
-    if not data or 'curriculo' not in data or 'vaga' not in data:
-        raise application_exception("Payload inválido. 'curriculo' e 'vaga' são obrigatórios.", status_code=400)
-    
-    curriculo_info = data.get('curriculo')
-    vaga_info = data.get('vaga')
 
     try:
-        resultado_avaliacao = avaliacao_service.gerar_avaliacao_detalhada_llm(curriculo_info, vaga_info)
+        prompt = data.get('prompt')
+        resultado_avaliacao = avaliacao_service.gerar_avaliacao_detalhada_llm(prompt)
         return jsonify(resultado_avaliacao), 200
     except Exception as e:
         raise 

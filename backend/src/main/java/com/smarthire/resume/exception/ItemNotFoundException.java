@@ -1,7 +1,10 @@
 package com.smarthire.resume.exception;
 
-public class ItemNotFoundException extends RuntimeException {
+import com.smarthirepro.core.exception.FrameworkBaseException;
+import org.springframework.http.HttpStatus;
+
+public class ItemNotFoundException extends FrameworkBaseException {
     public ItemNotFoundException(String item, Object id) {
-        super(item + " com identificador " + id + " não foi encontrado.");
+        super(item + " com identificador " + id + " não foi encontrado.", HttpStatus.NOT_FOUND);
     }
 }
