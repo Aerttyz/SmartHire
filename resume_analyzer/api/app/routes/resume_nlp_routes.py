@@ -22,28 +22,21 @@ def extract_entities_route():
         raise
 
     
-@resume_bp.route('/compare_resumes', methods=['GET'])
+@resume_bp.route('/compare_resumes', methods=['POST'])
 def compare_resumes_route():
-    job_id = request.args.get('vaga_id')
+    prompts = request.get_json() 
 
-    if not job_id:
-        raise application_exception("vaga_id is required", status_code=400)
-
-    candidates = compare_to_job_service.search_candidates_from_jobs_service(job_id)
+    candidates = compare_to_job_service.search_candidates_from_jobs_service(prompts)
     return jsonify({"candidates": candidates}), 200
 
 
 @resume_bp.route('/avaliar', methods=['POST'])
 def avaliar_compatibilidade_route():
     data = request.get_json()
-    if not data or 'curriculo' not in data or 'vaga' not in data:
-        raise application_exception("Payload inválido. 'curriculo' e 'vaga' são obrigatórios.", status_code=400)
-    
-    curriculo_info = data.get('curriculo')
-    vaga_info = data.get('vaga')
 
     try:
-        resultado_avaliacao = avaliacao_service.gerar_avaliacao_detalhada_llm(curriculo_info, vaga_info)
+        prompt = data.get('prompt')
+        resultado_avaliacao = avaliacao_service.gerar_avaliacao_detalhada_llm(prompt)
         return jsonify(resultado_avaliacao), 200
     except Exception as e:
         raise 

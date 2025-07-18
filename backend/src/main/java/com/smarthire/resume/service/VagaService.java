@@ -1,15 +1,12 @@
 package com.smarthire.resume.service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.smarthire.resume.domain.DTO.FaseDto;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRequisitosDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
@@ -17,9 +14,9 @@ import com.smarthire.resume.domain.model.Vaga;
 import com.smarthire.resume.domain.model.VagaRequisitosModel;
 import com.smarthire.resume.domain.repository.EmpresaRepositoryJpa;
 import com.smarthire.resume.domain.repository.VagaRepository;
-import com.smarthire.resume.exception.BusinessRuleException;
 import com.smarthire.resume.exception.InvalidScoreWeightsException;
 import com.smarthire.resume.exception.ItemNotFoundException;
+import com.smarthirepro.core.exception.BusinessRuleException;
 import com.smarthirepro.core.security.AuthUtils;
 import com.smarthirepro.domain.model.Empresa;
 
@@ -32,17 +29,16 @@ public class VagaService {
     private VagaRepository vagaRepository;
     @Autowired
     private EmpresaRepositoryJpa empresaRepository;
-    @Autowired
-    private EmpresaService empresaService;
 
     @Transactional
     public void salvar(VagaDto dto) {
         validarPesos(dto);
-        Empresa empresaLogada = empresaService.getEmpresaAutenticada();
-        UUID id = empresaLogada.getId();
+        UUID id = AuthUtils.getEmpresaId();
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new BusinessRuleException("Empresa com Id" + dto.empresaId() + " não encontrada."));
         Vaga vaga = new Vaga();
         vaga.setNome(dto.nome());
-        vaga.setEmpresaId(id);
+        vaga.setEmpresa(empresa);
         vaga.setActive(dto.isActive());
         vaga.setPontuacaoMinima(dto.pontuacaoMinima());
 
@@ -56,19 +52,17 @@ public class VagaService {
         requisitos.setPesoFormacaoAcademica(dto.pesoFormacaoAcademica());
         requisitos.setPesoExperiencia(dto.pesoExperiencia());
 
-        requisitos.setVaga(vaga);
+        requisitos.setCargo(vaga);
         vaga.setRequisitos(requisitos);
 
         vagaRepository.save(vaga);
     }
 
     private VagaRespostaDto listar(Vaga vaga) {
-        Empresa empresa = empresaService.findById(vaga.getEmpresaId())
-                .orElseThrow(() -> new BusinessRuleException("Dados da empresa não encontrados."));
         VagaRequisitosDto requisitosDto = null;
 
         if (vaga.getRequisitos() != null) {
-            VagaRequisitosModel requisitos = vaga.getRequisitos();
+            VagaRequisitosModel requisitos = (VagaRequisitosModel) vaga.getRequisitos();
 
             requisitosDto = new VagaRequisitosDto(
                     requisitos.getHabilidades(),
@@ -81,23 +75,12 @@ public class VagaService {
                     requisitos.getPesoExperiencia());
         }
 
-        List<FaseDto> fases = Collections.emptyList();
-        if (vaga.getFases() != null) {
-            fases = vaga.getFases().stream()
-                    .map(fase -> new FaseDto(
-                            fase.getTitulo(),
-                            fase.getDescricao(),
-                            fase.getOrdem()))
-                    .collect(Collectors.toList());
-        }
         return new VagaRespostaDto(
                 vaga.getId(),
                 vaga.getNome(),
                 vaga.isActive(),
-                empresa.getNome(),
-                requisitosDto,
-                fases
-        );
+                vaga.getEmpresa().getNome(),
+                requisitosDto);
     }
 
     public List<VagaRespostaDto> listarPorNome(String nomeVaga) {
@@ -123,16 +106,6 @@ public class VagaService {
                 .map(this::listar)
                 .collect(Collectors.toList());
     }
-
-    // public VagaRespostaDto atualizarVagaPorId(UUID id, VagaPatchResposta data) {
-    // Vaga vaga = vagaRepository.findById(id)
-    // .orElseThrow(() -> new ItemNotFoundException("Vaga", id));
-    // Empresa empresa = empresaRepository.findById(AuthUtils.getEmpresaId())
-    // .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada"));
-    // vaga.vagaDtoMapper(data, empresa);
-    // Vaga vagaAtualizada = vagaRepository.save(vaga);
-    // return listar(vagaAtualizada);
-    // }
 
     public void excluir(UUID id) {
         Vaga vaga = vagaRepository.findById(id)

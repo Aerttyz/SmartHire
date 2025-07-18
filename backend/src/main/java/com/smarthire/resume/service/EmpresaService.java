@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,11 +13,11 @@ import com.smarthire.resume.domain.DTO.EmpresaPatchRequestDto;
 import com.smarthire.resume.domain.DTO.EmpresaResponseDTO;
 import com.smarthire.resume.domain.repository.EmpresaRepositoryJpa;
 import com.smarthire.resume.domain.repository.VagaRepository;
-import com.smarthire.resume.exception.BusinessRuleException;
-import com.smarthire.resume.exception.ItemNotFoundException;
+import com.smarthirepro.core.exception.BusinessRuleException;
 import com.smarthirepro.core.security.AuthUtils;
 import com.smarthirepro.domain.model.Empresa;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -73,23 +72,10 @@ public class EmpresaService {
         return new EmpresaResponseDTO(empresa.get());
     }
 
-    public Empresa getEmpresaAutenticada() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (!(principal instanceof String)) {
-            throw new IllegalStateException("O principal da autenticação não é do tipo String. Tipo encontrado: " + principal.getClass().getName());
-        }
-
-        String emailEmpresa = (String) principal;
-
-        return empresaRepository.findByEmail(emailEmpresa)
-                .orElseThrow(() -> new UsernameNotFoundException("Empresa com email " + emailEmpresa + " não encontrada no banco de dados."));
-    }
-
     public Empresa atualizarEmpresaPorId(EmpresaPatchRequestDto data) {
         UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException("Empresa", id));
+                .orElseThrow(() -> new EntityNotFoundException());
         if (data.nome() != null && !data.nome().isBlank())
             empresa.setNome(data.nome());
         if (data.cnpj() != null && !data.cnpj().isBlank())
@@ -102,16 +88,12 @@ public class EmpresaService {
         return empresaRepository.save(empresa);
     }
 
-    public Optional<Empresa> findById(UUID id) {
-        return empresaRepository.findById(id);
-    }
-
     @Transactional
     public void excluir() {
         UUID id = AuthUtils.getEmpresaId();
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Empresa não encontrada."));
-        vagaRepository.deleteAllByEmpresaId(id);
+        vagaRepository.deleteAllByEmpresa(empresa);
         empresaRepository.delete(empresa);
     }
 }

@@ -8,10 +8,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Table(name = "fase")
 @Entity
 @Getter
 @Setter
@@ -21,17 +22,13 @@ public class Fase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @EqualsAndHashCode.Include
     private UUID id;
 
     private String titulo;
-
     private String descricao;
-
     private int ordem;
 
     @ManyToOne
     @JoinColumn(name = "vaga_id", nullable = false)
     private Vaga vaga;
-
 }

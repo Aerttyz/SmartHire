@@ -11,30 +11,34 @@ import org.springframework.stereotype.Repository;
 
 import com.smarthire.resume.domain.model.Vaga;
 import com.smarthirepro.domain.model.Empresa;
+import com.smarthirepro.domain.repositories.CargoRepository;
 
 @Repository
-public interface VagaRepository extends JpaRepository<Vaga, UUID> {
+public interface VagaRepository extends JpaRepository<Vaga, UUID>, CargoRepository {
 
     List<Vaga> findByNome(String nomeVaga);
 
-    List<Vaga> findByNomeContainingIgnoreCaseAndEmpresaId(String nome, UUID empresaId);
+    List<Vaga> findByEmpresa(Empresa empresa);
+
+    List<Vaga> findByNomeContainingIgnoreCaseAndEmpresa(String nome, Empresa empresa);
 
     boolean existsByNome(String nomeVaga);
 
+    @Override
     Optional<Vaga> findById(UUID id);
 
     List<Vaga> findByEmpresaId(UUID empresaId);
 
-//    Optional<Vaga> findByIdAndEmpresa(UUID id, Empresa empresa);
+    Optional<Vaga> findByIdAndEmpresa(UUID id, Empresa empresa);
 
     @Query("SELECT v.pontuacaoMinima FROM Vaga v WHERE v.id = :vagaId")
     Double findPontuacaoMinimaById(@Param("vagaId") UUID vagaId);
 
-    @Query("SELECT v.id FROM Vaga v where v.empresaId = :empresaId")
+    @Query("SELECT v.id FROM Vaga v where v.empresa.id = :empresaId")
     List<UUID> findVagaIdsByEmpresaId(@Param("empresaId") UUID empresaId);
 
     double countByEmpresaId(UUID empresaId);
 
-    void deleteAllByEmpresaId(UUID empresaId);
+    void deleteAllByEmpresa(Empresa empresa);
 
 }

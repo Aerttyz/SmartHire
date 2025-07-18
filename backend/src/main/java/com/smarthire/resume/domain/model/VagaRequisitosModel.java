@@ -1,32 +1,24 @@
 package com.smarthire.resume.domain.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.smarthirepro.domain.model.CargoCompetenciasGenerico;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "vaga_requisitos")
-public class VagaRequisitosModel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @EqualsAndHashCode.Include
-    private String id;
-
-    @OneToOne
-    @JoinColumn(name = "vaga_id")
-    private Vaga vaga;
-
-    private String habilidades;
-    private String idiomas;
-    private String formacaoAcademica;
-    private String experiencia;
+public class VagaRequisitosModel extends CargoCompetenciasGenerico {
 
     private Double pesoHabilidades;
-    private Double pesoIdiomas; 
+    private Double pesoIdiomas;
     private Double pesoFormacaoAcademica;
     private Double pesoExperiencia;
 }

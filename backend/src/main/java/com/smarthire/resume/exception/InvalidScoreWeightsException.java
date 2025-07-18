@@ -1,6 +1,8 @@
 package com.smarthire.resume.exception;
 
-public class InvalidScoreWeightsException extends RuntimeException {
+import com.smarthirepro.core.exception.BusinessRuleException ;
+
+public class InvalidScoreWeightsException extends BusinessRuleException  {
     public InvalidScoreWeightsException(String message) {
         super(message);
     }
