@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smarthire.resume.domain.DTO.VagaDto;
 import com.smarthire.resume.domain.DTO.VagaRespostaDto;
 import com.smarthire.resume.service.AnaliseService;
-import com.smarthire.resume.service.PontuacaoVagaService;
 import com.smarthire.resume.service.VagaService;
 
 import jakarta.validation.Valid;
@@ -30,8 +29,6 @@ public class VagaController {
 
     @Autowired
     private VagaService vagaService;
-    @Autowired
-    private PontuacaoVagaService pontuacaoVagaService;
     @Autowired
     private AnaliseService analiseService;
 
@@ -59,14 +56,6 @@ public class VagaController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // @PatchMapping("/{id}")
-    // public ResponseEntity<VagaRespostaDto> atualizarVagaPorId(@PathVariable UUID
-    // id,
-    // @Valid @RequestBody VagaPatchResposta data) {
-    // VagaRespostaDto vagaAtualizada = vagaService.atualizarVagaPorId(id, data);
-    // return ResponseEntity.ok(vagaAtualizada);
-    // }
-
     @DeleteMapping({ "/{id}" })
     public ResponseEntity<Void> removerVaga(@PathVariable UUID id) {
         vagaService.excluir(id);
@@ -78,12 +67,6 @@ public class VagaController {
     @PostMapping("/{idVaga}/pontuacoes")
     public ResponseEntity<String> obterPontuacoesCandidatos(@PathVariable UUID idVaga) {
         return ResponseEntity.ok(analiseService.realizarAnalise(idVaga));
-    }
-
-    @PostMapping("/{vagaId}/enviar-emails-inaptos")
-    public ResponseEntity<String> enviarEmails(@PathVariable UUID vagaId) {
-        pontuacaoVagaService.enviarEmailsParaCandidatosInaptos(vagaId);
-        return ResponseEntity.ok("Emails enviados para candidatos com pontuação abaixo da mínima");
     }
 
 }

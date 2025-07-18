@@ -21,6 +21,8 @@ export default function AnalisarVagaPage({ params }: { params: Promise<{ vagaId:
   const [token, setToken] = useState<string | null>(null); 
   const [avaliacaoCurriculo, setAvaliacaoCurriculo] = useState<AvaliacaoLLM | null>(null);
   const [toggleAvaliacao, setToggleAvaliacao] = useState<boolean>(false);
+  const [avaliacoesLote, setAvaliacoesLote] = useState<string[]>([]);
+  const [toggleLote, setToggleLote] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -46,7 +48,7 @@ export default function AnalisarVagaPage({ params }: { params: Promise<{ vagaId:
       return;
     }
     try {
-      const response = await fetch(`${API_URL}/curriculos/avaliar/${vagaId}/${idCandidato}`, {
+      const response = await fetch(`${API_URL}/avaliacoes/avaliar/${vagaId}/${idCandidato}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -64,6 +66,31 @@ export default function AnalisarVagaPage({ params }: { params: Promise<{ vagaId:
     } catch (error) {
       console.error("Erro ao realizar análise para o currículo: ", error);
       alert("Erro ao realizar análise para o currículo.");
+      router.push('/vagas');
+    }
+  };
+
+  const avaliarCandidatosDaVaga = async (vagaId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/vagas/${vagaId}/pontuacoes`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao avaliar currículo: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const resultados = data.candidates.map((item: any) => item.score_total);
+      setAvaliacoesLote(resultados);
+      setToggleLote(true);
+    } catch (error) {
+      console.error("Erro ao avaliar candidatos da vaga: ", error);
+      alert("Erro ao avaliar candidatos da vaga.");
       router.push('/vagas');
     }
   };
@@ -158,6 +185,12 @@ export default function AnalisarVagaPage({ params }: { params: Promise<{ vagaId:
               <CardTitle>Listar candidatos</CardTitle>
               <CardDescription>Exibição de todos os candidatos vinculados à empresa</CardDescription>
             </CardHeader>
+            <button
+              onClick={() => avaliarCandidatosDaVaga(vagaId)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+            >
+              Avaliar Todos os Candidatos da Vaga
+            </button>
             <CrudTable
               headers={["Nome", "E-mail", "Telefone", "Id do candidato"]}
               data={ candidatos.map((c: Candidato) => [
@@ -202,6 +235,21 @@ export default function AnalisarVagaPage({ params }: { params: Promise<{ vagaId:
                     <p className="text-muted-foreground whitespace-pre-wrap">{avaliacaoCurriculo.sugestoesParaEmpresa}</p>
                   </div>
                 </div>
+              </div>
+            </Card>
+          )}
+          {toggleLote && avaliacoesLote.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Resultado da Avaliação de Compatibilidade</CardTitle>
+                <CardDescription>Pontuação geral dos candidatos desta vaga</CardDescription>
+              </CardHeader>
+              <div className="p-6 pt-0 text-sm">
+                <ul className="list-disc pl-6">
+                  {avaliacoesLote.map((texto, index) => (
+                    <li key={index} className="text-muted-foreground">{texto}</li>
+                  ))}
+                </ul>
               </div>
             </Card>
           )}
