@@ -2,10 +2,11 @@ import google.generativeai as genai
 from google.api_core.exceptions import InvalidArgument, PermissionDenied, ResourceExhausted
 from app.exceptions.errors import application_exception
 from app.logger import logger
+import os
 
 def gemini_response(prompt):
     try:
-        api_key = ""
+        api_key = os.getenv("API_KEY")
         if not api_key:
             raise application_exception("API key is required", status_code=400)
         
